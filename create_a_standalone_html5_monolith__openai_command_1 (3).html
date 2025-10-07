@@ -1,0 +1,2679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Command Center</title>
+    <style>
+        :root {
+            --primary-color: #10A37F;
+            --secondary-color: #0D8C67;
+            --dark-color: #1E1E1E;
+            --light-color: #F5F5F5;
+            --text-color: #E0E0E0;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--box-shadow);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        nav {
+            background-color: var(--dark-color);
+            padding: 1rem;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+
+        nav ul {
+            list-style: none;
+        }
+
+        nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.5rem;
+            display: block;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        nav a:hover, nav a.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        main {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        section {
+            background-color: #2D2D2D;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #444;
+            border-radius: var(--border-radius);
+            background-color: #333;
+            color: var(--text-color);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .slider-value {
+            margin-left: 1rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .response-container {
+            background-color: #333;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .token-counter {
+            color: #AAA;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .cost-calculator {
+            background-color: #2D2D2D;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .cost-display {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .budget-alert {
+            color: #FF6B6B;
+            margin-top: 0.5rem;
+        }
+
+        .api-key-manager {
+            background-color: #2D2D2D;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .api-key-status {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        .valid {
+            background-color: rgba(16, 163, 127, 0.2);
+            color: var(--primary-color);
+        }
+
+        .invalid {
+            background-color: rgba(255, 107, 107, 0.2);
+            color: #FF6B6B;
+        }
+
+        .code-export {
+            margin-top: 2rem;
+        }
+
+        .code-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        .code-tab {
+            padding: 0.5rem 1rem;
+            background-color: #333;
+            cursor: pointer;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            margin-right: 0.5rem;
+        }
+
+        .code-tab.active {
+            background-color: var(--primary-color);
+        }
+
+        .code-container {
+            background-color: #333;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            display: none;
+        }
+
+        .code-container.active {
+            display: block;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .workflow-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .workflow-step {
+            background-color: #2D2D2D;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .workflow-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .workflow-step.active {
+            background-color: var(--primary-color);
+        }
+
+        .similarity-matrix {
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        .similarity-cell {
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            margin: 1px;
+            border-radius: 2px;
+        }
+
+        .dimension-reduction {
+            margin-top: 1rem;
+            height: 300px;
+            background-color: #333;
+            border-radius: var(--border-radius);
+        }
+
+        .canvas-container {
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        canvas {
+            border: 1px solid #444;
+            border-radius: var(--border-radius);
+            cursor: crosshair;
+        }
+
+        .canvas-tools {
+            margin-top: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .voice-preview {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .voice-name {
+            margin-left: 1rem;
+        }
+
+        .moderation-gauge {
+            margin-top: 1rem;
+            height: 20px;
+            background-color: #333;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .gauge-fill {
+            height: 100%;
+            transition: var(--transition);
+        }
+
+        .model-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .model-filter {
+            padding: 0.25rem 0.5rem;
+            background-color: #333;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+
+        .model-filter.active {
+            background-color: var(--primary-color);
+        }
+
+        .file-uploader {
+            border: 2px dashed #444;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-uploader:hover {
+            border-color: var(--primary-color);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #333;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .file-list {
+            margin-top: 1rem;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #444;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tool-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .tool-option {
+            background-color: #333;
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tool-option:hover {
+            background-color: #444;
+        }
+
+        .tool-option.active {
+            background-color: var(--primary-color);
+        }
+
+        .message-history {
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            background-color: #333;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        .user-message {
+            background-color: rgba(16, 163, 127, 0.2);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .assistant-message {
+            background-color: rgba(51, 51, 51, 0.5);
+            border-left: 3px solid #666;
+        }
+
+        .run-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .dimension-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .similarity-threshold {
+            margin-top: 1rem;
+        }
+
+        .batch-progress {
+            margin-top: 1rem;
+        }
+
+        .notification-system {
+            margin-top: 1rem;
+        }
+
+        .notification {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification.success {
+            background-color: rgba(16, 163, 127, 0.2);
+            color: var(--primary-color);
+        }
+
+        .notification.error {
+            background-color: rgba(255, 107, 107, 0.2);
+            color: #FF6B6B;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                height: auto;
+                padding: 0;
+            }
+
+            nav ul {
+                display: flex;
+                overflow-x: auto;
+            }
+
+            nav li {
+                margin-bottom: 0;
+            }
+
+            nav a {
+                padding: 0.5rem 1rem;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">OpenAI Command Center</div>
+        <div class="theme-toggle" id="themeToggle">🌙</div>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#chat-completions" class="active">Chat Completions</a></li>
+            <li><a href="#embeddings">Embeddings</a></li>
+            <li><a href="#dall-e">DALL·E</a></li>
+            <li><a href="#whisper">Whisper</a></li>
+            <li><a href="#tts">Text-to-Speech</a></li>
+            <li><a href="#content-moderation">Content Moderation</a></li>
+            <li><a href="#models">Models</a></li>
+            <li><a href="#files">Files</a></li>
+            <li><a href="#assistants">Assistants</a></li>
+            <li><a href="#threads">Threads</a></li>
+            <li><a href="#vector-stores">Vector Stores</a></li>
+            <li><a href="#batch-jobs">Batch Jobs</a></li>
+            <li><a href="#workflow">Workflow</a></li>
+            <li><a href="#api-key">API Key</a></li>
+            <li><a href="#cost-calculator">Cost Calculator</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section id="chat-completions">
+            <h2>Chat Completions</h2>
+            <div class="form-group">
+                <label for="system-message">System Message</label>
+                <textarea id="system-message" rows="3" placeholder="You are a helpful assistant."></textarea>
+                <div class="token-counter">Tokens: <span id="system-tokens">0</span></div>
+            </div>
+            <div class="form-group">
+                <label for="user-message">User Message</label>
+                <textarea id="user-message" rows="5" placeholder="What's the weather like today?"></textarea>
+                <div class="token-counter">Tokens: <span id="user-tokens">0</span></div>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="streaming-toggle"> Enable Streaming
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="temperature">Temperature</label>
+                <div class="slider-container">
+                    <input type="range" id="temperature" min="0" max="2" step="0.1" value="1">
+                    <span class="slider-value" id="temperature-value">1.0</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="top-p">Top P</label>
+                <div class="slider-container">
+                    <input type="range" id="top-p" min="0" max="1" step="0.05" value="1">
+                    <span class="slider-value" id="top-p-value">1.0</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="max-tokens">Max Tokens</label>
+                <input type="number" id="max-tokens" min="1" value="100">
+            </div>
+            <button id="send-chat">Send Chat</button>
+            <div class="response-container" id="chat-response"></div>
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="embeddings">
+            <h2>Embeddings</h2>
+            <div class="form-group">
+                <label for="text-input">Text Input</label>
+                <textarea id="text-input" rows="5" placeholder="Enter text to generate embeddings..."></textarea>
+                <div class="token-counter">Tokens: <span id="embedding-tokens">0</span></div>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="batch-processing"> Enable Batch Processing
+                </label>
+            </div>
+            <button id="generate-embeddings">Generate Embeddings</button>
+            <div class="similarity-matrix" id="similarity-matrix"></div>
+            <div class="dimension-reduction" id="dimension-reduction"></div>
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="embeddings-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="embeddings-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="embeddings-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="dall-e">
+            <h2>DALL·E</h2>
+            <div class="form-group">
+                <label for="image-prompt">Image Prompt</label>
+                <textarea id="image-prompt" rows="3" placeholder="A futuristic cityscape with flying cars..."></textarea>
+                <div class="token-counter">Tokens: <span id="prompt-tokens">0</span></div>
+            </div>
+            <div class="form-group">
+                <label for="image-size">Image Size</label>
+                <select id="image-size">
+                    <option value="256x256">256x256</option>
+                    <option value="512x512">512x512</option>
+                    <option value="1024x1024">1024x1024</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="image-quality">Image Quality</label>
+                <select id="image-quality">
+                    <option value="standard">Standard</option>
+                    <option value="hd">HD</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="image-style">Image Style</label>
+                <select id="image-style">
+                    <option value="vivid">Vivid</option>
+                    <option value="natural">Natural</option>
+                </select>
+            </div>
+            <button id="generate-image">Generate Image</button>
+            <div class="response-container" id="image-response"></div>
+
+            <h3>Edit Image</h3>
+            <div class="form-group">
+                <label for="edit-prompt">Edit Prompt</label>
+                <textarea id="edit-prompt" rows="3" placeholder="Describe the changes you want..."></textarea>
+                <div class="token-counter">Tokens: <span id="edit-tokens">0</span></div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="edit-canvas" width="512" height="512"></canvas>
+                <div class="canvas-tools">
+                    <button id="draw-mode">Draw</button>
+                    <button id="erase-mode">Erase</button>
+                    <button id="clear-canvas">Clear</button>
+                </div>
+            </div>
+            <button id="edit-image">Edit Image</button>
+            <div class="response-container" id="edit-response"></div>
+
+            <h3>Image Variations</h3>
+            <div class="form-group">
+                <label for="variation-style">Style Transfer</label>
+                <select id="variation-style">
+                    <option value="original">Original</option>
+                    <option value="impressionist">Impressionist</option>
+                    <option value="cubist">Cubist</option>
+                    <option value="pointillist">Pointillist</option>
+                </select>
+            </div>
+            <button id="generate-variations">Generate Variations</button>
+            <div class="response-container" id="variations-response"></div>
+
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="dall-e-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="dall-e-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="dall-e-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="whisper">
+            <h2>Whisper</h2>
+            <div class="form-group">
+                <label for="audio-file">Audio File</label>
+                <input type="file" id="audio-file" accept="audio/*">
+            </div>
+            <div class="form-group">
+                <label for="microphone-input">Microphone Input</label>
+                <button id="microphone-input">Start Recording</button>
+                <div id="recording-status"></div>
+            </div>
+            <div class="form-group">
+                <label for="language">Language</label>
+                <select id="language">
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="it">Italian</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ru">Russian</option>
+                    <option value="zh">Chinese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="translate"> Translate to English
+                </label>
+            </div>
+            <button id="transcribe-audio">Transcribe Audio</button>
+            <div class="response-container" id="transcription-response"></div>
+
+            <h3>Generate Subtitles</h3>
+            <div class="form-group">
+                <label for="subtitle-format">Subtitle Format</label>
+                <select id="subtitle-format">
+                    <option value="srt">SRT</option>
+                    <option value="vtt">VTT</option>
+                </select>
+            </div>
+            <button id="generate-subtitles">Generate Subtitles</button>
+            <div class="response-container" id="subtitles-response"></div>
+
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="whisper-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="whisper-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="whisper-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="tts">
+            <h2>Text-to-Speech</h2>
+            <div class="form-group">
+                <label for="tts-text">Text</label>
+                <textarea id="tts-text" rows="5" placeholder="Enter text to convert to speech..."></textarea>
+                <div class="token-counter">Tokens: <span id="tts-tokens">0</span></div>
+            </div>
+            <div class="form-group">
+                <label for="tts-voice">Voice</label>
+                <select id="tts-voice">
+                    <option value="alloy">Alloy</option>
+                    <option value="echo">Echo</option>
+                    <option value="fable">Fable</option>
+                    <option value="onyx">Onyx</option>
+                    <option value="nova">Nova</option>
+                    <option value="shimmer">Shimmer</option>
+                </select>
+            </div>
+            <div class="voice-preview">
+                <button class="play-voice" data-voice="alloy">▶</button>
+                <span class="voice-name">Alloy</span>
+            </div>
+            <div class="voice-preview">
+                <button class="play-voice" data-voice="echo">▶</button>
+                <span class="voice-name">Echo</span>
+            </div>
+            <div class="voice-preview">
+                <button class="play-voice" data-voice="fable">▶</button>
+                <span class="voice-name">Fable</span>
+            </div>
+            <div class="voice-preview">
+                <button class="play-voice" data-voice="onyx">▶</button>
+                <span class="voice-name">Onyx</span>
+            </div>
+            <div class="voice-preview">
+                <button class="play-voice" data-voice="nova">▶</button>
+                <span class="voice-name">Nova</span>
+            </div>
+            <div class="voice-preview">
+                <button class="play-voice" data-voice="shimmer">▶</button>
+                <span class="voice-name">Shimmer</span>
+            </div>
+            <div class="form-group">
+                <label for="tts-response-format">Response Format</label>
+                <select id="tts-response-format">
+                    <option value="mp3">MP3</option>
+                    <option value="opus">Opus</option>
+                    <option value="aac">AAC</option>
+                    <option value="flac">FLAC</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tts-speed">Speed</label>
+                <div class="slider-container">
+                    <input type="range" id="tts-speed" min="0.25" max="4" step="0.25" value="1">
+                    <span class="slider-value" id="tts-speed-value">1.0</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="tts-pitch">Pitch</label>
+                <div class="slider-container">
+                    <input type="range" id="tts-pitch" min="0.5" max="2" step="0.1" value="1">
+                    <span class="slider-value" id="tts-pitch-value">1.0</span>
+                </div>
+            </div>
+            <button id="generate-speech">Generate Speech</button>
+            <div class="response-container" id="speech-response"></div>
+
+            <h3>SSML Editor</h3>
+            <div class="form-group">
+                <label for="ssml-text">SSML Text</label>
+                <textarea id="ssml-text" rows="5" placeholder="Enter SSML text..."></textarea>
+                <div class="token-counter">Tokens: <span id="ssml-tokens">0</span></div>
+            </div>
+            <button id="generate-ssml-speech">Generate SSML Speech</button>
+            <div class="response-container" id="ssml-speech-response"></div>
+
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="tts-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="tts-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="tts-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="content-moderation">
+            <h2>Content Moderation</h2>
+            <div class="form-group">
+                <label for="moderation-text">Text to Moderate</label>
+                <textarea id="moderation-text" rows="5" placeholder="Enter text to check for inappropriate content..."></textarea>
+                <div class="token-counter">Tokens: <span id="moderation-tokens">0</span></div>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="batch-moderation"> Enable Batch Moderation
+                </label>
+            </div>
+            <button id="check-moderation">Check Moderation</button>
+            <div class="response-container" id="moderation-response"></div>
+
+            <h3>Moderation Scores</h3>
+            <div class="moderation-gauge">
+                <div class="gauge-fill" id="hate-fill" style="width: 0%; background-color: #FF6B6B;"></div>
+            </div>
+            <div>Hate: <span id="hate-score">0.0</span></div>
+
+            <div class="moderation-gauge">
+                <div class="gauge-fill" id="hate-threat-fill" style="width: 0%; background-color: #FF9F40;"></div>
+            </div>
+            <div>Hate/Threatening: <span id="hate-threat-score">0.0</span></div>
+
+            <div class="moderation-gauge">
+                <div class="gauge-fill" id="self-harm-fill" style="width: 0%; background-color: #FFCD56;"></div>
+            </div>
+            <div>Self-Harm: <span id="self-harm-score">0.0</span></div>
+
+            <div class="moderation-gauge">
+                <div class="gauge-fill" id="sexual-fill" style="width: 0%; background-color: #4BC0C0;"></div>
+            </div>
+            <div>Sexual: <span id="sexual-score">0.0</span></div>
+
+            <div class="moderation-gauge">
+                <div class="gauge-fill" id="sexual-minors-fill" style="width: 0%; background-color: #9966FF;"></div>
+            </div>
+            <div>Sexual/Minors: <span id="sexual-minors-score">0.0</span></div>
+
+            <div class="moderation-gauge">
+                <div class="gauge-fill" id="violence-fill" style="width: 0%; background-color: #66CC99;"></div>
+            </div>
+            <div>Violence: <span id="violence-score">0.0</span></div>
+
+            <div class="moderation-gauge">
+                <div class="gauge-fill" id="violence-graphic-fill" style="width: 0%; background-color: #36A2EB;"></div>
+            </div>
+            <div>Violence/Graphic: <span id="violence-graphic-score">0.0</span></div>
+
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="moderation-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="moderation-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="moderation-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="models">
+            <h2>Models</h2>
+            <div class="model-filters">
+                <div class="model-filter active" data-capability="all">All</div>
+                <div class="model-filter" data-capability="chat">Chat</div>
+                <div class="model-filter" data-capability="completion">Completion</div>
+                <div class="model-filter" data-capability="embeddings">Embeddings</div>
+                <div class="model-filter" data-capability="images">Images</div>
+                <div class="model-filter" data-capability="audio">Audio</div>
+                <div class="model-filter" data-capability="moderations">Moderations</div>
+            </div>
+            <div class="response-container" id="models-response"></div>
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="models-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="models-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="models-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="files">
+            <h2>Files</h2>
+            <div class="file-uploader" id="file-uploader">
+                <p>Drag & drop files here or click to select</p>
+                <input type="file" id="file-input" multiple style="display: none;">
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="upload-progress" style="width: 0%;"></div>
+            </div>
+            <div class="file-list" id="file-list"></div>
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="files-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="files-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="files-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="assistants">
+            <h2>Assistants</h2>
+            <div class="form-group">
+                <label for="assistant-name">Assistant Name</label>
+                <input type="text" id="assistant-name" placeholder="My Assistant">
+            </div>
+            <div class="form-group">
+                <label for="assistant-model">Model</label>
+                <select id="assistant-model">
+                    <option value="gpt-4o">gpt-4o</option>
+                    <option value="gpt-4-turbo">gpt-4-turbo</option>
+                    <option value="gpt-4">gpt-4</option>
+                    <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="assistant-description">Description</label>
+                <textarea id="assistant-description" rows="3" placeholder="Describe your assistant..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="assistant-instructions">Instructions</label>
+                <textarea id="assistant-instructions" rows="5" placeholder="Provide instructions for your assistant..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="assistant-tools">Tools</label>
+                <div class="tool-config" id="assistant-tools">
+                    <div class="tool-option active" data-tool="code_interpreter">Code Interpreter</div>
+                    <div class="tool-option" data-tool="retrieval">Retrieval</div>
+                    <div class="tool-option" data-tool="function">Function</div>
+                </div>
+            </div>
+            <button id="create-assistant">Create Assistant</button>
+            <div class="response-container" id="assistant-response"></div>
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="assistants-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="assistants-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="assistants-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="threads">
+            <h2>Threads</h2>
+            <button id="create-thread">Create Thread</button>
+            <div class="response-container" id="thread-response"></div>
+
+            <h3>Message History</h3>
+            <div class="message-history" id="message-history"></div>
+
+            <h3>Run Controls</h3>
+            <div class="run-controls">
+                <button id="run-thread">Run Thread</button>
+                <button id="cancel-run">Cancel Run</button>
+                <button id="submit-tool-outputs">Submit Tool Outputs</button>
+            </div>
+            <div class="response-container" id="run-response"></div>
+
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="threads-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="threads-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="threads-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="vector-stores">
+            <h2>Vector Stores</h2>
+            <div class="form-group">
+                <label for="vector-store-name">Vector Store Name</label>
+                <input type="text" id="vector-store-name" placeholder="My Vector Store">
+            </div>
+            <div class="dimension-controls">
+                <div class="form-group">
+                    <label for="vector-dimensions">Dimensions</label>
+                    <input type="number" id="vector-dimensions" min="1" value="1536">
+                </div>
+                <div class="form-group">
+                    <label for="vector-size">Vector Size</label>
+                    <input type="number" id="vector-size" min="1" value="1000">
+                </div>
+            </div>
+            <button id="create-vector-store">Create Vector Store</button>
+            <div class="response-container" id="vector-store-response"></div>
+
+            <h3>Similarity Threshold</h3>
+            <div class="form-group">
+                <label for="similarity-threshold">Threshold</label>
+                <div class="slider-container">
+                    <input type="range" id="similarity-threshold" min="0" max="1" step="0.05" value="0.7">
+                    <span class="slider-value" id="similarity-threshold-value">0.7</span>
+                </div>
+            </div>
+
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="vector-stores-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="vector-stores-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="vector-stores-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="batch-jobs">
+            <h2>Batch Jobs</h2>
+            <div class="form-group">
+                <label for="batch-input-file">Input File</label>
+                <input type="file" id="batch-input-file">
+            </div>
+            <div class="form-group">
+                <label for="batch-endpoint">Endpoint</label>
+                <select id="batch-endpoint">
+                    <option value="/v1/chat/completions">Chat Completions</option>
+                    <option value="/v1/completions">Completions</option>
+                    <option value="/v1/embeddings">Embeddings</option>
+                </select>
+            </div>
+            <button id="create-batch">Create Batch</button>
+            <div class="batch-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="batch-progress" style="width: 0%;"></div>
+                </div>
+                <div>Progress: <span id="batch-progress-value">0%</span></div>
+            </div>
+            <div class="response-container" id="batch-response"></div>
+
+            <h3>Notification System</h3>
+            <div class="notification-system" id="notification-system"></div>
+
+            <div class="code-export">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-tab="curl">cURL</div>
+                    <div class="code-tab" data-tab="fetch">Fetch</div>
+                    <div class="code-tab" data-tab="python">Python</div>
+                </div>
+                <div class="code-container active" id="batch-jobs-curl-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="batch-jobs-fetch-code">
+                    <pre></pre>
+                </div>
+                <div class="code-container" id="batch-jobs-python-code">
+                    <pre></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow">
+            <h2>Workflow</h2>
+            <div class="workflow-container">
+                <div class="workflow-step" data-step="image">Image Generation</div>
+                <div class="workflow-step" data-step="vision">Vision Analysis</div>
+                <div class="workflow-step" data-step="copy">Copy Detection</div>
+                <div class="workflow-step" data-step="moderation">Content Moderation</div>
+                <div class="workflow-step" data-step="tts">Text-to-Speech</div>
+            </div>
+            <button id="run-workflow">Run Workflow</button>
+            <div class="response-container" id="workflow-response"></div>
+        </section>
+
+        <section id="api-key">
+            <h2>API Key Management</h2>
+            <div class="api-key-manager">
+                <div class="form-group">
+                    <label for="api-key-input">API Key</label>
+                    <input type="password" id="api-key-input" placeholder="Enter your OpenAI API key">
+                </div>
+                <button id="save-api-key">Save API Key</button>
+                <button id="validate-api-key">Validate API Key</button>
+                <div class="api-key-status" id="api-key-status"></div>
+            </div>
+        </section>
+
+        <section id="cost-calculator">
+            <h2>Cost Calculator</h2>
+            <div class="cost-calculator">
+                <div class="form-group">
+                    <label for="model-select">Model</label>
+                    <select id="model-select">
+                        <option value="gpt-4o">gpt-4o</option>
+                        <option value="gpt-4-turbo">gpt-4-turbo</option>
+                        <option value="gpt-4">gpt-4</option>
+                        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                        <option value="text-embedding-ada-002">text-embedding-ada-002</option>
+                        <option value="dall-e-2">dall-e-2</option>
+                        <option value="dall-e-3">dall-e-3</option>
+                        <option value="whisper-1">whisper-1</option>
+                        <option value="tts-1">tts-1</option>
+                        <option value="tts-1-hd">tts-1-hd</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="input-tokens">Input Tokens</label>
+                    <input type="number" id="input-tokens" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="output-tokens">Output Tokens</label>
+                    <input type="number" id="output-tokens" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="images-generated">Images Generated</label>
+                    <input type="number" id="images-generated" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="audio-minutes">Audio Minutes</label>
+                    <input type="number" id="audio-minutes" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="speech-characters">Speech Characters</label>
+                    <input type="number" id="speech-characters" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="budget">Monthly Budget ($)</label>
+                    <input type="number" id="budget" min="0" value="100">
+                </div>
+                <button id="calculate-cost">Calculate Cost</button>
+                <div class="cost-display" id="cost-display">Estimated Cost: $0.00</div>
+                <div class="budget-alert" id="budget-alert"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('light-theme');
+            const icon = this.textContent === '☀' ? '🌙' : '☀';
+            this.textContent = icon;
+        });
+
+        // Navigation functionality
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+                const targetId = this.getAttribute('href');
+                document.querySelectorAll('section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.querySelector(targetId).style.display = 'block';
+            });
+        });
+
+        // Initialize sections
+        document.querySelectorAll('section').forEach(section => {
+            section.style.display = 'none';
+        });
+        document.getElementById('chat-completions').style.display = 'block';
+
+        // Code export tabs functionality
+        document.querySelectorAll('.code-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const section = this.closest('section');
+                const tabId = this.getAttribute('data-tab');
+
+                section.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                section.querySelectorAll('.code-container').forEach(container => {
+                    container.classList.remove('active');
+                    if (container.id.includes(tabId)) {
+                        container.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Token counter functionality
+        function updateTokenCounter(textareaId, counterId) {
+            const textarea = document.getElementById(textareaId);
+            const counter = document.getElementById(counterId);
+
+            textarea.addEventListener('input', function() {
+                // Simple token estimation (not exact)
+                const tokens = Math.ceil(this.value.split(/\s+/).length * 0.75);
+                counter.textContent = tokens;
+            });
+        }
+
+        // Initialize token counters
+        updateTokenCounter('system-message', 'system-tokens');
+        updateTokenCounter('user-message', 'user-tokens');
+        updateTokenCounter('text-input', 'embedding-tokens');
+        updateTokenCounter('image-prompt', 'prompt-tokens');
+        updateTokenCounter('edit-prompt', 'edit-tokens');
+        updateTokenCounter('tts-text', 'tts-tokens');
+        updateTokenCounter('ssml-text', 'ssml-tokens');
+        updateTokenCounter('moderation-text', 'moderation-tokens');
+
+        // Slider value display functionality
+        function updateSliderValue(sliderId, valueId) {
+            const slider = document.getElementById(sliderId);
+            const valueDisplay = document.getElementById(valueId);
+
+            slider.addEventListener('input', function() {
+                valueDisplay.textContent = this.value;
+            });
+        }
+
+        // Initialize slider value displays
+        updateSliderValue('temperature', 'temperature-value');
+        updateSliderValue('top-p', 'top-p-value');
+        updateSliderValue('tts-speed', 'tts-speed-value');
+        updateSliderValue('tts-pitch', 'tts-pitch-value');
+        updateSliderValue('similarity-threshold', 'similarity-threshold-value');
+
+        // API request functionality
+        async function makeApiRequest(endpoint, method, data, apiKey) {
+            const url = `https://theserver-open-ai.replit.app${endpoint}`;
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            };
+
+            const options = {
+                method: method,
+                headers: headers
+            };
+
+            if (method !== 'GET' && data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error:', error);
+                return { error: error.message };
+            }
+        }
+
+        // Chat completions functionality
+        document.getElementById('send-chat').addEventListener('click', async function() {
+            const systemMessage = document.getElementById('system-message').value;
+            const userMessage = document.getElementById('user-message').value;
+            const streaming = document.getElementById('streaming-toggle').checked;
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const topP = parseFloat(document.getElementById('top-p').value);
+            const maxTokens = parseInt(document.getElementById('max-tokens').value);
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const data = {
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    { role: 'system', content: systemMessage },
+                    { role: 'user', content: userMessage }
+                ],
+                stream: streaming,
+                temperature: temperature,
+                top_p: topP,
+                max_tokens: maxTokens
+            };
+
+            const responseContainer = document.getElementById('chat-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest('/v1/chat/completions', 'POST', data, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                responseContainer.innerHTML = `<p>${result.choices[0].message.content}</p>`;
+            }
+
+            // Generate code examples
+            generateCodeExamples('chat', data, apiKey);
+        });
+
+        // Embeddings functionality
+        document.getElementById('generate-embeddings').addEventListener('click', async function() {
+            const textInput = document.getElementById('text-input').value;
+            const batchProcessing = document.getElementById('batch-processing').checked;
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const data = {
+                input: batchProcessing ? textInput.split('\n') : textInput,
+                model: 'text-embedding-ada-002'
+            };
+
+            const responseContainer = document.getElementById('embeddings-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest('/v1/embeddings', 'POST', data, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                // Display similarity matrix
+                displaySimilarityMatrix(result.data);
+
+                // Display dimension reduction plot
+                displayDimensionReduction(result.data);
+
+                responseContainer.innerHTML = '<p>Embeddings generated successfully!</p>';
+            }
+
+            // Generate code examples
+            generateCodeExamples('embeddings', data, apiKey);
+        });
+
+        // DALL·E functionality
+        document.getElementById('generate-image').addEventListener('click', async function() {
+            const prompt = document.getElementById('image-prompt').value;
+            const size = document.getElementById('image-size').value;
+            const quality = document.getElementById('image-quality').value;
+            const style = document.getElementById('image-style').value;
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const data = {
+                prompt: prompt,
+                n: 1,
+                size: size,
+                quality: quality,
+                style: style
+            };
+
+            const responseContainer = document.getElementById('image-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest('/v1/images/generations', 'POST', data, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                const imageUrl = result.data[0].url;
+                responseContainer.innerHTML = `<img src="${imageUrl}" alt="Generated Image" style="max-width: 100%;">`;
+            }
+
+            // Generate code examples
+            generateCodeExamples('dall-e', data, apiKey);
+        });
+
+        // Canvas functionality for DALL·E edit
+        const canvas = document.getElementById('edit-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let isErasing = false;
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        document.getElementById('draw-mode').addEventListener('click', function() {
+            isDrawing = true;
+            isErasing = false;
+        });
+
+        document.getElementById('erase-mode').addEventListener('click', function() {
+            isDrawing = false;
+            isErasing = true;
+        });
+
+        document.getElementById('clear-canvas').addEventListener('click', function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        function startDrawing(e) {
+            if (isDrawing || isErasing) {
+                draw(e);
+            }
+        }
+
+        function draw(e) {
+            if (!isDrawing && !isErasing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = isDrawing ? '#000000' : '#ffffff';
+            ctx.fill();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            isErasing = false;
+        }
+
+        // DALL·E edit functionality
+        document.getElementById('edit-image').addEventListener('click', async function() {
+            const prompt = document.getElementById('edit-prompt').value;
+            const imageData = canvas.toDataURL('image/png');
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            // In a real implementation, you would need to upload the image data to your server
+            // and then send the image URL to the OpenAI API
+            const responseContainer = document.getElementById('edit-response');
+            responseContainer.innerHTML = '<p>This functionality requires server-side implementation.</p>';
+
+            // Generate code examples
+            const data = {
+                prompt: prompt,
+                n: 1,
+                size: '1024x1024',
+                image: imageData
+            };
+            generateCodeExamples('dall-e-edit', data, apiKey);
+        });
+
+        // DALL·E variations functionality
+        document.getElementById('generate-variations').addEventListener('click', async function() {
+            const style = document.getElementById('variation-style').value;
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            // In a real implementation, you would need to upload an image to your server
+            // and then send the image URL to the OpenAI API
+            const responseContainer = document.getElementById('variations-response');
+            responseContainer.innerHTML = '<p>This functionality requires server-side implementation.</p>';
+
+            // Generate code examples
+            const data = {
+                n: 1,
+                size: '1024x1024',
+                style: style
+            };
+            generateCodeExamples('dall-e-variations', data, apiKey);
+        });
+
+        // Whisper functionality
+        document.getElementById('transcribe-audio').addEventListener('click', async function() {
+            const audioFile = document.getElementById('audio-file').files[0];
+            const language = document.getElementById('language').value;
+            const translate = document.getElementById('translate').checked;
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            if (!audioFile) {
+                alert('Please select an audio file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', audioFile);
+            formData.append('model', 'whisper-1');
+            formData.append('language', language);
+            if (translate) {
+                formData.append('response_format', 'json');
+                formData.append('temperature', '0');
+            }
+
+            const responseContainer = document.getElementById('transcription-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/audio/transcriptions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.error) {
+                    responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+                } else {
+                    responseContainer.innerHTML = `<p>${result.text}</p>`;
+                }
+
+                // Generate code examples
+                const data = {
+                    file: audioFile.name,
+                    model: 'whisper-1',
+                    language: language,
+                    response_format: translate ? 'json' : 'text'
+                };
+                generateCodeExamples('whisper', data, apiKey);
+            } catch (error) {
+                responseContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        });
+
+        // Microphone recording functionality
+        let mediaRecorder;
+        let audioChunks = [];
+
+        document.getElementById('microphone-input').addEventListener('click', async function() {
+            const statusElement = document.getElementById('recording-status');
+
+            if (this.textContent === 'Start Recording') {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        const audio = new Audio(audioUrl);
+                        audio.play();
+
+                        // Create a file from the blob
+                        const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' });
+
+                        // Set the file input to the recorded audio
+                        const fileInput = document.getElementById('audio-file');
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(audioFile);
+                        fileInput.files = dataTransfer.files;
+
+                        audioChunks = [];
+                    };
+
+                    mediaRecorder.start();
+                    this.textContent = 'Stop Recording';
+                    statusElement.textContent = 'Recording...';
+                } catch (error) {
+                    statusElement.textContent = `Error: ${error.message}`;
+                }
+            } else {
+                mediaRecorder.stop();
+                this.textContent = 'Start Recording';
+                statusElement.textContent = 'Recording stopped';
+            }
+        });
+
+        // Generate subtitles functionality
+        document.getElementById('generate-subtitles').addEventListener('click', async function() {
+            const format = document.getElementById('subtitle-format').value;
+            const transcription = document.getElementById('transcription-response').textContent;
+
+            if (!transcription) {
+                alert('Please transcribe audio first.');
+                return;
+            }
+
+            // In a real implementation, you would process the transcription to generate subtitles
+            const responseContainer = document.getElementById('subtitles-response');
+            responseContainer.innerHTML = '<p>This functionality requires server-side implementation.</p>';
+
+            // Generate code examples
+            const data = {
+                text: transcription,
+                format: format
+            };
+            const apiKey = localStorage.getItem('openaiApiKey');
+            generateCodeExamples('subtitles', data, apiKey);
+        });
+
+        // Text-to-Speech functionality
+        document.getElementById('generate-speech').addEventListener('click', async function() {
+            const text = document.getElementById('tts-text').value;
+            const voice = document.getElementById('tts-voice').value;
+            const responseFormat = document.getElementById('tts-response-format').value;
+            const speed = parseFloat(document.getElementById('tts-speed').value);
+            const pitch = parseFloat(document.getElementById('tts-pitch').value);
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const data = {
+                model: 'tts-1',
+                input: text,
+                voice: voice,
+                response_format: responseFormat,
+                speed: speed,
+                pitch: pitch
+            };
+
+            const responseContainer = document.getElementById('speech-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest('/v1/audio/speech', 'POST', data, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                // In a real implementation, you would play the audio
+                responseContainer.innerHTML = '<p>Audio generated successfully!</p>';
+            }
+
+            // Generate code examples
+            generateCodeExamples('tts', data, apiKey);
+        });
+
+        // Voice preview functionality
+        document.querySelectorAll('.play-voice').forEach(button => {
+            button.addEventListener('click', async function() {
+                const voice = this.getAttribute('data-voice');
+
+                const apiKey = localStorage.getItem('openaiApiKey');
+                if (!apiKey) {
+                    alert('Please set your API key in the API Key section.');
+                    return;
+                }
+
+                const data = {
+                    model: 'tts-1',
+                    input: `This is the ${voice} voice.`,
+                    voice: voice,
+                    response_format: 'mp3'
+                };
+
+                const result = await makeApiRequest('/v1/audio/speech', 'POST', data, apiKey);
+
+                if (result.error) {
+                    console.error('Error:', result.error);
+                } else {
+                    // In a real implementation, you would play the audio
+                    console.log('Voice preview played');
+                }
+            });
+        });
+
+        // SSML speech functionality
+        document.getElementById('generate-ssml-speech').addEventListener('click', async function() {
+            const ssmlText = document.getElementById('ssml-text').value;
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            // In a real implementation, you would process the SSML text
+            const responseContainer = document.getElementById('ssml-speech-response');
+            responseContainer.innerHTML = '<p>This functionality requires server-side implementation.</p>';
+
+            // Generate code examples
+            const data = {
+                model: 'tts-1',
+                input: ssmlText,
+                voice: 'alloy',
+                response_format: 'mp3'
+            };
+            generateCodeExamples('ssml', data, apiKey);
+        });
+
+        // Content moderation functionality
+        document.getElementById('check-moderation').addEventListener('click', async function() {
+            const text = document.getElementById('moderation-text').value;
+            const batchModeration = document.getElementById('batch-moderation').checked;
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const data = {
+                input: batchModeration ? text.split('\n') : text
+            };
+
+            const responseContainer = document.getElementById('moderation-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest('/v1/moderations', 'POST', data, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                const scores = result.results[0].category_scores;
+                responseContainer.innerHTML = `
+                    <p>Moderation results:</p>
+                    <pre>${JSON.stringify(scores, null, 2)}</pre>
+                `;
+
+                // Update gauge displays
+                updateModerationGauges(scores);
+            }
+
+            // Generate code examples
+            generateCodeExamples('moderation', data, apiKey);
+        });
+
+        // Models functionality
+        document.getElementById('models').addEventListener('click', async function() {
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const responseContainer = document.getElementById('models-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest('/v1/models', 'GET', null, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                // Filter models based on selected capability
+                const activeFilter = document.querySelector('.model-filter.active').getAttribute('data-capability');
+                let filteredModels = result.data;
+
+                if (activeFilter !== 'all') {
+                    filteredModels = result.data.filter(model => {
+                        if (activeFilter === 'chat') {
+                            return model.id.includes('gpt');
+                        } else if (activeFilter === 'completion') {
+                            return model.id.includes('text-davinci');
+                        } else if (activeFilter === 'embeddings') {
+                            return model.id.includes('embedding');
+                        } else if (activeFilter === 'images') {
+                            return model.id.includes('dall-e');
+                        } else if (activeFilter === 'audio') {
+                            return model.id.includes('whisper') || model.id.includes('tts');
+                        } else if (activeFilter === 'moderations') {
+                            return model.id.includes('moderation');
+                        }
+                        return false;
+                    });
+                }
+
+                // Display models
+                let html = '<ul>';
+                filteredModels.forEach(model => {
+                    html += `<li>${model.id} (${model.created})</li>`;
+                });
+                html += '</ul>';
+                responseContainer.innerHTML = html;
+            }
+
+            // Generate code examples
+            generateCodeExamples('models', {}, apiKey);
+        });
+
+        // Model filter functionality
+        document.querySelectorAll('.model-filter').forEach(filter => {
+            filter.addEventListener('click', function() {
+                document.querySelectorAll('.model-filter').forEach(f => f.classList.remove('active'));
+                this.classList.add('active');
+
+                // Trigger models display update
+                document.getElementById('models').click();
+            });
+        });
+
+        // Files functionality
+        const fileUploader = document.getElementById('file-uploader');
+        const fileInput = document.getElementById('file-input');
+
+        fileUploader.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', async function() {
+            const files = this.files;
+            if (files.length === 0) return;
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const progressBar = document.getElementById('upload-progress');
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('purpose', 'assistants');
+
+                try {
+                    const response = await fetch('https://theserver-open-ai.replit.app/v1/files', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.error) {
+                        fileList.innerHTML += `<p>Error uploading ${file.name}: ${result.error}</p>`;
+                    } else {
+                        fileList.innerHTML += `
+                            <div class="file-item">
+                                <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                                <div class="file-actions">
+                                    <button class="delete-file" data-id="${result.id}">Delete</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // Update progress
+                    progressBar.style.width = `${((i + 1) / files.length) * 100}%`;
+                } catch (error) {
+                    fileList.innerHTML += `<p>Error uploading ${file.name}: ${error.message}</p>`;
+                }
+            }
+
+            // Generate code examples
+            generateCodeExamples('files', {}, apiKey);
+        });
+
+        // Delete file functionality
+        document.addEventListener('click', async function(e) {
+            if (e.target.classList.contains('delete-file')) {
+                const fileId = e.target.getAttribute('data-id');
+
+                const apiKey = localStorage.getItem('openaiApiKey');
+                if (!apiKey) {
+                    alert('Please set your API key in the API Key section.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`https://theserver-open-ai.replit.app/v1/files/${fileId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.error) {
+                        alert(`Error deleting file: ${result.error}`);
+                    } else {
+                        e.target.closest('.file-item').remove();
+                    }
+                } catch (error) {
+                    alert(`Error deleting file: ${error.message}`);
+                }
+            }
+        });
+
+        // Assistants functionality
+        document.getElementById('create-assistant').addEventListener('click', async function() {
+            const name = document.getElementById('assistant-name').value;
+            const model = document.getElementById('assistant-model').value;
+            const description = document.getElementById('assistant-description').value;
+            const instructions = document.getElementById('assistant-instructions').value;
+            const tools = Array.from(document.querySelectorAll('.tool-option.active')).map(option => ({
+                type: option.getAttribute('data-tool')
+            }));
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const data = {
+                model: model,
+                name: name,
+                description: description,
+                instructions: instructions,
+                tools: tools
+            };
+
+            const responseContainer = document.getElementById('assistant-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest('/v1/assistants', 'POST', data, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                responseContainer.innerHTML = `
+                    <p>Assistant created successfully!</p>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+            }
+
+            // Generate code examples
+            generateCodeExamples('assistants', data, apiKey);
+        });
+
+        // Tool configuration functionality
+        document.querySelectorAll('.tool-option').forEach(option => {
+            option.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Threads functionality
+        document.getElementById('create-thread').addEventListener('click', async function() {
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const responseContainer = document.getElementById('thread-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest('/v1/threads', 'POST', {}, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                responseContainer.innerHTML = `
+                    <p>Thread created successfully!</p>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+
+                // Store thread ID for later use
+                localStorage.setItem('currentThreadId', result.id);
+            }
+
+            // Generate code examples
+            generateCodeExamples('threads', {}, apiKey);
+        });
+
+        // Run thread functionality
+        document.getElementById('run-thread').addEventListener('click', async function() {
+            const threadId = localStorage.getItem('currentThreadId');
+            if (!threadId) {
+                alert('Please create a thread first.');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const data = {
+                assistant_id: 'asst_abc123' // Replace with actual assistant ID
+            };
+
+            const responseContainer = document.getElementById('run-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest(`/v1/threads/${threadId}/runs`, 'POST', data, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                responseContainer.innerHTML = `
+                    <p>Thread run started successfully!</p>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+
+                // Store run ID for later use
+                localStorage.setItem('currentRunId', result.id);
+
+                // Update message history
+                updateMessageHistory(threadId, apiKey);
+            }
+
+            // Generate code examples
+            generateCodeExamples('run-thread', data, apiKey);
+        });
+
+        // Cancel run functionality
+        document.getElementById('cancel-run').addEventListener('click', async function() {
+            const threadId = localStorage.getItem('currentThreadId');
+            const runId = localStorage.getItem('currentRunId');
+
+            if (!threadId || !runId) {
+                alert('Please create a thread and run it first.');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const responseContainer = document.getElementById('run-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest(`/v1/threads/${threadId}/runs/${runId}/cancel`, 'POST', {}, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                responseContainer.innerHTML = `
+                    <p>Run cancelled successfully!</p>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+            }
+
+            // Generate code examples
+            generateCodeExamples('cancel-run', {}, apiKey);
+        });
+
+        // Submit tool outputs functionality
+        document.getElementById('submit-tool-outputs').addEventListener('click', async function() {
+            const threadId = localStorage.getItem('currentThreadId');
+            const runId = localStorage.getItem('currentRunId');
+
+            if (!threadId || !runId) {
+                alert('Please create a thread and run it first.');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            // In a real implementation, you would collect the tool outputs from the user
+            const data = {
+                tool_outputs: [
+                    {
+                        tool_call_id: 'call_abc123',
+                        output: 'Tool output data'
+                    }
+                ]
+            };
+
+            const responseContainer = document.getElementById('run-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest(`/v1/threads/${threadId}/runs/${runId}/submit_tool_outputs`, 'POST', data, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                responseContainer.innerHTML = `
+                    <p>Tool outputs submitted successfully!</p>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+
+                // Update message history
+                updateMessageHistory(threadId, apiKey);
+            }
+
+            // Generate code examples
+            generateCodeExamples('submit-tool-outputs', data, apiKey);
+        });
+
+        // Vector stores functionality
+        document.getElementById('create-vector-store').addEventListener('click', async function() {
+            const name = document.getElementById('vector-store-name').value;
+            const dimensions = parseInt(document.getElementById('vector-dimensions').value);
+            const size = parseInt(document.getElementById('vector-size').value);
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const data = {
+                name: name,
+                dimensions: dimensions,
+                size: size
+            };
+
+            const responseContainer = document.getElementById('vector-store-response');
+            responseContainer.innerHTML = '<p>Loading...</p>';
+
+            const result = await makeApiRequest('/v1/vector_stores', 'POST', data, apiKey);
+
+            if (result.error) {
+                responseContainer.innerHTML = `<p>Error: ${result.error}</p>`;
+            } else {
+                responseContainer.innerHTML = `
+                    <p>Vector store created successfully!</p>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+
+                // Store vector store ID for later use
+                localStorage.setItem('currentVectorStoreId', result.id);
+            }
+
+            // Generate code examples
+            generateCodeExamples('vector-stores', data, apiKey);
+        });
+
+        // Batch jobs functionality
+        document.getElementById('create-batch').addEventListener('click', async function() {
+            const inputFile = document.getElementById('batch-input-file').files[0];
+            const endpoint = document.getElementById('batch-endpoint').value;
+
+            if (!inputFile) {
+                alert('Please select an input file.');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            // In a real implementation, you would upload the input file to your server
+            // and then create the batch job
+            const responseContainer = document.getElementById('batch-response');
+            responseContainer.innerHTML = '<p>This functionality requires server-side implementation.</p>';
+
+            // Generate code examples
+            const data = {
+                input_file_id: 'file-abc123',
+                endpoint: endpoint,
+                completion_window: '24h'
+            };
+            generateCodeExamples('batch-jobs', data, apiKey);
+        });
+
+        // Workflow functionality
+        document.querySelectorAll('.workflow-step').forEach(step => {
+            step.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        document.getElementById('run-workflow').addEventListener('click', async function() {
+            const activeSteps = Array.from(document.querySelectorAll('.workflow-step.active')).map(step => step.getAttribute('data-step'));
+
+            if (activeSteps.length === 0) {
+                alert('Please select at least one workflow step.');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                alert('Please set your API key in the API Key section.');
+                return;
+            }
+
+            const responseContainer = document.getElementById('workflow-response');
+            responseContainer.innerHTML = '<p>Running workflow...</p>';
+
+            // Simulate workflow execution
+            setTimeout(async () => {
+                let resultHtml = '<p>Workflow completed:</p>';
+
+                for (const step of activeSteps) {
+                    if (step === 'image') {
+                        const imageResult = await makeApiRequest('/v1/images/generations', 'POST', {
+                            prompt: 'A futuristic cityscape',
+                            n: 1,
+                            size: '256x256'
+                        }, apiKey);
+
+                        if (imageResult.error) {
+                            resultHtml += `<p>Error in image generation: ${imageResult.error}</p>`;
+                        } else {
+                            const imageUrl = imageResult.data[0].url;
+                            resultHtml += `<p>Image generated: <img src="${imageUrl}" alt="Generated Image" style="max-width: 100px;"></p>`;
+                        }
+                    } else if (step === 'vision') {
+                        // In a real implementation, you would process the image with vision
+                        resultHtml += '<p>Vision analysis completed (simulated)</p>';
+                    } else if (step === 'copy') {
+                        // In a real implementation, you would check for copyright issues
+                        resultHtml += '<p>Copy detection completed (simulated)</p>';
+                    } else if (step === 'moderation') {
+                        const moderationResult = await makeApiRequest('/v1/moderations', 'POST', {
+                            input: 'Sample text to moderate'
+                        }, apiKey);
+
+                        if (moderationResult.error) {
+                            resultHtml += `<p>Error in moderation: ${moderationResult.error}</p>`;
+                        } else {
+                            resultHtml += '<p>Moderation completed:</p>';
+                            resultHtml += `<pre>${JSON.stringify(moderationResult.results[0].category_scores, null, 2)}</pre>`;
+                        }
+                    } else if (step === 'tts') {
+                        const ttsResult = await makeApiRequest('/v1/audio/speech', 'POST', {
+                            model: 'tts-1',
+                            input: 'Hello, this is a test of the text-to-speech system.',
+                            voice: 'alloy'
+                        }, apiKey);
+
+                        if (ttsResult.error) {
+                            resultHtml += `<p>Error in text-to-speech: ${ttsResult.error}</p>`;
+                        } else {
+                            // In a real implementation, you would play the audio
+                            resultHtml += '<p>Text-to-speech completed (simulated)</p>';
+                        }
+                    }
+                }
+
+                responseContainer.innerHTML = resultHtml;
+            }, 2000);
+        });
+
+        // API key management functionality
+        document.getElementById('save-api-key').addEventListener('click', function() {
+            const apiKey = document.getElementById('api-key-input').value.trim();
+            if (apiKey) {
+                localStorage.setItem('openaiApiKey', apiKey);
+                document.getElementById('api-key-status').textContent = 'API key saved successfully!';
+                document.getElementById('api-key-status').className = 'api-key-status valid';
+            } else {
+                document.getElementById('api-key-status').textContent = 'Please enter a valid API key.';
+                document.getElementById('api-key-status').className = 'api-key-status invalid';
+            }
+        });
+
+        document.getElementById('validate-api-key').addEventListener('click', async function() {
+            const apiKey = localStorage.getItem('openaiApiKey');
+            if (!apiKey) {
+                document.getElementById('api-key-status').textContent = 'Please set an API key first.';
+                document.getElementById('api-key-status').className = 'api-key-status invalid';
+                return;
+            }
+
+            const responseContainer = document.getElementById('api-key-status');
+            responseContainer.textContent = 'Validating API key...';
+            responseContainer.className = 'api-key-status';
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    }
+                });
+
+                if (response.ok) {
+                    responseContainer.textContent = 'API key is valid!';
+                    responseContainer.className = 'api-key-status valid';
+                } else {
+                    const errorData = await response.json();
+                    responseContainer.textContent = `API key validation failed: ${errorData.error.message}`;
+                    responseContainer.className = 'api-key-status invalid';
+                }
+            } catch (error) {
+                responseContainer.textContent = `Error validating API key: ${error.message}`;
+                responseContainer.className = 'api-key-status invalid';
+            }
+        });
+
+        // Cost calculator functionality
+        document.getElementById('calculate-cost').addEventListener('click', function() {
+            const model = document.getElementById('model-select').value;
+            const inputTokens = parseInt(document.getElementById('input-tokens').value);
+            const outputTokens = parseInt(document.getElementById('output-tokens').value);
+            const imagesGenerated = parseInt(document.getElementById('images-generated').value);
+            const audioMinutes = parseInt(document.getElementById('audio-minutes').value);
+            const speechCharacters = parseInt(document.getElementById('speech-characters').value);
+            const budget = parseFloat(document.getElementById('budget').value);
+
+            let cost = 0;
+
+            // Pricing based on OpenAI's current pricing (as of June 2024)
+            switch (model) {
+                case 'gpt-4o':
+                    cost = (inputTokens * 0.000005) + (outputTokens * 0.000015);
+                    break;
+                case 'gpt-4-turbo':
+                    cost = (inputTokens * 0.00001) + (outputTokens * 0.00003);
+                    break;
+                case 'gpt-4':
+                    cost = (inputTokens * 0.00003) + (outputTokens * 0.00006);
+                    break;
+                case 'gpt-3.5-turbo':
+                    cost = (inputTokens * 0.0000005) + (outputTokens * 0.0000015);
+                    break;
+                case 'text-embedding-ada-002':
+                    cost = inputTokens * 0.0000001;
+                    break;
+                case 'dall-e-2':
+                    cost = imagesGenerated * 0.016;
+                    break;
+                case 'dall-e-3':
+                    cost = imagesGenerated * 0.04;
+                    break;
+                case 'whisper-1':
+                    cost = audioMinutes * 0.006;
+                    break;
+                case 'tts-1':
+                    cost = speechCharacters * 0.000015;
+                    break;
+                case 'tts-1-hd':
+                    cost = speechCharacters * 0.00003;
+                    break;
+                default:
+                    cost = 0;
+            }
+
+            const costDisplay = document.getElementById('cost-display');
+            costDisplay.textContent = `Estimated Cost: $${cost.toFixed(4)}`;
+
+            // Check budget
+            const budgetAlert = document.getElementById('budget-alert');
+            if (cost > budget) {
+                budgetAlert.textContent = `Warning: This request exceeds your monthly budget of $${budget.toFixed(2)}!`;
+                budgetAlert.style.display = 'block';
+            } else {
+                budgetAlert.style.display = 'none';
+            }
+        });
+
+        // Helper functions
+        function displaySimilarityMatrix(embeddings) {
+            const matrixContainer = document.getElementById('similarity-matrix');
+            matrixContainer.innerHTML = '';
+
+            if (embeddings.length < 2) {
+                matrixContainer.innerHTML = '<p>Need at least 2 embeddings to display similarity matrix.</p>';
+                return;
+            }
+
+            // Calculate similarity matrix
+            const matrix = [];
+            for (let i = 0; i < embeddings.length; i++) {
+                matrix[i] = [];
+                for (let j = 0; j < embeddings.length; j++) {
+                    if (i === j) {
+                        matrix[i][j] = 1; // Diagonal is 1 (perfect similarity)
+                    } else {
+                        // Calculate cosine similarity
+                        const dotProduct = embeddings[i].embedding.reduce((sum, val, idx) => sum + val * embeddings[j].embedding[idx], 0);
+                        const magnitudeA = Math.sqrt(embeddings[i].embedding.reduce((sum, val) => sum + val * val, 0));
+                        const magnitudeB = Math.sqrt(embeddings[j].embedding.reduce((sum, val) => sum + val * val, 0));
+                        matrix[i][j] = dotProduct / (magnitudeA * magnitudeB);
+                    }
+                }
+            }
+
+            // Display matrix
+            let html = '<div style="display: inline-block;">';
+            for (let i = 0; i < matrix.length; i++) {
+                for (let j = 0; j < matrix[i].length; j++) {
+                    const similarity = matrix[i][j];
+                    const colorValue = Math.floor(similarity * 255);
+                    html += `<div class="similarity-cell" style="background-color: rgb(${colorValue}, ${colorValue}, 255);" title="Similarity: ${similarity.toFixed(2)}"></div>`;
+                }
+                html += '<br>';
+            }
+            html += '</div>';
+            matrixContainer.innerHTML = html;
+        }
+
+        function displayDimensionReduction(embeddings) {
+            const plotContainer = document.getElementById('dimension-reduction');
+            plotContainer.innerHTML = '';
+
+            if (embeddings.length < 2) {
+                plotContainer.innerHTML = '<p>Need at least 2 embeddings to display dimension reduction plot.</p>';
+                return;
+            }
+
+            // Simple PCA implementation for dimension reduction
+            const data = embeddings.map(e => e.embedding);
+            const mean = data[0].map((_, i) => data.reduce((sum, row) => sum + row[i], 0) / data.length);
+            const centered = data.map(row => row.map((val, i) => val - mean[i]));
+
+            // Calculate covariance matrix
+            const n = centered.length;
+            const m = centered[0].length;
+            const covariance = Array.from({ length: m }, () => Array(m).fill(0));
+
+            for (let i = 0; i < m; i++) {
+                for (let j = 0; j < m; j++) {
+                    let sum = 0;
+                    for (let k = 0; k < n; k++) {
+                        sum += centered[k][i] * centered[k][j];
+                    }
+                    covariance[i][j] = sum / (n - 1);
+                }
+            }
+
+            // Find eigenvectors (simplified)
+            // In a real implementation, you would use a proper eigenvalue decomposition
+            const eigenvectors = [
+                Array(m).fill(1).map((_, i) => i === 0 ? 1 : 0), // First principal component
+                Array(m).fill(1).map((_, i) => i === 1 ? 1 : 0)  // Second principal component
+            ];
+
+            // Project data onto first two principal components
+            const projected = centered.map(row => [
+                row.reduce((sum, val, i) => sum + val * eigenvectors[0][i], 0),
+                row.reduce((sum, val, i) => sum + val * eigenvectors[1][i], 0)
+            ]);
+
+            // Create a simple scatter plot
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.setAttribute('viewBox', '0 0 100 100');
+
+            // Find min and max values for scaling
+            const xMin = Math.min(...projected.map(p => p[0]));
+            const xMax = Math.max(...projected.map(p => p[0]));
+            const yMin = Math.min(...projected.map(p => p[1]));
+            const yMax = Math.max(...projected.map(p => p[1]));
+
+            // Plot points
+            projected.forEach((point, i) => {
+                const x = 10 + ((point[0] - xMin) / (xMax - xMin)) * 80;
+                const y = 90 - ((point[1] - yMin) / (yMax - yMin)) * 80;
+
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y);
+                circle.setAttribute('r', 2);
+                circle.setAttribute('fill', `hsl(${i * 360 / projected.length}, 100%, 50%)`);
+                svg.appendChild(circle);
+            });
+
+            plotContainer.appendChild(svg);
+        }
+
+        function updateModerationGauges(scores) {
+            document.getElementById('hate-fill').style.width = `${scores.hate * 100}%`;
+            document.getElementById('hate-score').textContent = scores.hate.toFixed(2);
+
+            document.getElementById('hate-threat-fill').style.width = `${scores['hate/threatening'] * 100}%`;
+            document.getElementById('hate-threat-score').textContent = scores['hate/threatening'].toFixed(2);
+
+            document.getElementById('self-harm-fill').style.width = `${scores['self-harm'] * 100}%`;
+            document.getElementById('self-harm-score').textContent = scores['self-harm'].toFixed(2);
+
+            document.getElementById('sexual-fill').style.width = `${scores.sexual * 100}%`;
+            document.getElementById('sexual-score').textContent = scores.sexual.toFixed(2);
+
+            document.getElementById('sexual-minors-fill').style.width = `${scores['sexual/minors'] * 100}%`;
+            document.getElementById('sexual-minors-score').textContent = scores['sexual/minors'].toFixed(2);
+
+            document.getElementById('violence-fill').style.width = `${scores.violence * 100}%`;
+            document.getElementById('violence-score').textContent = scores.violence.toFixed(2);
+
+            document.getElementById('violence-graphic-fill').style.width = `${scores['violence/graphic'] * 100}%`;
+            document.getElementById('violence-graphic-score').textContent = scores['violence/graphic'].toFixed(2);
+        }
+
+        async function updateMessageHistory(threadId, apiKey) {
+            const response = await fetch(`https://theserver-open-ai.replit.app/v1/threads/${threadId}/messages`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.error) {
+                console.error('Error fetching messages:', result.error);
+                return;
+            }
+
+            const messageHistory = document.getElementById('message-history');
+            messageHistory.innerHTML = '';
+
+            result.data.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.role}-message`;
+                messageDiv.innerHTML = `
+                    <strong>${message.role}:</strong>
+                    <p>${message.content[0].text.value}</p>
+                `;
+                messageHistory.appendChild(messageDiv);
+            });
+
+            // Scroll to bottom
+            messageHistory.scrollTop = messageHistory.scrollHeight;
+        }
+
+        function generateCodeExamples(endpoint, data, apiKey) {
+            // Generate cURL example
+            let curlExample = `curl https://theserver-open-ai.replit.app/v1/${endpoint} \\\n`;
+            curlExample += `  -H "Content-Type: application/json" \\\n`;
+            curlExample += `  -H "Authorization: Bearer ${apiKey}" \\\n`;
+            if (Object.keys(data).length > 0) {
+                curlExample += `  -d '${JSON.stringify(data)}'`;
+            }
+
+            // Generate Fetch example
+            let fetchExample = `fetch('https://theserver-open-ai.replit.app/v1/${endpoint}', {\n`;
+            fetchExample += `  method: '${Object.keys(data).length > 0 ? 'POST' : 'GET'}',\n`;
+            fetchExample += `  headers: {\n`;
+            fetchExample += `    'Content-Type': 'application/json',\n`;
+            fetchExample += `    'Authorization': 'Bearer ${apiKey}'\n`;
+            fetchExample += `  },\n`;
+            if (Object.keys(data).length > 0) {
+                fetchExample += `  body: JSON.stringify(${JSON.stringify(data)})\n`;
+            }
+            fetchExample += `})\n`;
+            fetchExample += `.then(response => response.json())\n`;
+            fetchExample += `.then(data => console.log(data))\n`;
+            fetchExample += `.catch(error => console.error('Error:', error));`;
+
+            // Generate Python example
+            let pythonExample = `import requests\n\n`;
+            pythonExample += `url = "https://theserver-open-ai.replit.app/v1/${endpoint}"\n`;
+            pythonExample += `headers = {\n`;
+            pythonExample += `    "Content-Type": "application/json",\n`;
+            pythonExample += `    "Authorization": "Bearer ${apiKey}"\n`;
+            pythonExample += `}\n`;
+            if (Object.keys(data).length > 0) {
+                pythonExample += `data = ${JSON.stringify(data, null, 4)}\n\n`;
+            }
+            pythonExample += `response = requests.${Object.keys(data).length > 0 ? 'post' : 'get'}(url, headers=headers${Object.keys(data).length > 0 ? ', json=data' : ''})\n`;
+            pythonExample += `print(response.json())`;
+
+            // Update code examples in the UI
+            const section = document.querySelector(`section[id^="${endpoint.split('-')[0]}"]`);
+            if (section) {
+                section.querySelector('.code-container[data-tab="curl"] pre').textContent = curlExample;
+                section.querySelector('.code-container[data-tab="fetch"] pre').textContent = fetchExample;
+                section.querySelector('.code-container[data-tab="python"] pre').textContent = pythonExample;
+            }
+        }
+
+        // Initialize API key status
+        const savedApiKey = localStorage.getItem('openaiApiKey');
+        if (savedApiKey) {
+            document.getElementById('api-key-status').textContent = 'API key loaded from storage.';
+            document.getElementById('api-key-status').className = 'api-key-status valid';
+        } else {
+            document.getElementById('api-key-status').textContent = 'No API key set. Please enter your OpenAI API key.';
+            document.getElementById('api-key-status').className = 'api-key-status invalid';
+        }
+
+        // Load saved settings
+        function loadSavedSettings() {
+            // Load chat completions settings
+            const savedSystemMessage = localStorage.getItem('systemMessage');
+            if (savedSystemMessage) {
+                document.getElementById('system-message').value = savedSystemMessage;
+            }
+
+            // Load other settings as needed
+        }
+
+        // Save settings when leaving the page
+        window.addEventListener('beforeunload', function() {
+            // Save chat completions settings
+            localStorage.setItem('systemMessage', document.getElementById('system-message').value);
+
+            // Save other settings as needed
+        });
+
+        // Load saved settings on page load
+        loadSavedSettings();
+    </script>
+</body>
+</html>

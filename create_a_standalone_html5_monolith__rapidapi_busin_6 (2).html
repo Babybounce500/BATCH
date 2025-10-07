@@ -1,0 +1,3947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RapidAPI Business Intelligence Dashboard">
+    <title>RapidAPI Business Intelligence</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --dark-color: #1a1a1a;
+            --light-color: #ecf0f1;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --text-color: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--dark-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--secondary-color);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            transition: color var(--transition-speed);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .tabs-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 80vh;
+        }
+
+        .tabs-header {
+            display: flex;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--text-secondary);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            margin-right: 0.25rem;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            transition: background-color var(--transition-speed);
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+        }
+
+        .tab-content {
+            background-color: var(--secondary-color);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            flex-grow: 1;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--text-secondary);
+            border-radius: var(--border-radius);
+            background-color: var(--dark-color);
+            color: var(--text-color);
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            font-weight: 500;
+            transition: background-color var(--transition-speed);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #1a252f;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .results-container {
+            margin-top: 2rem;
+            background-color: var(--dark-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .results-title {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--text-secondary);
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+        }
+
+        td {
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+        }
+
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .chart-container {
+            height: 400px;
+            margin: 2rem 0;
+            background-color: var(--dark-color);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(52, 152, 219, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-message {
+            color: var(--accent-color);
+            padding: 1rem;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            padding: 1rem;
+            background-color: rgba(46, 204, 113, 0.1);
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+        }
+
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .range-value {
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .filter-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--dark-color);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            color: var(--primary-color);
+        }
+
+        .card-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric {
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .metric-label {
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            font-weight: 500;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-speed), visibility var(--transition-speed);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--secondary-color);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            color: var(--primary-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .close-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .api-key-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .api-key-input {
+            flex-grow: 1;
+        }
+
+        .usage-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .usage-item {
+            text-align: center;
+        }
+
+        .usage-label {
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            color: var(--text-secondary);
+        }
+
+        .usage-value {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            font-weight: 500;
+        }
+
+        .progress-container {
+            height: 10px;
+            background-color: rgba(52, 152, 219, 0.2);
+            border-radius: 5px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width var(--transition-speed);
+        }
+
+        .favorites-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .favorite-item {
+            background-color: var(--dark-color);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+
+        .favorite-title {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .favorite-type {
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .favorite-content {
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .favorite-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .tag {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 10px;
+            font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+        }
+
+        .favorite-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .favorite-btn {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: none;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color var(--transition-speed);
+        }
+
+        .favorite-btn:hover {
+            background-color: #1a252f;
+        }
+
+        .delete-btn {
+            background-color: var(--accent-color);
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .add-favorite-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            box-shadow: var(--box-shadow);
+            cursor: pointer;
+            z-index: 100;
+            transition: transform var(--transition-speed);
+        }
+
+        .add-favorite-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--dark-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            z-index: 10;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .autocomplete-results.active {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .autocomplete-item:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .autocomplete-item .symbol {
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .autocomplete-item .name {
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            color: var(--text-secondary);
+        }
+
+        .export-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .export-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .export-option input {
+            width: auto;
+        }
+
+        .sentiment-positive {
+            color: var(--success-color);
+        }
+
+        .sentiment-negative {
+            color: var(--accent-color);
+        }
+
+        .sentiment-neutral {
+            color: var(--text-secondary);
+        }
+
+        .news-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .news-filter {
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            background-color: var(--dark-color);
+            cursor: pointer;
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            transition: background-color var(--transition-speed);
+        }
+
+        .news-filter.active {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+        }
+
+        .news-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--text-secondary);
+        }
+
+        .news-title {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .news-source {
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .news-date {
+            font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .news-content {
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .news-sentiment {
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            font-weight: 500;
+        }
+
+        .search-history {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .history-item {
+            background-color: var(--dark-color);
+            border-radius: var(--border-radius);
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .history-item:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .history-type {
+            font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .history-query {
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+        }
+
+        .history-time {
+            font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0.5rem;
+            }
+
+            .filter-container {
+                grid-template-columns: 1fr;
+            }
+
+            .card-content {
+                grid-template-columns: 1fr;
+            }
+
+            .favorites-container {
+                grid-template-columns: 1fr;
+            }
+
+            .export-options {
+                flex-direction: column;
+            }
+
+            .search-history {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">RapidAPI BI</a>
+            <nav>
+                <ul>
+                    <li><a href="#jsearch">Job Search</a></li>
+                    <li><a href="#yahoo">Yahoo Finance</a></li>
+                    <li><a href="#google">Google Search</a></li>
+                    <li><a href="#scraper">Web Scraper</a></li>
+                    <li><a href="#favorites">Favorites</a></li>
+                    <li><a href="#history">Search History</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab active" data-tab="jsearch">Job Search</button>
+                <button class="tab" data-tab="yahoo">Yahoo Finance</button>
+                <button class="tab" data-tab="google">Google Search</button>
+                <button class="tab" data-tab="scraper">Web Scraper</button>
+                <button class="tab" data-tab="favorites">Favorites</button>
+                <button class="tab" data-tab="history">Search History</button>
+            </div>
+
+            <div class="tab-content active" id="jsearch">
+                <h2 class="section-title">Job Search</h2>
+
+                <div class="api-key-container">
+                    <input type="text" class="api-key-input" id="jsearch-api-key" placeholder="Enter your RapidAPI key">
+                    <button id="save-jsearch-key">Save Key</button>
+                </div>
+
+                <div class="usage-info">
+                    <div class="usage-item">
+                        <div class="usage-label">Requests Today</div>
+                        <div class="usage-value" id="jsearch-requests">0</div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="jsearch-progress"></div>
+                        </div>
+                    </div>
+                    <div class="usage-item">
+                        <div class="usage-label">Remaining</div>
+                        <div class="usage-value" id="jsearch-remaining">1000</div>
+                    </div>
+                </div>
+
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <button class="tab active" data-tab="search">Search</button>
+                        <button class="tab" data-tab="details">Details</button>
+                        <button class="tab" data-tab="filters">Filters</button>
+                        <button class="tab" data-tab="salary">Salary</button>
+                    </div>
+
+                    <div class="tab-content active" id="jsearch-search">
+                        <form id="jsearch-search-form">
+                            <div class="form-group">
+                                <label for="jsearch-query">Job Title or Keywords</label>
+                                <input type="text" id="jsearch-query" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="jsearch-location">Location</label>
+                                <input type="text" id="jsearch-location">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="jsearch-radius">Search Radius (miles)</label>
+                                <select id="jsearch-radius">
+                                    <option value="5">5 miles</option>
+                                    <option value="10">10 miles</option>
+                                    <option value="15">15 miles</option>
+                                    <option value="25">25 miles</option>
+                                    <option value="50">50 miles</option>
+                                    <option value="100">100 miles</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="jsearch-salary-min">Minimum Salary</label>
+                                <div class="range-container">
+                                    <span class="range-value" id="jsearch-salary-min-value">0</span>
+                                    <input type="range" id="jsearch-salary-min" min="0" max="500000" step="1000" value="0">
+                                    <span class="range-value" id="jsearch-salary-max-value">500000</span>
+                                    <input type="range" id="jsearch-salary-max" min="0" max="500000" step="1000" value="500000">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="jsearch-date-posted">Date Posted</label>
+                                <select id="jsearch-date-posted">
+                                    <option value="all">Anytime</option>
+                                    <option value="1">Last 24 hours</option>
+                                    <option value="3">Last 3 days</option>
+                                    <option value="7">Last week</option>
+                                    <option value="14">Last 2 weeks</option>
+                                    <option value="30">Last month</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="jsearch-employment-type">Employment Type</label>
+                                <select id="jsearch-employment-type">
+                                    <option value="all">All Types</option>
+                                    <option value="fulltime">Full-time</option>
+                                    <option value="parttime">Part-time</option>
+                                    <option value="contract">Contract</option>
+                                    <option value="internship">Internship</option>
+                                    <option value="temporary">Temporary</option>
+                                </select>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit">Search Jobs</button>
+                                <button type="button" id="save-jsearch-search" class="btn-secondary">Save Search</button>
+                            </div>
+                        </form>
+
+                        <div class="results-container" id="jsearch-results">
+                            <div class="results-header">
+                                <h3 class="results-title">Job Results</h3>
+                                <div class="btn-group">
+                                    <button id="export-jsearch-results" class="btn-secondary">Export</button>
+                                    <button id="save-jsearch-results" class="btn-secondary">Save Results</button>
+                                </div>
+                            </div>
+                            <div id="jsearch-results-content"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="jsearch-details">
+                        <form id="jsearch-details-form">
+                            <div class="form-group">
+                                <label for="jsearch-job-id">Job ID</label>
+                                <input type="text" id="jsearch-job-id" required>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit">Get Job Details</button>
+                                <button type="button" id="save-jsearch-details" class="btn-secondary">Save Details</button>
+                            </div>
+                        </form>
+
+                        <div class="results-container" id="jsearch-details-results">
+                            <div class="results-header">
+                                <h3 class="results-title">Job Details</h3>
+                                <div class="btn-group">
+                                    <button id="export-jsearch-details" class="btn-secondary">Export</button>
+                                    <button id="save-jsearch-details-results" class="btn-secondary">Save Details</button>
+                                </div>
+                            </div>
+                            <div id="jsearch-details-content"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="jsearch-filters">
+                        <form id="jsearch-filters-form">
+                            <div class="form-group">
+                                <label for="jsearch-industry">Industry</label>
+                                <select id="jsearch-industry">
+                                    <option value="">All Industries</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="jsearch-experience">Experience Level</label>
+                                <select id="jsearch-experience">
+                                    <option value="">All Levels</option>
+                                    <option value="internship">Internship</option>
+                                    <option value="entry">Entry Level</option>
+                                    <option value="associate">Associate</option>
+                                    <option value="mid">Mid-Senior Level</option>
+                                    <option value="director">Director</option>
+                                    <option value="executive">Executive</option>
+                                </select>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit">Get Filters</button>
+                                <button type="button" id="save-jsearch-filters" class="btn-secondary">Save Filters</button>
+                            </div>
+                        </form>
+
+                        <div class="results-container" id="jsearch-filters-results">
+                            <div class="results-header">
+                                <h3 class="results-title">Filter Results</h3>
+                                <div class="btn-group">
+                                    <button id="export-jsearch-filters" class="btn-secondary">Export</button>
+                                    <button id="save-jsearch-filters-results" class="btn-secondary">Save Filters</button>
+                                </div>
+                            </div>
+                            <div id="jsearch-filters-content"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="jsearch-salary">
+                        <form id="jsearch-salary-form">
+                            <div class="form-group">
+                                <label for="jsearch-salary-job-title">Job Title</label>
+                                <input type="text" id="jsearch-salary-job-title" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="jsearch-salary-location">Location</label>
+                                <input type="text" id="jsearch-salary-location">
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit">Analyze Salary</button>
+                                <button type="button" id="save-jsearch-salary" class="btn-secondary">Save Analysis</button>
+                            </div>
+                        </form>
+
+                        <div class="results-container" id="jsearch-salary-results">
+                            <div class="results-header">
+                                <h3 class="results-title">Salary Analysis</h3>
+                                <div class="btn-group">
+                                    <button id="export-jsearch-salary" class="btn-secondary">Export</button>
+                                    <button id="save-jsearch-salary-results" class="btn-secondary">Save Analysis</button>
+                                </div>
+                            </div>
+                            <div id="jsearch-salary-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="yahoo">
+                <h2 class="section-title">Yahoo Finance</h2>
+
+                <div class="api-key-container">
+                    <input type="text" class="api-key-input" id="yahoo-api-key" placeholder="Enter your RapidAPI key">
+                    <button id="save-yahoo-key">Save Key</button>
+                </div>
+
+                <div class="usage-info">
+                    <div class="usage-item">
+                        <div class="usage-label">Requests Today</div>
+                        <div class="usage-value" id="yahoo-requests">0</div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="yahoo-progress"></div>
+                        </div>
+                    </div>
+                    <div class="usage-item">
+                        <div class="usage-label">Remaining</div>
+                        <div class="usage-value" id="yahoo-remaining">1000</div>
+                    </div>
+                </div>
+
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <button class="tab active" data-tab="statistics">Key Statistics</button>
+                        <button class="tab" data-tab="analysis">Financial Analysis</button>
+                        <button class="tab" data-tab="earnings">Earnings Trend</button>
+                        <button class="tab" data-tab="price">Price Data</button>
+                        <button class="tab" data-tab="multi-quote">Multi Quote</button>
+                        <button class="tab" data-tab="news">News</button>
+                    </div>
+
+                    <div class="tab-content active" id="yahoo-statistics">
+                        <form id="yahoo-statistics-form">
+                            <div class="form-group autocomplete-container">
+                                <label for="yahoo-symbol">Stock Symbol</label>
+                                <input type="text" id="yahoo-symbol" required>
+                                <div class="autocomplete-results" id="yahoo-symbol-results"></div>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit">Get Key Statistics</button>
+                                <button type="button" id="save-yahoo-statistics" class="btn-secondary">Save Statistics</button>
+                            </div>
+                        </form>
+
+                        <div class="results-container" id="yahoo-statistics-results">
+                            <div class="results-header">
+                                <h3 class="results-title">Key Statistics</h3>
+                                <div class="btn-group">
+                                    <button id="export-yahoo-statistics" class="btn-secondary">Export</button>
+                                    <button id="save-yahoo-statistics-results" class="btn-secondary">Save Statistics</button>
+                                </div>
+                            </div>
+                            <div id="yahoo-statistics-content"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="yahoo-analysis">
+                        <form id="yahoo-analysis-form">
+                            <div class="form-group autocomplete-container">
+                                <label for="yahoo-analysis-symbol">Stock Symbol</label>
+                                <input type="text" id="yahoo-analysis-symbol" required>
+                                <div class="autocomplete-results" id="yahoo-analysis-symbol-results"></div>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit">Get Financial Analysis</button>
+                                <button type="button" id="save-yahoo-analysis" class="btn-secondary">Save Analysis</button>
+                            </div>
+                        </form>
+
+                        <div class="results-container" id="yahoo-analysis-results">
+                            <div class="results-header">
+                                <h3 class="results-title">Financial Analysis</h3>
+                                <div class="btn-group">
+                                    <button id="export-yahoo-analysis" class="btn-secondary">Export</button>
+                                    <button id="save-yahoo-analysis-results" class="btn-secondary">Save Analysis</button>
+                                </div>
+                            </div>
+                            <div id="yahoo-analysis-content"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="yahoo-earnings">
+                        <form id="yahoo-earnings-form">
+                            <div class="form-group autocomplete-container">
+                                <label for="yahoo-earnings-symbol">Stock Symbol</label>
+                                <input type="text" id="yahoo-earnings-symbol" required>
+                                <div class="autocomplete-results" id="yahoo-earnings-symbol-results"></div>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit">Get Earnings Trend</button>
+                                <button type="button" id="save-yahoo-earnings" class="btn-secondary">Save Trend</button>
+                            </div>
+                        </form>
+
+                        <div class="results-container" id="yahoo-earnings-results">
+                            <div class="results-header">
+                                <h3 class="results-title">Earnings Trend</h3>
+                                <div class="btn-group">
+                                    <button id="export-yahoo-earnings" class="btn-secondary">Export</button>
+                                    <button id="save-yahoo-earnings-results" class="btn-secondary">Save Trend</button>
+                                </div>
+                            </div>
+                            <div id="yahoo-earnings-content"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="yahoo-price">
+                        <form id="yahoo-price-form">
+                            <div class="form-group autocomplete-container">
+                                <label for="yahoo-price-symbol">Stock Symbol</label>
+                                <input type="text" id="yahoo-price-symbol" required>
+                                <div class="autocomplete-results" id="yahoo-price-symbol-results"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="yahoo-price-range">Time Range</label>
+                                <select id="yahoo-price-range">
+                                    <option value="1d">1 Day</option>
+                                    <option value="5d">5 Days</option>
+                                    <option value="1mo">1 Month</option>
+                                    <option value="3mo">3 Months</option>
+                                    <option value="6mo">6 Months</option>
+                                    <option value="1y">1 Year</option>
+                                    <option value="2y">2 Years</option>
+                                    <option value="5y">5 Years</option>
+                                    <option value="10y">10 Years</option>
+                                    <option value="ytd">Year to Date</option>
+                                    <option value="max">Max</option>
+                                </select>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit">Get Price Data</button>
+                                <button type="button" id="save-yahoo-price" class="btn-secondary">Save Data</button>
+                            </div>
+                        </form>
+
+                        <div class="results-container" id="yahoo-price-results">
+                            <div class="results-header">
+                                <h3 class="results-title">Price Data</h3>
+                                <div class="btn-group">
+                                    <button id="export-yahoo-price" class="btn-secondary">Export</button>
+                                    <button id="save-yahoo-price-results" class="btn-secondary">Save Data</button>
+                                </div>
+                            </div>
+                            <div id="yahoo-price-content"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="yahoo-multi-quote">
+                        <form id="yahoo-multi-quote-form">
+                            <div class="form-group">
+                                <label for="yahoo-symbols">Stock Symbols (comma separated)</label>
+                                <input type="text" id="yahoo-symbols" required>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit">Get Multi Quote</button>
+                                <button type="button" id="save-yahoo-multi-quote" class="btn-secondary">Save Quote</button>
+                            </div>
+                        </form>
+
+                        <div class="results-container" id="yahoo-multi-quote-results">
+                            <div class="results-header">
+                                <h3 class="results-title">Multi Quote</h3>
+                                <div class="btn-group">
+                                    <button id="export-yahoo-multi-quote" class="btn-secondary">Export</button>
+                                    <button id="save-yahoo-multi-quote-results" class="btn-secondary">Save Quote</button>
+                                </div>
+                            </div>
+                            <div id="yahoo-multi-quote-content"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="yahoo-news">
+                        <form id="yahoo-news-form">
+                            <div class="form-group autocomplete-container">
+                                <label for="yahoo-news-symbol">Stock Symbol</label>
+                                <input type="text" id="yahoo-news-symbol" required>
+                                <div class="autocomplete-results" id="yahoo-news-symbol-results"></div>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit">Get News</button>
+                                <button type="button" id="save-yahoo-news" class="btn-secondary">Save News</button>
+                            </div>
+                        </form>
+
+                        <div class="results-container" id="yahoo-news-results">
+                            <div class="results-header">
+                                <h3 class="results-title">News</h3>
+                                <div class="btn-group">
+                                    <button id="export-yahoo-news" class="btn-secondary">Export</button>
+                                    <button id="save-yahoo-news-results" class="btn-secondary">Save News</button>
+                                </div>
+                            </div>
+                            <div id="yahoo-news-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="google">
+                <h2 class="section-title">Google Search</h2>
+
+                <div class="api-key-container">
+                    <input type="text" class="api-key-input" id="google-api-key" placeholder="Enter your RapidAPI key">
+                    <button id="save-google-key">Save Key</button>
+                </div>
+
+                <div class="usage-info">
+                    <div class="usage-item">
+                        <div class="usage-label">Requests Today</div>
+                        <div class="usage-value" id="google-requests">0</div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="google-progress"></div>
+                        </div>
+                    </div>
+                    <div class="usage-item">
+                        <div class="usage-label">Remaining</div>
+                        <div class="usage-value" id="google-remaining">1000</div>
+                    </div>
+                </div>
+
+                <form id="google-search-form">
+                    <div class="form-group">
+                        <label for="google-query">Search Query</label>
+                        <input type="text" id="google-query" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="google-location">Location</label>
+                        <input type="text" id="google-location">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="google-language">Language</label>
+                        <select id="google-language">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="it">Italian</option>
+                            <option value="pt">Portuguese</option>
+                            <option value="ru">Russian</option>
+                            <option value="zh">Chinese</option>
+                            <option value="ja">Japanese</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="google-region">Region</label>
+                        <select id="google-region">
+                            <option value="us">United States</option>
+                            <option value="uk">United Kingdom</option>
+                            <option value="ca">Canada</option>
+                            <option value="au">Australia</option>
+                            <option value="fr">France</option>
+                            <option value="de">Germany</option>
+                            <option value="it">Italy</option>
+                            <option value="br">Brazil</option>
+                            <option value="in">India</option>
+                            <option value="jp">Japan</option>
+                            <option value="cn">China</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="google-safe">Safe Search</label>
+                        <select id="google-safe">
+                            <option value="active">Active</option>
+                            <option value="off">Off</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="google-gl">Google Domain</label>
+                        <select id="google-gl">
+                            <option value="com">google.com</option>
+                            <option value="co.uk">google.co.uk</option>
+                            <option value="com.au">google.com.au</option>
+                            <option value="co.fr">google.co.fr</option>
+                            <option value="de">google.de</option>
+                            <option value="co.it">google.co.it</option>
+                            <option value="com.br">google.com.br</option>
+                            <option value="co.in">google.co.in</option>
+                            <option value="co.jp">google.co.jp</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="google-device">Device</label>
+                        <select id="google-device">
+                            <option value="desktop">Desktop</option>
+                            <option value="mobile">Mobile</option>
+                            <option value="tablet">Tablet</option>
+                        </select>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit">Search</button>
+                        <button type="button" id="save-google-search" class="btn-secondary">Save Search</button>
+                    </div>
+                </form>
+
+                <div class="results-container" id="google-results">
+                    <div class="results-header">
+                        <h3 class="results-title">Search Results</h3>
+                        <div class="btn-group">
+                            <button id="export-google-results" class="btn-secondary">Export</button>
+                            <button id="save-google-results" class="btn-secondary">Save Results</button>
+                        </div>
+                    </div>
+                    <div id="google-results-content"></div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="scraper">
+                <h2 class="section-title">Web Scraper</h2>
+
+                <div class="api-key-container">
+                    <input type="text" class="api-key-input" id="scraper-api-key" placeholder="Enter your RapidAPI key">
+                    <button id="save-scraper-key">Save Key</button>
+                </div>
+
+                <div class="usage-info">
+                    <div class="usage-item">
+                        <div class="usage-label">Requests Today</div>
+                        <div class="usage-value" id="scraper-requests">0</div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="scraper-progress"></div>
+                        </div>
+                    </div>
+                    <div class="usage-item">
+                        <div class="usage-label">Remaining</div>
+                        <div class="usage-value" id="scraper-remaining">1000</div>
+                    </div>
+                </div>
+
+                <form id="scraper-contacts-form">
+                    <div class="form-group">
+                        <label for="scraper-url">Target URL</label>
+                        <input type="url" id="scraper-url" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scraper-depth">Scraping Depth</label>
+                        <select id="scraper-depth">
+                            <option value="1">1 Page</option>
+                            <option value="2">2 Pages</option>
+                            <option value="3">3 Pages</option>
+                            <option value="5">5 Pages</option>
+                            <option value="10">10 Pages</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scraper-follow-links">Follow Links</label>
+                        <select id="scraper-follow-links">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit">Scrape Contacts</button>
+                        <button type="button" id="save-scraper-contacts" class="btn-secondary">Save Scrape</button>
+                    </div>
+                </form>
+
+                <div class="results-container" id="scraper-results">
+                    <div class="results-header">
+                        <h3 class="results-title">Scraped Contacts</h3>
+                        <div class="btn-group">
+                            <button id="export-scraper-results" class="btn-secondary">Export</button>
+                            <button id="save-scraper-results" class="btn-secondary">Save Results</button>
+                        </div>
+                    </div>
+                    <div id="scraper-results-content"></div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="favorites">
+                <h2 class="section-title">Favorites</h2>
+
+                <div class="favorites-container" id="favorites-content"></div>
+            </div>
+
+            <div class="tab-content" id="history">
+                <h2 class="section-title">Search History</h2>
+
+                <div class="search-history" id="history-content"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="export-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Export Options</h3>
+                <button class="close-btn" id="close-export-modal">&times;</button>
+            </div>
+
+            <form id="export-form">
+                <div class="form-group">
+                    <label for="export-format">File Format</label>
+                    <select id="export-format">
+                        <option value="csv">CSV</option>
+                        <option value="excel">Excel</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+
+                <div class="export-options" id="export-options-container"></div>
+
+                <div class="btn-group">
+                    <button type="submit">Export</button>
+                    <button type="button" id="cancel-export" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="favorite-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add to Favorites</h3>
+                <button class="close-btn" id="close-favorite-modal">&times;</button>
+            </div>
+
+            <form id="favorite-form">
+                <div class="form-group">
+                    <label for="favorite-name">Name</label>
+                    <input type="text" id="favorite-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="favorite-tags">Tags (comma separated)</label>
+                    <input type="text" id="favorite-tags">
+                </div>
+
+                <div class="form-group">
+                    <label for="favorite-notes">Notes</label>
+                    <textarea id="favorite-notes"></textarea>
+                </div>
+
+                <input type="hidden" id="favorite-data">
+                <input type="hidden" id="favorite-type">
+
+                <div class="btn-group">
+                    <button type="submit">Save to Favorites</button>
+                    <button type="button" id="cancel-favorite" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <button class="add-favorite-btn" id="add-favorite-btn">+</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabButtons = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+
+                    // Remove active class from all tabs and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Add active class to clicked tab and corresponding content
+                    button.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // Range input value display
+            const salaryMinInput = document.getElementById('jsearch-salary-min');
+            const salaryMaxInput = document.getElementById('jsearch-salary-max');
+            const salaryMinValue = document.getElementById('jsearch-salary-min-value');
+            const salaryMaxValue = document.getElementById('jsearch-salary-max-value');
+
+            if (salaryMinInput && salaryMaxInput && salaryMinValue && salaryMaxValue) {
+                salaryMinInput.addEventListener('input', () => {
+                    salaryMinValue.textContent = salaryMinInput.value;
+                });
+
+                salaryMaxInput.addEventListener('input', () => {
+                    salaryMaxValue.textContent = salaryMaxInput.value;
+                });
+            }
+
+            // API key management
+            const apiKeys = {
+                jsearch: localStorage.getItem('jsearchApiKey') || '',
+                yahoo: localStorage.getItem('yahooApiKey') || '',
+                google: localStorage.getItem('googleApiKey') || '',
+                scraper: localStorage.getItem('scraperApiKey') || ''
+            };
+
+            // Set initial API key values
+            document.getElementById('jsearch-api-key').value = apiKeys.jsearch;
+            document.getElementById('yahoo-api-key').value = apiKeys.yahoo;
+            document.getElementById('google-api-key').value = apiKeys.google;
+            document.getElementById('scraper-api-key').value = apiKeys.scraper;
+
+            // Save API keys
+            document.getElementById('save-jsearch-key').addEventListener('click', () => {
+                apiKeys.jsearch = document.getElementById('jsearch-api-key').value;
+                localStorage.setItem('jsearchApiKey', apiKeys.jsearch);
+                showSuccessMessage('JSearch API key saved successfully');
+            });
+
+            document.getElementById('save-yahoo-key').addEventListener('click', () => {
+                apiKeys.yahoo = document.getElementById('yahoo-api-key').value;
+                localStorage.setItem('yahooApiKey', apiKeys.yahoo);
+                showSuccessMessage('Yahoo Finance API key saved successfully');
+            });
+
+            document.getElementById('save-google-key').addEventListener('click', () => {
+                apiKeys.google = document.getElementById('google-api-key').value;
+                localStorage.setItem('googleApiKey', apiKeys.google);
+                showSuccessMessage('Google Search API key saved successfully');
+            });
+
+            document.getElementById('save-scraper-key').addEventListener('click', () => {
+                apiKeys.scraper = document.getElementById('scraper-api-key').value;
+                localStorage.setItem('scraperApiKey', apiKeys.scraper);
+                showSuccessMessage('Web Scraper API key saved successfully');
+            });
+
+            // Form submissions
+            document.getElementById('jsearch-search-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await searchJobs();
+            });
+
+            document.getElementById('jsearch-details-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await getJobDetails();
+            });
+
+            document.getElementById('jsearch-filters-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await getJobFilters();
+            });
+
+            document.getElementById('jsearch-salary-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await analyzeSalary();
+            });
+
+            document.getElementById('yahoo-statistics-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await getKeyStatistics();
+            });
+
+            document.getElementById('yahoo-analysis-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await getFinancialAnalysis();
+            });
+
+            document.getElementById('yahoo-earnings-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await getEarningsTrend();
+            });
+
+            document.getElementById('yahoo-price-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await getPriceData();
+            });
+
+            document.getElementById('yahoo-multi-quote-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await getMultiQuote();
+            });
+
+            document.getElementById('yahoo-news-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await getNews();
+            });
+
+            document.getElementById('google-search-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await searchGoogle();
+            });
+
+            document.getElementById('scraper-contacts-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await scrapeContacts();
+            });
+
+            // Export functionality
+            document.getElementById('export-jsearch-results').addEventListener('click', () => {
+                showExportModal('jsearch-results', 'Job Search Results');
+            });
+
+            document.getElementById('export-jsearch-details').addEventListener('click', () => {
+                showExportModal('jsearch-details', 'Job Details');
+            });
+
+            document.getElementById('export-jsearch-filters').addEventListener('click', () => {
+                showExportModal('jsearch-filters', 'Job Filters');
+            });
+
+            document.getElementById('export-jsearch-salary').addEventListener('click', () => {
+                showExportModal('jsearch-salary', 'Salary Analysis');
+            });
+
+            document.getElementById('export-yahoo-statistics').addEventListener('click', () => {
+                showExportModal('yahoo-statistics', 'Key Statistics');
+            });
+
+            document.getElementById('export-yahoo-analysis').addEventListener('click', () => {
+                showExportModal('yahoo-analysis', 'Financial Analysis');
+            });
+
+            document.getElementById('export-yahoo-earnings').addEventListener('click', () => {
+                showExportModal('yahoo-earnings', 'Earnings Trend');
+            });
+
+            document.getElementById('export-yahoo-price').addEventListener('click', () => {
+                showExportModal('yahoo-price', 'Price Data');
+            });
+
+            document.getElementById('export-yahoo-multi-quote').addEventListener('click', () => {
+                showExportModal('yahoo-multi-quote', 'Multi Quote');
+            });
+
+            document.getElementById('export-yahoo-news').addEventListener('click', () => {
+                showExportModal('yahoo-news', 'News');
+            });
+
+            document.getElementById('export-google-results').addEventListener('click', () => {
+                showExportModal('google-results', 'Google Search Results');
+            });
+
+            document.getElementById('export-scraper-results').addEventListener('click', () => {
+                showExportModal('scraper-results', 'Scraped Contacts');
+            });
+
+            document.getElementById('export-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                exportData();
+            });
+
+            document.getElementById('close-export-modal').addEventListener('click', () => {
+                document.getElementById('export-modal').classList.remove('active');
+            });
+
+            document.getElementById('cancel-export').addEventListener('click', () => {
+                document.getElementById('export-modal').classList.remove('active');
+            });
+
+            // Save functionality
+            document.getElementById('save-jsearch-search').addEventListener('click', () => {
+                saveToFavorites('jsearch-search', 'Job Search');
+            });
+
+            document.getElementById('save-jsearch-details').addEventListener('click', () => {
+                saveToFavorites('jsearch-details', 'Job Details');
+            });
+
+            document.getElementById('save-jsearch-filters').addEventListener('click', () => {
+                saveToFavorites('jsearch-filters', 'Job Filters');
+            });
+
+            document.getElementById('save-jsearch-salary').addEventListener('click', () => {
+                saveToFavorites('jsearch-salary', 'Salary Analysis');
+            });
+
+            document.getElementById('save-yahoo-statistics').addEventListener('click', () => {
+                saveToFavorites('yahoo-statistics', 'Key Statistics');
+            });
+
+            document.getElementById('save-yahoo-analysis').addEventListener('click', () => {
+                saveToFavorites('yahoo-analysis', 'Financial Analysis');
+            });
+
+            document.getElementById('save-yahoo-earnings').addEventListener('click', () => {
+                saveToFavorites('yahoo-earnings', 'Earnings Trend');
+            });
+
+            document.getElementById('save-yahoo-price').addEventListener('click', () => {
+                saveToFavorites('yahoo-price', 'Price Data');
+            });
+
+            document.getElementById('save-yahoo-multi-quote').addEventListener('click', () => {
+                saveToFavorites('yahoo-multi-quote', 'Multi Quote');
+            });
+
+            document.getElementById('save-yahoo-news').addEventListener('click', () => {
+                saveToFavorites('yahoo-news', 'News');
+            });
+
+            document.getElementById('save-google-search').addEventListener('click', () => {
+                saveToFavorites('google-search', 'Google Search');
+            });
+
+            document.getElementById('save-scraper-contacts').addEventListener('click', () => {
+                saveToFavorites('scraper-contacts', 'Web Scraper');
+            });
+
+            // Favorite functionality
+            document.getElementById('favorite-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                addToFavorites();
+            });
+
+            document.getElementById('close-favorite-modal').addEventListener('click', () => {
+                document.getElementById('favorite-modal').classList.remove('active');
+            });
+
+            document.getElementById('cancel-favorite').addEventListener('click', () => {
+                document.getElementById('favorite-modal').classList.remove('active');
+            });
+
+            document.getElementById('add-favorite-btn').addEventListener('click', () => {
+                showFavoriteModal();
+            });
+
+            // Load favorites and history
+            loadFavorites();
+            loadHistory();
+
+            // Autocomplete for stock symbols
+            setupAutocomplete('yahoo-symbol', 'yahoo-symbol-results');
+            setupAutocomplete('yahoo-analysis-symbol', 'yahoo-analysis-symbol-results');
+            setupAutocomplete('yahoo-earnings-symbol', 'yahoo-earnings-symbol-results');
+            setupAutocomplete('yahoo-price-symbol', 'yahoo-price-symbol-results');
+            setupAutocomplete('yahoo-news-symbol', 'yahoo-news-symbol-results');
+
+            // Initialize usage tracking
+            updateUsageDisplay('jsearch', 0, 1000);
+            updateUsageDisplay('yahoo', 0, 1000);
+            updateUsageDisplay('google', 0, 1000);
+            updateUsageDisplay('scraper', 0, 1000);
+        });
+
+        // Function to show loading state
+        function showLoading(containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+        }
+
+        // Function to show error message
+        function showError(containerId, message) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+
+        // Function to show success message
+        function showSuccessMessage(message) {
+            const successMessage = document.createElement('div');
+            successMessage.className = 'success-message';
+            successMessage.textContent = message;
+            document.body.appendChild(successMessage);
+
+            setTimeout(() => {
+                successMessage.remove();
+            }, 3000);
+        }
+
+        // Function to update usage display
+        function updateUsageDisplay(service, requests, limit) {
+            const requestsElement = document.getElementById(`${service}-requests`);
+            const remainingElement = document.getElementById(`${service}-remaining`);
+            const progressElement = document.getElementById(`${service}-progress`);
+
+            if (requestsElement && remainingElement && progressElement) {
+                requestsElement.textContent = requests;
+                remainingElement.textContent = limit - requests;
+                progressElement.style.width = `${(requests / limit) * 100}%`;
+            }
+        }
+
+        // Function to search jobs
+        async function searchJobs() {
+            const query = document.getElementById('jsearch-query').value;
+            const location = document.getElementById('jsearch-location').value;
+            const radius = document.getElementById('jsearch-radius').value;
+            const salaryMin = document.getElementById('jsearch-salary-min').value;
+            const salaryMax = document.getElementById('jsearch-salary-max').value;
+            const datePosted = document.getElementById('jsearch-date-posted').value;
+            const employmentType = document.getElementById('jsearch-employment-type').value;
+
+            const apiKey = localStorage.getItem('jsearchApiKey');
+            if (!apiKey) {
+                showError('jsearch-results-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('jsearch-results-content');
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/rapidapi/jsearch/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-RapidAPI-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        query,
+                        location,
+                        radius,
+                        salaryMin,
+                        salaryMax,
+                        datePosted,
+                        employmentType
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('jsearch', data.usage.requests, data.usage.limit);
+
+                // Display results
+                displayJobResults(data.results);
+
+                // Add to history
+                addToHistory('jsearch-search', query);
+            } catch (error) {
+                showError('jsearch-results-content', `Error searching jobs: ${error.message}`);
+            }
+        }
+
+        // Function to display job results
+        function displayJobResults(results) {
+            const container = document.getElementById('jsearch-results-content');
+
+            if (!results || results.length === 0) {
+                container.innerHTML = '<div class="error-message">No jobs found</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Job Title</th>
+                            <th>Company</th>
+                            <th>Location</th>
+                            <th>Salary</th>
+                            <th>Date Posted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            results.forEach(job => {
+                html += `
+                    <tr>
+                        <td>${job.job_title || 'N/A'}</td>
+                        <td>${job.employer_name || 'N/A'}</td>
+                        <td>${job.job_city || 'N/A'}, ${job.job_country || 'N/A'}</td>
+                        <td>${job.job_min_salary ? `$${job.job_min_salary} - $${job.job_max_salary}` : 'N/A'}</td>
+                        <td>${job.job_posted_at_datetime_utc ? new Date(job.job_posted_at_datetime_utc).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                            <button class="btn-secondary view-job-details" data-id="${job.job_id}">View Details</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+
+            container.innerHTML = html;
+
+            // Add event listeners to view details buttons
+            document.querySelectorAll('.view-job-details').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const jobId = e.target.getAttribute('data-id');
+                    document.getElementById('jsearch-job-id').value = jobId;
+                    document.querySelector('.tab[data-tab="details"]').click();
+                    document.getElementById('jsearch-details-form').dispatchEvent(new Event('submit'));
+                });
+            });
+        }
+
+        // Function to get job details
+        async function getJobDetails() {
+            const jobId = document.getElementById('jsearch-job-id').value;
+
+            if (!jobId) {
+                showError('jsearch-details-content', 'Please enter a Job ID');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('jsearchApiKey');
+            if (!apiKey) {
+                showError('jsearch-details-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('jsearch-details-content');
+
+            try {
+                const response = await fetch(`https://theserver-open-ai.replit.app/rapidapi/jsearch/details/${jobId}`, {
+                    headers: {
+                        'X-RapidAPI-Key': apiKey
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('jsearch', data.usage.requests, data.usage.limit);
+
+                // Display details
+                displayJobDetails(data.details);
+
+                // Add to history
+                addToHistory('jsearch-details', jobId);
+            } catch (error) {
+                showError('jsearch-details-content', `Error getting job details: ${error.message}`);
+            }
+        }
+
+        // Function to display job details
+        function displayJobDetails(details) {
+            const container = document.getElementById('jsearch-details-content');
+
+            if (!details) {
+                container.innerHTML = '<div class="error-message">No details found for this job</div>';
+                return;
+            }
+
+            let html = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">${details.job_title || 'N/A'}</h3>
+                        <button class="btn-secondary save-job-details" data-details='${JSON.stringify(details)}'>Save Details</button>
+                    </div>
+
+                    <div class="card-content">
+                        <div class="metric">
+                            <div class="metric-label">Company</div>
+                            <div class="metric-value">${details.employer_name || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Location</div>
+                            <div class="metric-value">${details.job_city || 'N/A'}, ${details.job_country || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Salary</div>
+                            <div class="metric-value">${details.job_min_salary ? `$${details.job_min_salary} - $${details.job_max_salary}` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Date Posted</div>
+                            <div class="metric-value">${details.job_posted_at_datetime_utc ? new Date(details.job_posted_at_datetime_utc).toLocaleDateString() : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Employment Type</div>
+                            <div class="metric-value">${details.job_employment_type || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Job Description</div>
+                            <div class="metric-value">${details.job_description || 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+
+            // Add event listener to save details button
+            document.querySelector('.save-job-details').addEventListener('click', (e) => {
+                const details = JSON.parse(e.target.getAttribute('data-details'));
+                saveToFavorites('jsearch-details', 'Job Details', details);
+            });
+        }
+
+        // Function to get job filters
+        async function getJobFilters() {
+            const industry = document.getElementById('jsearch-industry').value;
+            const experience = document.getElementById('jsearch-experience').value;
+
+            const apiKey = localStorage.getItem('jsearchApiKey');
+            if (!apiKey) {
+                showError('jsearch-filters-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('jsearch-filters-content');
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/rapidapi/jsearch/filters', {
+                    method: 'GET',
+                    headers: {
+                        'X-RapidAPI-Key': apiKey
+                    },
+                    params: {
+                        industry,
+                        experience
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('jsearch', data.usage.requests, data.usage.limit);
+
+                // Display filters
+                displayJobFilters(data.filters);
+
+                // Add to history
+                addToHistory('jsearch-filters', `${industry}, ${experience}`);
+            } catch (error) {
+                showError('jsearch-filters-content', `Error getting job filters: ${error.message}`);
+            }
+        }
+
+        // Function to display job filters
+        function displayJobFilters(filters) {
+            const container = document.getElementById('jsearch-filters-content');
+
+            if (!filters || filters.length === 0) {
+                container.innerHTML = '<div class="error-message">No filters found</div>';
+                return;
+            }
+
+            let html = `
+                <div class="filter-container">
+            `;
+
+            filters.forEach(filter => {
+                html += `
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">${filter.name || 'N/A'}</h3>
+                        </div>
+
+                        <div class="card-content">
+                `;
+
+                if (filter.options && filter.options.length > 0) {
+                    filter.options.forEach(option => {
+                        html += `
+                            <div class="metric">
+                                <div class="metric-label">${option.name || 'N/A'}</div>
+                                <div class="metric-value">${option.value || 'N/A'}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<div class="error-message">No options available</div>';
+                }
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // Function to analyze salary
+        async function analyzeSalary() {
+            const jobTitle = document.getElementById('jsearch-salary-job-title').value;
+            const location = document.getElementById('jsearch-salary-location').value;
+
+            const apiKey = localStorage.getItem('jsearchApiKey');
+            if (!apiKey) {
+                showError('jsearch-salary-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('jsearch-salary-content');
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/rapidapi/jsearch/salary', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-RapidAPI-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        jobTitle,
+                        location
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('jsearch', data.usage.requests, data.usage.limit);
+
+                // Display salary analysis
+                displaySalaryAnalysis(data.analysis);
+
+                // Add to history
+                addToHistory('jsearch-salary', `${jobTitle}, ${location}`);
+            } catch (error) {
+                showError('jsearch-salary-content', `Error analyzing salary: ${error.message}`);
+            }
+        }
+
+        // Function to display salary analysis
+        function displaySalaryAnalysis(analysis) {
+            const container = document.getElementById('jsearch-salary-content');
+
+            if (!analysis) {
+                container.innerHTML = '<div class="error-message">No salary analysis available</div>';
+                return;
+            }
+
+            let html = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Salary Analysis for ${analysis.jobTitle || 'N/A'}</h3>
+                    </div>
+
+                    <div class="card-content">
+                        <div class="metric">
+                            <div class="metric-label">Location</div>
+                            <div class="metric-value">${analysis.location || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Average Salary</div>
+                            <div class="metric-value">${analysis.averageSalary ? `$${analysis.averageSalary}` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Salary Range</div>
+                            <div class="metric-value">${analysis.minSalary ? `$${analysis.minSalary} - $${analysis.maxSalary}` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Salary Percentile 25th</div>
+                            <div class="metric-value">${analysis.percentile25 ? `$${analysis.percentile25}` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Salary Percentile 50th</div>
+                            <div class="metric-value">${analysis.percentile50 ? `$${analysis.percentile50}` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Salary Percentile 75th</div>
+                            <div class="metric-value">${analysis.percentile75 ? `$${analysis.percentile75}` : 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="salary-chart"></canvas>
+                </div>
+            `;
+
+            container.innerHTML = html;
+
+            // Create chart
+            if (analysis.chartData) {
+                createSalaryChart(analysis.chartData);
+            }
+        }
+
+        // Function to create salary chart
+        function createSalaryChart(chartData) {
+            const ctx = document.getElementById('salary-chart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Salary Distribution',
+                        data: chartData.data,
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ecf0f1'
+                            },
+                            grid: {
+                                color: 'rgba(236, 240, 241, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ecf0f1'
+                            },
+                            grid: {
+                                color: 'rgba(236, 240, 241, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ecf0f1'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to get key statistics
+        async function getKeyStatistics() {
+            const symbol = document.getElementById('yahoo-symbol').value;
+
+            if (!symbol) {
+                showError('yahoo-statistics-content', 'Please enter a stock symbol');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('yahooApiKey');
+            if (!apiKey) {
+                showError('yahoo-statistics-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('yahoo-statistics-content');
+
+            try {
+                const response = await fetch(`https://theserver-open-ai.replit.app/rapidapi/yahoo/key-statistics/${symbol}`, {
+                    headers: {
+                        'X-RapidAPI-Key': apiKey
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('yahoo', data.usage.requests, data.usage.limit);
+
+                // Display key statistics
+                displayKeyStatistics(data.statistics);
+
+                // Add to history
+                addToHistory('yahoo-statistics', symbol);
+            } catch (error) {
+                showError('yahoo-statistics-content', `Error getting key statistics: ${error.message}`);
+            }
+        }
+
+        // Function to display key statistics
+        function displayKeyStatistics(statistics) {
+            const container = document.getElementById('yahoo-statistics-content');
+
+            if (!statistics) {
+                container.innerHTML = '<div class="error-message">No statistics found for this symbol</div>';
+                return;
+            }
+
+            let html = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Key Statistics for ${statistics.symbol || 'N/A'}</h3>
+                    </div>
+
+                    <div class="card-content">
+                        <div class="metric">
+                            <div class="metric-label">Market Cap</div>
+                            <div class="metric-value">${statistics.marketCap ? `$${statistics.marketCap.toLocaleString()}` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Enterprise Value</div>
+                            <div class="metric-value">${statistics.enterpriseValue ? `$${statistics.enterpriseValue.toLocaleString()}` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Trailing P/E</div>
+                            <div class="metric-value">${statistics.trailingPE || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Forward P/E</div>
+                            <div class="metric-value">${statistics.forwardPE || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">PEG Ratio</div>
+                            <div class="metric-value">${statistics.pegRatio || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Price/Sales</div>
+                            <div class="metric-value">${statistics.priceToSales || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Price/Book</div>
+                            <div class="metric-value">${statistics.priceToBook || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Enterprise to Revenue</div>
+                            <div class="metric-value">${statistics.enterpriseToRevenue || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Enterprise to EBITDA</div>
+                            <div class="metric-value">${statistics.enterpriseToEbitda || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Beta</div>
+                            <div class="metric-value">${statistics.beta || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">52 Week High</div>
+                            <div class="metric-value">${statistics.fiftyTwoWeekHigh || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">52 Week Low</div>
+                            <div class="metric-value">${statistics.fiftyTwoWeekLow || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">50 Day Average</div>
+                            <div class="metric-value">${statistics.fiftyDayAverage || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">200 Day Average</div>
+                            <div class="metric-value">${statistics.twoHundredDayAverage || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Average Volume</div>
+                            <div class="metric-value">${statistics.averageVolume ? statistics.averageVolume.toLocaleString() : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Shares Outstanding</div>
+                            <div class="metric-value">${statistics.sharesOutstanding ? statistics.sharesOutstanding.toLocaleString() : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Float</div>
+                            <div class="metric-value">${statistics.floatShares ? statistics.floatShares.toLocaleString() : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Holders</div>
+                            <div class="metric-value">${statistics.heldPercentInstitutions ? `${statistics.heldPercentInstitutions}%` : 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Function to get financial analysis
+        async function getFinancialAnalysis() {
+            const symbol = document.getElementById('yahoo-analysis-symbol').value;
+
+            if (!symbol) {
+                showError('yahoo-analysis-content', 'Please enter a stock symbol');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('yahooApiKey');
+            if (!apiKey) {
+                showError('yahoo-analysis-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('yahoo-analysis-content');
+
+            try {
+                const response = await fetch(`https://theserver-open-ai.replit.app/rapidapi/yahoo/financial-analysis/${symbol}`, {
+                    headers: {
+                        'X-RapidAPI-Key': apiKey
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('yahoo', data.usage.requests, data.usage.limit);
+
+                // Display financial analysis
+                displayFinancialAnalysis(data.analysis);
+
+                // Add to history
+                addToHistory('yahoo-analysis', symbol);
+            } catch (error) {
+                showError('yahoo-analysis-content', `Error getting financial analysis: ${error.message}`);
+            }
+        }
+
+        // Function to display financial analysis
+        function displayFinancialAnalysis(analysis) {
+            const container = document.getElementById('yahoo-analysis-content');
+
+            if (!analysis) {
+                container.innerHTML = '<div class="error-message">No financial analysis found for this symbol</div>';
+                return;
+            }
+
+            let html = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Financial Analysis for ${analysis.symbol || 'N/A'}</h3>
+                    </div>
+
+                    <div class="card-content">
+                        <div class="metric">
+                            <div class="metric-label">Revenue Growth</div>
+                            <div class="metric-value">${analysis.revenueGrowth ? `${(analysis.revenueGrowth * 100).toFixed(2)}%` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Earnings Growth</div>
+                            <div class="metric-value">${analysis.earningsGrowth ? `${(analysis.earningsGrowth * 100).toFixed(2)}%` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Profit Margin</div>
+                            <div class="metric-value">${analysis.profitMargin ? `${(analysis.profitMargin * 100).toFixed(2)}%` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Operating Margin</div>
+                            <div class="metric-value">${analysis.operatingMargin ? `${(analysis.operatingMargin * 100).toFixed(2)}%` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Return on Assets</div>
+                            <div class="metric-value">${analysis.returnOnAssets ? `${(analysis.returnOnAssets * 100).toFixed(2)}%` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Return on Equity</div>
+                            <div class="metric-value">${analysis.returnOnEquity ? `${(analysis.returnOnEquity * 100).toFixed(2)}%` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Current Ratio</div>
+                            <div class="metric-value">${analysis.currentRatio || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Quick Ratio</div>
+                            <div class="metric-value">${analysis.quickRatio || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Debt to Equity</div>
+                            <div class="metric-value">${analysis.debtToEquity || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Price to Book</div>
+                            <div class="metric-value">${analysis.priceToBook || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Price to Sales</div>
+                            <div class="metric-value">${analysis.priceToSales || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Price to Free Cash Flow</div>
+                            <div class="metric-value">${analysis.priceToFreeCashFlow || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Dividend Yield</div>
+                            <div class="metric-value">${analysis.dividendYield ? `${(analysis.dividendYield * 100).toFixed(2)}%` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Payout Ratio</div>
+                            <div class="metric-value">${analysis.payoutRatio ? `${(analysis.payoutRatio * 100).toFixed(2)}%` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Graham Number</div>
+                            <div class="metric-value">${analysis.grahamNumber || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Graham Net Net</div>
+                            <div class="metric-value">${analysis.grahamNetNet ? `${(analysis.grahamNetNet * 100).toFixed(2)}%` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">ROIC</div>
+                            <div class="metric-value">${analysis.roic ? `${(analysis.roic * 100).toFixed(2)}%` : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Enterprise Value</div>
+                            <div class="metric-value">${analysis.enterpriseValue ? `$${analysis.enterpriseValue.toLocaleString()}` : 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Function to get earnings trend
+        async function getEarningsTrend() {
+            const symbol = document.getElementById('yahoo-earnings-symbol').value;
+
+            if (!symbol) {
+                showError('yahoo-earnings-content', 'Please enter a stock symbol');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('yahooApiKey');
+            if (!apiKey) {
+                showError('yahoo-earnings-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('yahoo-earnings-content');
+
+            try {
+                const response = await fetch(`https://theserver-open-ai.replit.app/rapidapi/yahoo/earnings-trend/${symbol}`, {
+                    headers: {
+                        'X-RapidAPI-Key': apiKey
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('yahoo', data.usage.requests, data.usage.limit);
+
+                // Display earnings trend
+                displayEarningsTrend(data.trend);
+
+                // Add to history
+                addToHistory('yahoo-earnings', symbol);
+            } catch (error) {
+                showError('yahoo-earnings-content', `Error getting earnings trend: ${error.message}`);
+            }
+        }
+
+        // Function to display earnings trend
+        function displayEarningsTrend(trend) {
+            const container = document.getElementById('yahoo-earnings-content');
+
+            if (!trend || !trend.quarterly || trend.quarterly.length === 0) {
+                container.innerHTML = '<div class="error-message">No earnings trend data available</div>';
+                return;
+            }
+
+            let html = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Earnings Trend for ${trend.symbol || 'N/A'}</h3>
+                    </div>
+
+                    <div class="card-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Quarter</th>
+                                    <th>Revenue Estimate</th>
+                                    <th>Revenue Actual</th>
+                                    <th>Earnings Estimate</th>
+                                    <th>Earnings Actual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+
+            trend.quarterly.forEach(quarter => {
+                html += `
+                    <tr>
+                        <td>${quarter.period || 'N/A'}</td>
+                        <td>${quarter.revenueEstimate ? `$${quarter.revenueEstimate.toLocaleString()}` : 'N/A'}</td>
+                        <td>${quarter.revenueActual ? `$${quarter.revenueActual.toLocaleString()}` : 'N/A'}</td>
+                        <td>${quarter.earningsEstimate ? `$${quarter.earningsEstimate.toLocaleString()}` : 'N/A'}</td>
+                        <td>${quarter.earningsActual ? `$${quarter.earningsActual.toLocaleString()}` : 'N/A'}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="earnings-chart"></canvas>
+                </div>
+            `;
+
+            container.innerHTML = html;
+
+            // Create chart
+            createEarningsChart(trend);
+        }
+
+        // Function to create earnings chart
+        function createEarningsChart(trend) {
+            const ctx = document.getElementById('earnings-chart').getContext('2d');
+
+            const labels = trend.quarterly.map(q => q.period);
+            const revenueEstimate = trend.quarterly.map(q => q.revenueEstimate || 0);
+            const revenueActual = trend.quarterly.map(q => q.revenueActual || 0);
+            const earningsEstimate = trend.quarterly.map(q => q.earningsEstimate || 0);
+            const earningsActual = trend.quarterly.map(q => q.earningsActual || 0);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Revenue Estimate',
+                            data: revenueEstimate,
+                            backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Revenue Actual',
+                            data: revenueActual,
+                            backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Earnings Estimate',
+                            data: earningsEstimate,
+                            backgroundColor: 'rgba(243, 156, 18, 0.7)',
+                            borderColor: 'rgba(243, 156, 18, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Earnings Actual',
+                            data: earningsActual,
+                            backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ecf0f1'
+                            },
+                            grid: {
+                                color: 'rgba(236, 240, 241, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ecf0f1'
+                            },
+                            grid: {
+                                color: 'rgba(236, 240, 241, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ecf0f1'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to get price data
+        async function getPriceData() {
+            const symbol = document.getElementById('yahoo-price-symbol').value;
+            const range = document.getElementById('yahoo-price-range').value;
+
+            if (!symbol) {
+                showError('yahoo-price-content', 'Please enter a stock symbol');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('yahooApiKey');
+            if (!apiKey) {
+                showError('yahoo-price-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('yahoo-price-content');
+
+            try {
+                const response = await fetch(`https://theserver-open-ai.replit.app/rapidapi/yahoo/price/${symbol}`, {
+                    headers: {
+                        'X-RapidAPI-Key': apiKey
+                    },
+                    params: {
+                        range: range
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('yahoo', data.usage.requests, data.usage.limit);
+
+                // Display price data
+                displayPriceData(data.priceData);
+
+                // Add to history
+                addToHistory('yahoo-price', `${symbol}, ${range}`);
+            } catch (error) {
+                showError('yahoo-price-content', `Error getting price data: ${error.message}`);
+            }
+        }
+
+        // Function to display price data
+        function displayPriceData(priceData) {
+            const container = document.getElementById('yahoo-price-content');
+
+            if (!priceData || !priceData.chart || !priceData.chart.result || priceData.chart.result.length === 0) {
+                container.innerHTML = '<div class="error-message">No price data available</div>';
+                return;
+            }
+
+            const result = priceData.chart.result[0];
+            const meta = result.meta;
+            const timestamps = result.timestamp;
+            const indicators = result.indicators;
+
+            let html = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Price Data for ${meta.symbol || 'N/A'}</h3>
+                    </div>
+
+                    <div class="card-content">
+                        <div class="metric">
+                            <div class="metric-label">Currency</div>
+                            <div class="metric-value">${meta.currency || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Timezone</div>
+                            <div class="metric-value">${meta.timezone || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Exchange Timezone</div>
+                            <div class="metric-value">${meta.exchangeTimezone || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Exchange Name</div>
+                            <div class="metric-value">${meta.exchangeName || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Instrument Type</div>
+                            <div class="metric-value">${meta.instrumentType || 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">First Trade Date</div>
+                            <div class="metric-value">${meta.firstTradeDate ? new Date(meta.firstTradeDate * 1000).toLocaleDateString() : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Regular Market Time</div>
+                            <div class="metric-value">${meta.regularMarketTime ? new Date(meta.regularMarketTime * 1000).toLocaleString() : 'N/A'}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">GMTOffset</div>
+                            <div class="metric-value">${meta.gmtoffset || 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="price-chart"></canvas>
+                </div>
+            `;
+
+            container.innerHTML = html;
+
+            // Create chart
+            createPriceChart(timestamps, indicators);
+        }
+
+        // Function to create price chart
+        function createPriceChart(timestamps, indicators) {
+            const ctx = document.getElementById('price-chart').getContext('2d');
+
+            const labels = timestamps.map(t => new Date(t * 1000).toLocaleDateString());
+            const quote = indicators.quote[0];
+            const open = quote.open;
+            const close = quote.close;
+            const high = quote.high;
+            const low = quote.low;
+            const volume = quote.volume;
+
+            new Chart(ctx, {
+                type: 'candlestick',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Price Data',
+                        data: timestamps.map((t, i) => ({
+                            x: t,
+                            o: open[i],
+                            h: high[i],
+                            l: low[i],
+                            c: close[i]
+                        })),
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            },
+                            ticks: {
+                                color: '#ecf0f1'
+                            },
+                            grid: {
+                                color: 'rgba(236, 240, 241, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#ecf0f1'
+                            },
+                            grid: {
+                                color: 'rgba(236, 240, 241, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ecf0f1'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const data = context.raw;
+                                    return [
+                                        `Open: ${data.o}`,
+                                        `High: ${data.h}`,
+                                        `Low: ${data.l}`,
+                                        `Close: ${data.c}`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to get multi quote
+        async function getMultiQuote() {
+            const symbols = document.getElementById('yahoo-symbols').value;
+
+            if (!symbols) {
+                showError('yahoo-multi-quote-content', 'Please enter stock symbols');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('yahooApiKey');
+            if (!apiKey) {
+                showError('yahoo-multi-quote-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('yahoo-multi-quote-content');
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/rapidapi/yahoo/multi-quote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-RapidAPI-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        symbols: symbols.split(',').map(s => s.trim())
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('yahoo', data.usage.requests, data.usage.limit);
+
+                // Display multi quote
+                displayMultiQuote(data.quotes);
+
+                // Add to history
+                addToHistory('yahoo-multi-quote', symbols);
+            } catch (error) {
+                showError('yahoo-multi-quote-content', `Error getting multi quote: ${error.message}`);
+            }
+        }
+
+        // Function to display multi quote
+        function displayMultiQuote(quotes) {
+            const container = document.getElementById('yahoo-multi-quote-content');
+
+            if (!quotes || quotes.length === 0) {
+                container.innerHTML = '<div class="error-message">No quotes found for the given symbols</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>% Change</th>
+                            <th>Volume</th>
+                            <th>Market Cap</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            quotes.forEach(quote => {
+                const change = quote.regularMarketChange || 0;
+                const percentChange = quote.regularMarketChangePercent || 0;
+                const changeClass = change >= 0 ? 'sentiment-positive' : 'sentiment-negative';
+
+                html += `
+                    <tr>
+                        <td>${quote.symbol || 'N/A'}</td>
+                        <td>${quote.longName || 'N/A'}</td>
+                        <td>${quote.regularMarketPrice || 'N/A'}</td>
+                        <td class="${changeClass}">${change.toFixed(2)}</td>
+                        <td class="${changeClass}">${percentChange.toFixed(2)}%</td>
+                        <td>${quote.regularMarketVolume ? quote.regularMarketVolume.toLocaleString() : 'N/A'}</td>
+                        <td>${quote.marketCap ? `$${quote.marketCap.toLocaleString()}` : 'N/A'}</td>
+                        <td>
+                            <button class="btn-secondary view-statistics" data-symbol="${quote.symbol}">Statistics</button>
+                            <button class="btn-secondary view-analysis" data-symbol="${quote.symbol}">Analysis</button>
+                            <button class="btn-secondary view-earnings" data-symbol="${quote.symbol}">Earnings</button>
+                            <button class="btn-secondary view-price" data-symbol="${quote.symbol}">Price</button>
+                            <button class="btn-secondary view-news" data-symbol="${quote.symbol}">News</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+
+            container.innerHTML = html;
+
+            // Add event listeners to view buttons
+            document.querySelectorAll('.view-statistics').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const symbol = e.target.getAttribute('data-symbol');
+                    document.getElementById('yahoo-symbol').value = symbol;
+                    document.querySelector('.tab[data-tab="statistics"]').click();
+                    document.getElementById('yahoo-statistics-form').dispatchEvent(new Event('submit'));
+                });
+            });
+
+            document.querySelectorAll('.view-analysis').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const symbol = e.target.getAttribute('data-symbol');
+                    document.getElementById('yahoo-analysis-symbol').value = symbol;
+                    document.querySelector('.tab[data-tab="analysis"]').click();
+                    document.getElementById('yahoo-analysis-form').dispatchEvent(new Event('submit'));
+                });
+            });
+
+            document.querySelectorAll('.view-earnings').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const symbol = e.target.getAttribute('data-symbol');
+                    document.getElementById('yahoo-earnings-symbol').value = symbol;
+                    document.querySelector('.tab[data-tab="earnings"]').click();
+                    document.getElementById('yahoo-earnings-form').dispatchEvent(new Event('submit'));
+                });
+            });
+
+            document.querySelectorAll('.view-price').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const symbol = e.target.getAttribute('data-symbol');
+                    document.getElementById('yahoo-price-symbol').value = symbol;
+                    document.querySelector('.tab[data-tab="price"]').click();
+                    document.getElementById('yahoo-price-form').dispatchEvent(new Event('submit'));
+                });
+            });
+
+            document.querySelectorAll('.view-news').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const symbol = e.target.getAttribute('data-symbol');
+                    document.getElementById('yahoo-news-symbol').value = symbol;
+                    document.querySelector('.tab[data-tab="news"]').click();
+                    document.getElementById('yahoo-news-form').dispatchEvent(new Event('submit'));
+                });
+            });
+        }
+
+        // Function to get news
+        async function getNews() {
+            const symbol = document.getElementById('yahoo-news-symbol').value;
+
+            if (!symbol) {
+                showError('yahoo-news-content', 'Please enter a stock symbol');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('yahooApiKey');
+            if (!apiKey) {
+                showError('yahoo-news-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('yahoo-news-content');
+
+            try {
+                const response = await fetch(`https://theserver-open-ai.replit.app/rapidapi/yahoo/news/${symbol}`, {
+                    headers: {
+                        'X-RapidAPI-Key': apiKey
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('yahoo', data.usage.requests, data.usage.limit);
+
+                // Display news
+                displayNews(data.news);
+
+                // Add to history
+                addToHistory('yahoo-news', symbol);
+            } catch (error) {
+                showError('yahoo-news-content', `Error getting news: ${error.message}`);
+            }
+        }
+
+        // Function to display news
+        function displayNews(news) {
+            const container = document.getElementById('yahoo-news-content');
+
+            if (!news || news.length === 0) {
+                container.innerHTML = '<div class="error-message">No news found for this symbol</div>';
+                return;
+            }
+
+            // Get unique categories
+            const categories = [...new Set(news.map(item => item.category))];
+
+            let html = `
+                <div class="news-filters">
+                    <button class="news-filter active" data-category="all">All</button>
+            `;
+
+            categories.forEach(category => {
+                html += `<button class="news-filter" data-category="${category}">${category}</button>`;
+            });
+
+            html += '</div>';
+
+            html += '<div class="news-container">';
+
+            news.forEach(item => {
+                const sentimentClass = item.sentiment === 'positive' ? 'sentiment-positive' :
+                                      item.sentiment === 'negative' ? 'sentiment-negative' : 'sentiment-neutral';
+
+                html += `
+                    <div class="news-item" data-category="${item.category}">
+                        <h4 class="news-title">${item.title || 'N/A'}</h4>
+                        <div class="news-source">${item.source || 'N/A'}</div>
+                        <div class="news-date">${item.date ? new Date(item.date).toLocaleString() : 'N/A'}</div>
+                        <p class="news-content">${item.content || 'N/A'}</p>
+                        <div class="news-sentiment ${sentimentClass}">${item.sentiment || 'neutral'}</div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+
+            container.innerHTML = html;
+
+            // Add event listeners to filters
+            document.querySelectorAll('.news-filter').forEach(filter => {
+                filter.addEventListener('click', () => {
+                    const category = filter.getAttribute('data-category');
+
+                    // Remove active class from all filters
+                    document.querySelectorAll('.news-filter').forEach(f => f.classList.remove('active'));
+
+                    // Add active class to clicked filter
+                    filter.classList.add('active');
+
+                    // Show/hide news items based on category
+                    document.querySelectorAll('.news-item').forEach(item => {
+                        if (category === 'all' || item.getAttribute('data-category') === category) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        }
+
+        // Function to search Google
+        async function searchGoogle() {
+            const query = document.getElementById('google-query').value;
+            const location = document.getElementById('google-location').value;
+            const language = document.getElementById('google-language').value;
+            const region = document.getElementById('google-region').value;
+            const safe = document.getElementById('google-safe').value;
+            const gl = document.getElementById('google-gl').value;
+            const device = document.getElementById('google-device').value;
+
+            if (!query) {
+                showError('google-results-content', 'Please enter a search query');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('googleApiKey');
+            if (!apiKey) {
+                showError('google-results-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('google-results-content');
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/rapidapi/google/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-RapidAPI-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        query,
+                        location,
+                        language,
+                        region,
+                        safe,
+                        gl,
+                        device
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('google', data.usage.requests, data.usage.limit);
+
+                // Display search results
+                displayGoogleResults(data.results);
+
+                // Add to history
+                addToHistory('google-search', query);
+            } catch (error) {
+                showError('google-results-content', `Error searching Google: ${error.message}`);
+            }
+        }
+
+        // Function to display Google search results
+        function displayGoogleResults(results) {
+            const container = document.getElementById('google-results-content');
+
+            if (!results || results.length === 0) {
+                container.innerHTML = '<div class="error-message">No results found for your search</div>';
+                return;
+            }
+
+            let html = '<div class="results-container">';
+
+            results.forEach(result => {
+                html += `
+                    <div class="result-item">
+                        <h4 class="result-title"><a href="${result.link}" target="_blank">${result.title || 'N/A'}</a></h4>
+                        <div class="result-link">${result.link || 'N/A'}</div>
+                        <p class="result-description">${result.description || 'N/A'}</p>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // Function to scrape contacts
+        async function scrapeContacts() {
+            const url = document.getElementById('scraper-url').value;
+            const depth = document.getElementById('scraper-depth').value;
+            const followLinks = document.getElementById('scraper-follow-links').value;
+
+            if (!url) {
+                showError('scraper-results-content', 'Please enter a target URL');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('scraperApiKey');
+            if (!apiKey) {
+                showError('scraper-results-content', 'Please enter and save your RapidAPI key first');
+                return;
+            }
+
+            showLoading('scraper-results-content');
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/rapidapi/scraper/contacts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-RapidAPI-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        url,
+                        depth,
+                        followLinks
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update usage display
+                updateUsageDisplay('scraper', data.usage.requests, data.usage.limit);
+
+                // Display scraped contacts
+                displayScrapedContacts(data.contacts);
+
+                // Add to history
+                addToHistory('scraper-contacts', url);
+            } catch (error) {
+                showError('scraper-results-content', `Error scraping contacts: ${error.message}`);
+            }
+        }
+
+        // Function to display scraped contacts
+        function displayScrapedContacts(contacts) {
+            const container = document.getElementById('scraper-results-content');
+
+            if (!contacts || contacts.length === 0) {
+                container.innerHTML = '<div class="error-message">No contacts found on the target URL</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>LinkedIn</th>
+                            <th>Twitter</th>
+                            <th>Source</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            contacts.forEach(contact => {
+                html += `
+                    <tr>
+                        <td>${contact.name || 'N/A'}</td>
+                        <td>${contact.email || 'N/A'}</td>
+                        <td>${contact.phone || 'N/A'}</td>
+                        <td>${contact.linkedin ? `<a href="${contact.linkedin}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
+                        <td>${contact.twitter ? `<a href="${contact.twitter}" target="_blank">Twitter</a>` : 'N/A'}</td>
+                        <td>${contact.source || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+
+            container.innerHTML = html;
+        }
+
+        // Function to show export modal
+        function showExportModal(contentId, title) {
+            const modal = document.getElementById('export-modal');
+            const modalTitle = document.querySelector('#export-modal .modal-title');
+            const optionsContainer = document.getElementById('export-options-container');
+
+            // Set modal title
+            modalTitle.textContent = `Export ${title}`;
+
+            // Get content to export
+            const content = document.getElementById(contentId).innerHTML;
+
+            // Generate export options based on content type
+            let optionsHtml = '';
+
+            if (contentId.includes('results') || contentId.includes('content')) {
+                optionsHtml += `
+                    <div class="export-option">
+                        <input type="checkbox" id="export-headers" checked>
+                        <label for="export-headers">Include Headers</label>
+                    </div>
+
+                    <div class="export-option">
+                        <input type="checkbox" id="export-images" checked>
+                        <label for="export-images">Include Images</label>
+                    </div>
+
+                    <div class="export-option">
+                        <input type="checkbox" id="export-links" checked>
+                        <label for="export-links">Include Links</label>
+                    </div>
+                `;
+            }
+
+            if (contentId.includes('chart')) {
+                optionsHtml += `
+                    <div class="export-option">
+                        <input type="checkbox" id="export-chart-image" checked>
+                        <label for="export-chart-image">Export Chart as Image</label>
+                    </div>
+                `;
+            }
+
+            optionsContainer.innerHTML = optionsHtml;
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+        // Function to export data
+        function exportData() {
+            const format = document.getElementById('export-format').value;
+            const options = {};
+
+            // Get export options
+            document.querySelectorAll('#export-options-container input[type="checkbox"]').forEach(input => {
+                options[input.id] = input.checked;
+            });
+
+            // Get content to export (this would be more complex in a real implementation)
+            const content = 'Sample content to export'; // Replace with actual content
+
+            // Create export data based on format
+            let exportData;
+
+            switch (format) {
+                case 'csv':
+                    exportData = convertToCSV(content, options);
+                    break;
+                case 'excel':
+                    exportData = convertToExcel(content, options);
+                    break;
+                case 'json':
+                    exportData = JSON.stringify(content, null, 2);
+                    break;
+                default:
+                    exportData = content;
+            }
+
+            // Create download link
+            const blob = new Blob([exportData], { type: `text/${format}` });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `export.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // Close modal
+            document.getElementById('export-modal').classList.remove('active');
+
+            // Show success message
+            showSuccessMessage('Data exported successfully');
+        }
+
+        // Function to convert data to CSV
+        function convertToCSV(data, options) {
+            // This is a simplified version - a real implementation would need to parse the HTML content
+            return 'Name,Email,Phone\nJohn Doe,john@example.com,123-456-7890';
+        }
+
+        // Function to convert data to Excel
+        function convertToExcel(data, options) {
+            // This is a simplified version - a real implementation would need to parse the HTML content
+            return 'Excel data would be here';
+        }
+
+        // Function to save to favorites
+        function saveToFavorites(type, name, data = null) {
+            const modal = document.getElementById('favorite-modal');
+            const modalTitle = document.querySelector('#favorite-modal .modal-title');
+            const favoriteName = document.getElementById('favorite-name');
+            const favoriteData = document.getElementById('favorite-data');
+            const favoriteType = document.getElementById('favorite-type');
+
+            // Set modal title
+            modalTitle.textContent = `Save ${name} to Favorites`;
+
+            // Set default name
+            favoriteName.value = name;
+
+            // Set data to be saved
+            if (data) {
+                favoriteData.value = JSON.stringify(data);
+            } else {
+                // Get data from the appropriate form or results container
+                switch (type) {
+                    case 'jsearch-search':
+                        favoriteData.value = JSON.stringify({
+                            query: document.getElementById('jsearch-query').value,
+                            location: document.getElementById('jsearch-location').value,
+                            radius: document.getElementById('jsearch-radius').value,
+                            salaryMin: document.getElementById('jsearch-salary-min').value,
+                            salaryMax: document.getElementById('jsearch-salary-max').value,
+                            datePosted: document.getElementById('jsearch-date-posted').value,
+                            employmentType: document.getElementById('jsearch-employment-type').value
+                        });
+                        break;
+                    case 'jsearch-details':
+                        favoriteData.value = JSON.stringify({
+                            jobId: document.getElementById('jsearch-job-id').value
+                        });
+                        break;
+                    case 'jsearch-filters':
+                        favoriteData.value = JSON.stringify({
+                            industry: document.getElementById('jsearch-industry').value,
+                            experience: document.getElementById('jsearch-experience').value
+                        });
+                        break;
+                    case 'jsearch-salary':
+                        favoriteData.value = JSON.stringify({
+                            jobTitle: document.getElementById('jsearch-salary-job-title').value,
+                            location: document.getElementById('jsearch-salary-location').value
+                        });
+                        break;
+                    case 'yahoo-statistics':
+                        favoriteData.value = JSON.stringify({
+                            symbol: document.getElementById('yahoo-symbol').value
+                        });
+                        break;
+                    case 'yahoo-analysis':
+                        favoriteData.value = JSON.stringify({
+                            symbol: document.getElementById('yahoo-analysis-symbol').value
+                        });
+                        break;
+                    case 'yahoo-earnings':
+                        favoriteData.value = JSON.stringify({
+                            symbol: document.getElementById('yahoo-earnings-symbol').value
+                        });
+                        break;
+                    case 'yahoo-price':
+                        favoriteData.value = JSON.stringify({
+                            symbol: document.getElementById('yahoo-price-symbol').value,
+                            range: document.getElementById('yahoo-price-range').value
+                        });
+                        break;
+                    case 'yahoo-multi-quote':
+                        favoriteData.value = JSON.stringify({
+                            symbols: document.getElementById('yahoo-symbols').value
+                        });
+                        break;
+                    case 'yahoo-news':
+                        favoriteData.value = JSON.stringify({
+                            symbol: document.getElementById('yahoo-news-symbol').value
+                        });
+                        break;
+                    case 'google-search':
+                        favoriteData.value = JSON.stringify({
+                            query: document.getElementById('google-query').value,
+                            location: document.getElementById('google-location').value,
+                            language: document.getElementById('google-language').value,
+                            region: document.getElementById('google-region').value,
+                            safe: document.getElementById('google-safe').value,
+                            gl: document.getElementById('google-gl').value,
+                            device: document.getElementById('google-device').value
+                        });
+                        break;
+                    case 'scraper-contacts':
+                        favoriteData.value = JSON.stringify({
+                            url: document.getElementById('scraper-url').value,
+                            depth: document.getElementById('scraper-depth').value,
+                            followLinks: document.getElementById('scraper-follow-links').value
+                        });
+                        break;
+                    default:
+                        favoriteData.value = '';
+                }
+            }
+
+            // Set type
+            favoriteType.value = type;
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+        // Function to show favorite modal
+        function showFavoriteModal() {
+            const modal = document.getElementById('favorite-modal');
+            const modalTitle = document.querySelector('#favorite-modal .modal-title');
+            const favoriteName = document.getElementById('favorite-name');
+            const favoriteData = document.getElementById('favorite-data');
+            const favoriteType = document.getElementById('favorite-type');
+
+            // Set modal title
+            modalTitle.textContent = 'Add to Favorites';
+
+            // Clear form
+            favoriteName.value = '';
+            favoriteData.value = '';
+            favoriteType.value = '';
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+        // Function to add to favorites
+        function addToFavorites() {
+            const name = document.getElementById('favorite-name').value;
+            const tags = document.getElementById('favorite-tags').value;
+            const notes = document.getElementById('favorite-notes').value;
+            const data = document.getElementById('favorite-data').value;
+            const type = document.getElementById('favorite-type').value;
+
+            if (!name) {
+                showError('favorite-modal', 'Please enter a name for your favorite');
+                return;
+            }
+
+            // Get existing favorites from localStorage
+            let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+            // Create new favorite
+            const favorite = {
+                id: Date.now().toString(),
+                name,
+                tags: tags.split(',').map(tag => tag.trim()),
+                notes,
+                data: data ? JSON.parse(data) : null,
+                type,
+                createdAt: new Date().toISOString()
+            };
+
+            // Add to favorites array
+            favorites.push(favorite);
+
+            // Save to localStorage
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+
+            // Close modal
+            document.getElementById('favorite-modal').classList.remove('active');
+
+            // Show success message
+            showSuccessMessage('Added to favorites successfully');
+
+            // Reload favorites
+            loadFavorites();
+        }
+
+        // Function to load favorites
+        function loadFavorites() {
+            const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            const container = document.getElementById('favorites-content');
+
+            if (favorites.length === 0) {
+                container.innerHTML = '<div class="error-message">No favorites saved yet</div>';
+                return;
+            }
+
+            let html = '';
+
+            favorites.forEach(favorite => {
+                html += `
+                    <div class="favorite-item" data-id="${favorite.id}">
+                        <h4 class="favorite-title">${favorite.name}</h4>
+                        <div class="favorite-type">${favorite.type}</div>
+                        <div class="favorite-content">${favorite.notes || 'No notes'}</div>
+
+                        <div class="favorite-tags">
+                `;
+
+                if (favorite.tags && favorite.tags.length > 0) {
+                    favorite.tags.forEach(tag => {
+                        html += `<span class="tag">${tag}</span>`;
+                    });
+                } else {
+                    html += '<span class="tag">No tags</span>';
+                }
+
+                html += `
+                        </div>
+
+                        <div class="favorite-actions">
+                            <button class="favorite-btn view-favorite" data-id="${favorite.id}">View</button>
+                            <button class="favorite-btn delete-favorite" data-id="${favorite.id}">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            // Add event listeners to view and delete buttons
+            document.querySelectorAll('.view-favorite').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    viewFavorite(id);
+                });
+            });
+
+            document.querySelectorAll('.delete-favorite').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    deleteFavorite(id);
+                });
+            });
+        }
+
+        // Function to view favorite
+        function viewFavorite(id) {
+            const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            const favorite = favorites.find(f => f.id === id);
+
+            if (!favorite) {
+                showError('favorites-content', 'Favorite not found');
+                return;
+            }
+
+            // Navigate to the appropriate tab and set the form values
+            switch (favorite.type) {
+                case 'jsearch-search':
+                    document.querySelector('.tab[data-tab="search"]').click();
+                    if (favorite.data) {
+                        document.getElementById('jsearch-query').value = favorite.data.query || '';
+                        document.getElementById('jsearch-location').value = favorite.data.location || '';
+                        document.getElementById('jsearch-radius').value = favorite.data.radius || '5';
+                        document.getElementById('jsearch-salary-min').value = favorite.data.salaryMin || '0';
+                        document.getElementById('jsearch-salary-max').value = favorite.data.salaryMax || '500000';
+                        document.getElementById('jsearch-date-posted').value = favorite.data.datePosted || 'all';
+                        document.getElementById('jsearch-employment-type').value = favorite.data.employmentType || 'all';
+                    }
+                    break;
+                case 'jsearch-details':
+                    document.querySelector('.tab[data-tab="details"]').click();
+                    if (favorite.data) {
+                        document.getElementById('jsearch-job-id').value = favorite.data.jobId || '';
+                    }
+                    break;
+                case 'jsearch-filters':
+                    document.querySelector('.tab[data-tab="filters"]').click();
+                    if (favorite.data) {
+                        document.getElementById('jsearch-industry').value = favorite.data.industry || '';
+                        document.getElementById('jsearch-experience').value = favorite.data.experience || '';
+                    }
+                    break;
+                case 'jsearch-salary':
+                    document.querySelector('.tab[data-tab="salary"]').click();
+                    if (favorite.data) {
+                        document.getElementById('jsearch-salary-job-title').value = favorite.data.jobTitle || '';
+                        document.getElementById('jsearch-salary-location').value = favorite.data.location || '';
+                    }
+                    break;
+                case 'yahoo-statistics':
+                    document.querySelector('.tab[data-tab="statistics"]').click();
+                    if (favorite.data) {
+                        document.getElementById('yahoo-symbol').value = favorite.data.symbol || '';
+                    }
+                    break;
+                case 'yahoo-analysis':
+                    document.querySelector('.tab[data-tab="analysis"]').click();
+                    if (favorite.data) {
+                        document.getElementById('yahoo-analysis-symbol').value = favorite.data.symbol || '';
+                    }
+                    break;
+                case 'yahoo-earnings':
+                    document.querySelector('.tab[data-tab="earnings"]').click();
+                    if (favorite.data) {
+                        document.getElementById('yahoo-earnings-symbol').value = favorite.data.symbol || '';
+                    }
+                    break;
+                case 'yahoo-price':
+                    document.querySelector('.tab[data-tab="price"]').click();
+                    if (favorite.data) {
+                        document.getElementById('yahoo-price-symbol').value = favorite.data.symbol || '';
+                        document.getElementById('yahoo-price-range').value = favorite.data.range || '1mo';
+                    }
+                    break;
+                case 'yahoo-multi-quote':
+                    document.querySelector('.tab[data-tab="multi-quote"]').click();
+                    if (favorite.data) {
+                        document.getElementById('yahoo-symbols').value = favorite.data.symbols || '';
+                    }
+                    break;
+                case 'yahoo-news':
+                    document.querySelector('.tab[data-tab="news"]').click();
+                    if (favorite.data) {
+                        document.getElementById('yahoo-news-symbol').value = favorite.data.symbol || '';
+                    }
+                    break;
+                case 'google-search':
+                    document.querySelector('.tab[data-tab="google"]').click();
+                    if (favorite.data) {
+                        document.getElementById('google-query').value = favorite.data.query || '';
+                        document.getElementById('google-location').value = favorite.data.location || '';
+                        document.getElementById('google-language').value = favorite.data.language || 'en';
+                        document.getElementById('google-region').value = favorite.data.region || 'us';
+                        document.getElementById('google-safe').value = favorite.data.safe || 'active';
+                        document.getElementById('google-gl').value = favorite.data.gl || 'com';
+                        document.getElementById('google-device').value = favorite.data.device || 'desktop';
+                    }
+                    break;
+                case 'scraper-contacts':
+                    document.querySelector('.tab[data-tab="scraper"]').click();
+                    if (favorite.data) {
+                        document.getElementById('scraper-url').value = favorite.data.url || '';
+                        document.getElementById('scraper-depth').value = favorite.data.depth || '1';
+                        document.getElementById('scraper-follow-links').value = favorite.data.followLinks || 'true';
+                    }
+                    break;
+                default:
+                    showError('favorites-content', 'Unknown favorite type');
+            }
+
+            // Show success message
+            showSuccessMessage('Favorite loaded successfully');
+        }
+
+        // Function to delete favorite
+        function deleteFavorite(id) {
+            // Get existing favorites from localStorage
+            let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+            // Filter out the favorite to delete
+            favorites = favorites.filter(f => f.id !== id);
+
+            // Save to localStorage
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+
+            // Show success message
+            showSuccessMessage('Favorite deleted successfully');
+
+            // Reload favorites
+            loadFavorites();
+        }
+
+        // Function to add to history
+        function addToHistory(type, query) {
+            // Get existing history from localStorage
+            let history = JSON.parse(localStorage.getItem('history')) || [];
+
+            // Create new history item
+            const historyItem = {
+                id: Date.now().toString(),
+                type,
+                query,
+                timestamp: new Date().toISOString()
+            };
+
+            // Add to history array
+            history.unshift(historyItem);
+
+            // Limit history to 50 items
+            if (history.length > 50) {
+                history = history.slice(0, 50);
+            }
+
+            // Save to localStorage
+            localStorage.setItem('history', JSON.stringify(history));
+
+            // Reload history
+            loadHistory();
+        }
+
+        // Function to load history
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('history')) || [];
+            const container = document.getElementById('history-content');
+
+            if (history.length === 0) {
+                container.innerHTML = '<div class="error-message">No search history yet</div>';
+                return;
+            }
+
+            let html = '';
+
+            history.forEach(item => {
+                html += `
+                    <div class="history-item" data-id="${item.id}">
+                        <div class="history-type">${item.type}</div>
+                        <div class="history-query">${item.query}</div>
+                        <div class="history-time">${new Date(item.timestamp).toLocaleString()}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            // Add event listeners to history items
+            document.querySelectorAll('.history-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = item.getAttribute('data-id');
+                    replayHistory(id);
+                });
+            });
+        }
+
+        // Function to replay history
+        function replayHistory(id) {
+            const history = JSON.parse(localStorage.getItem('history')) || [];
+            const item = history.find(h => h.id === id);
+
+            if (!item) {
+                showError('history-content', 'History item not found');
+                return;
+            }
+
+            // Navigate to the appropriate tab and set the form values
+            switch (item.type) {
+                case 'jsearch-search':
+                    document.querySelector('.tab[data-tab="search"]').click();
+                    try {
+                        const data = JSON.parse(item.query);
+                        document.getElementById('jsearch-query').value = data.query || '';
+                        document.getElementById('jsearch-location').value = data.location || '';
+                        document.getElementById('jsearch-radius').value = data.radius || '5';
+                        document.getElementById('jsearch-salary-min').value = data.salaryMin || '0';
+                        document.getElementById('jsearch-salary-max').value = data.salaryMax || '500000';
+                        document.getElementById('jsearch-date-posted').value = data.datePosted || 'all';
+                        document.getElementById('jsearch-employment-type').value = data.employmentType || 'all';
+                    } catch (e) {
+                        document.getElementById('jsearch-query').value = item.query || '';
+                    }
+                    break;
+                case 'jsearch-details':
+                    document.querySelector('.tab[data-tab="details"]').click();
+                    document.getElementById('jsearch-job-id').value = item.query || '';
+                    break;
+                case 'jsearch-filters':
+                    document.querySelector('.tab[data-tab="filters"]').click();
+                    try {
+                        const data = JSON.parse(item.query);
+                        document.getElementById('jsearch-industry').value = data.industry || '';
+                        document.getElementById('jsearch-experience').value = data.experience || '';
+                    } catch (e) {
+                        // Handle error if needed
+                    }
+                    break;
+                case 'jsearch-salary':
+                    document.querySelector('.tab[data-tab="salary"]').click();
+                    try {
+                        const data = JSON.parse(item.query);
+                        document.getElementById('jsearch-salary-job-title').value = data.jobTitle || '';
+                        document.getElementById('jsearch-salary-location').value = data.location || '';
+                    } catch (e) {
+                        document.getElementById('jsearch-salary-job-title').value = item.query || '';
+                    }
+                    break;
+                case 'yahoo-statistics':
+                    document.querySelector('.tab[data-tab="statistics"]').click();
+                    document.getElementById('yahoo-symbol').value = item.query || '';
+                    break;
+                case 'yahoo-analysis':
+                    document.querySelector('.tab[data-tab="analysis"]').click();
+                    document.getElementById('yahoo-analysis-symbol').value = item.query || '';
+                    break;
+                case 'yahoo-earnings':
+                    document.querySelector('.tab[data-tab="earnings"]').click();
+                    document.getElementById('yahoo-earnings-symbol').value = item.query || '';
+                    break;
+                case 'yahoo-price':
+                    document.querySelector('.tab[data-tab="price"]').click();
+                    try {
+                        const data = JSON.parse(item.query);
+                        document.getElementById('yahoo-price-symbol').value = data.symbol || '';
+                        document.getElementById('yahoo

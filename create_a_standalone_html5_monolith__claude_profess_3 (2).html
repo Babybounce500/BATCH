@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Claude Professional Suite - Advanced AI Interaction Platform">
+    <title>Claude Professional Suite</title>
+    <style>
+        :root {
+            --primary-color: #FF6B35;
+            --secondary-color: #F5E6CA;
+            --dark-color: #1A1A1A;
+            --light-color: #F5F5F5;
+            --text-color: #E0E0E0;
+            --accent-color: #FF9A6B;
+            --error-color: #FF4757;
+            --success-color: #2ED573;
+            --font-main: 'Orbitron', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--dark-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav li {
+            margin-left: 1.5rem;
+        }
+
+        nav a {
+            color: var(--dark-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--secondary-color);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -0.25rem;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        aside {
+            background-color: #2A2A2A;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-title {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-item {
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: #3A3A3A;
+        }
+
+        .sidebar-item.active {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+        }
+
+        .content {
+            background-color: #2A2A2A;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            background-color: #3A3A3A;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #4A4A4A;
+            background-color: #2A2A2A;
+            color: var(--text-color);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-main);
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: #4A4A4A;
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #5A5A5A;
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #FF6B6B;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #55E691;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            margin-left: auto;
+            align-self: flex-end;
+        }
+
+        .assistant-message {
+            background-color: #4A4A4A;
+            margin-right: auto;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-right: auto;
+        }
+
+        .typing-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: var(--text-color);
+            border-radius: 50%;
+            animation: typing 1.5s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .token-counter {
+            background-color: #4A4A4A;
+            padding: 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .token-count {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .token-warning {
+            color: var(--error-color);
+        }
+
+        .token-safe {
+            color: var(--success-color);
+        }
+
+        .image-upload {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+
+        .annotation-tools {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .annotation-tool {
+            padding: 0.5rem;
+            background-color: #4A4A4A;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .annotation-tool:hover {
+            background-color: #5A5A5A;
+        }
+
+        .annotation-tool.active {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+        }
+
+        .extracted-text {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #4A4A4A;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+
+        .tool-editor {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .json-editor {
+            min-height: 200px;
+            font-family: monospace;
+        }
+
+        .json-error {
+            color: var(--error-color);
+            margin-top: 0.5rem;
+        }
+
+        .tool-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #4A4A4A;
+            border-radius: 4px;
+        }
+
+        .batch-config {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .file-upload {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .batch-status {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status-label {
+            color: var(--secondary-color);
+        }
+
+        .status-value {
+            font-weight: bold;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #4A4A4A;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .batch-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #4A4A4A;
+            border-radius: 8px;
+        }
+
+        .batch-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .batch-table th, .batch-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid #4A4A4A;
+        }
+
+        .batch-table th {
+            background-color: #3A3A3A;
+        }
+
+        .usage-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .chart-container {
+            background-color: #3A3A3A;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .model-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .model-card {
+            background-color: #3A3A3A;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .model-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .model-card.active {
+            border: 2px solid var(--primary-color);
+        }
+
+        .model-name {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+
+        .model-capabilities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .capability {
+            background-color: #4A4A4A;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .api-key-management {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .api-key-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .api-key-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-valid {
+            background-color: var(--success-color);
+        }
+
+        .status-invalid {
+            background-color: var(--error-color);
+        }
+
+        .status-unknown {
+            background-color: #4A4A4A;
+        }
+
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .step-number {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .workflow-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        @keyframes typing {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+                background-color: var(--primary-color);
+                color: var(--dark-color);
+                padding: 0.5rem;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            .mobile-menu.active {
+                background-color: var(--accent-color);
+            }
+
+            .mobile-nav {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background-color: var(--primary-color);
+                padding: 1rem;
+                z-index: 100;
+            }
+
+            .mobile-nav.active {
+                display: block;
+            }
+
+            .mobile-nav ul {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">Claude Professional Suite</div>
+        <nav>
+            <ul>
+                <li><a href="#messages" class="nav-link" data-section="messages">Messages</a></li>
+                <li><a href="#vision" class="nav-link" data-section="vision">Vision</a></li>
+                <li><a href="#tokens" class="nav-link" data-section="tokens">Tokens</a></li>
+                <li><a href="#tools" class="nav-link" data-section="tools">Tools</a></li>
+                <li><a href="#batch" class="nav-link" data-section="batch">Batch</a></li>
+                <li><a href="#organization" class="nav-link" data-section="organization">Organization</a></li>
+                <li><a href="#usage" class="nav-link" data-section="usage">Usage</a></li>
+                <li><a href="#models" class="nav-link" data-section="models">Models</a></li>
+                <li><a href="#workflows" class="nav-link" data-section="workflows">Workflows</a></li>
+                <li><a href="#api" class="nav-link" data-section="api">API</a></li>
+            </ul>
+        </nav>
+        <div class="mobile-menu">☰</div>
+    </header>
+    <div class="mobile-nav">
+        <ul>
+            <li><a href="#messages" class="nav-link" data-section="messages">Messages</a></li>
+            <li><a href="#vision" class="nav-link" data-section="vision">Vision</a></li>
+            <li><a href="#tokens" class="nav-link" data-section="tokens">Tokens</a></li>
+            <li><a href="#tools" class="nav-link" data-section="tools">Tools</a></li>
+            <li><a href="#batch" class="nav-link" data-section="batch">Batch</a></li>
+            <li><a href="#organization" class="nav-link" data-section="organization">Organization</a></li>
+            <li><a href="#usage" class="nav-link" data-section="usage">Usage</a></li>
+            <li><a href="#models" class="nav-link" data-section="models">Models</a></li>
+            <li><a href="#workflows" class="nav-link" data-section="workflows">Workflows</a></li>
+            <li><a href="#api" class="nav-link" data-section="api">API</a></li>
+        </ul>
+    </div>
+    <main>
+        <aside>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Sections</div>
+                <div class="sidebar-content">
+                    <div class="sidebar-item active" data-section="messages">Messages</div>
+                    <div class="sidebar-item" data-section="vision">Vision</div>
+                    <div class="sidebar-item" data-section="tokens">Tokens</div>
+                    <div class="sidebar-item" data-section="tools">Tools</div>
+                    <div class="sidebar-item" data-section="batch">Batch</div>
+                    <div class="sidebar-item" data-section="organization">Organization</div>
+                    <div class="sidebar-item" data-section="usage">Usage</div>
+                    <div class="sidebar-item" data-section="models">Models</div>
+                    <div class="sidebar-item" data-section="workflows">Workflows</div>
+                    <div class="sidebar-item" data-section="api">API</div>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Recent Conversations</div>
+                <div class="sidebar-content" id="conversation-history">
+                    <!-- Conversation history will be loaded here -->
+                </div>
+            </div>
+        </aside>
+        <div class="content">
+            <section id="messages" class="section active">
+                <h2 class="section-title">Messages</h2>
+                <div class="card">
+                    <div class="card-title">Create Message</div>
+                    <div class="form-group">
+                        <label for="message-type">Message Type</label>
+                        <select id="message-type">
+                            <option value="system">System</option>
+                            <option value="user">User</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message-content">Content</label>
+                        <textarea id="message-content" placeholder="Enter your message..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="context-window">Context Window</label>
+                        <input type="range" id="context-window" min="1" max="10" value="5">
+                        <div class="range-value">5 messages</div>
+                    </div>
+                    <div class="controls">
+                        <div class="token-counter">
+                            Tokens: <span class="token-count">0</span>
+                        </div>
+                        <div class="control-buttons">
+                            <button id="send-message">Send</button>
+                            <button id="clear-messages" class="btn-secondary">Clear</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Message History</div>
+                    <div class="message-container" id="message-history">
+                        <!-- Messages will be displayed here -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="vision" class="section">
+                <h2 class="section-title">Vision Analysis</h2>
+                <div class="card">
+                    <div class="card-title">Upload Image</div>
+                    <div class="image-upload">
+                        <input type="file" id="image-upload" accept="image/*">
+                        <img id="image-preview" class="image-preview" style="display: none;">
+                    </div>
+                    <div class="annotation-tools">
+                        <div class="annotation-tool" data-tool="rectangle">Rectangle</div>
+                        <div class="annotation-tool" data-tool="circle">Circle</div>
+                        <div class="annotation-tool" data-tool="text">Text</div>
+                        <div class="annotation-tool" data-tool="arrow">Arrow</div>
+                    </div>
+                    <div class="controls">
+                        <button id="analyze-image">Analyze Image</button>
+                        <button id="clear-annotations" class="btn-secondary">Clear Annotations</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Analysis Results</div>
+                    <div class="extracted-text" id="extracted-text">
+                        <!-- Extracted text will be displayed here -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="tokens" class="section">
+                <h2 class="section-title">Token Counter</h2>
+                <div class="card">
+                    <div class="card-title">Count Tokens</div>
+                    <div class="form-group">
+                        <label for="token-text">Text to Count</label>
+                        <textarea id="token-text" placeholder="Enter text to count tokens..."></textarea>
+                    </div>
+                    <div class="controls">
+                        <div class="token-counter">
+                            Tokens: <span class="token-count">0</span>
+                        </div>
+                        <button id="count-tokens">Count Tokens</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Budget Allocation</div>
+                    <div class="chart-container">
+                        <canvas id="budget-chart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Optimization Suggestions</div>
+                    <div id="optimization-suggestions">
+                        <!-- Optimization suggestions will be displayed here -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="tools" class="section">
+                <h2 class="section-title">Tool Calling</h2>
+                <div class="card">
+                    <div class="card-title">Tool Configuration</div>
+                    <div class="tool-editor">
+                        <div class="form-group">
+                            <label for="tool-name">Tool Name</label>
+                            <input type="text" id="tool-name" placeholder="Enter tool name">
+                        </div>
+                        <div class="form-group">
+                            <label for="tool-description">Description</label>
+                            <textarea id="tool-description" placeholder="Enter tool description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="tool-parameters">Parameters (JSON)</label>
+                            <textarea id="tool-parameters" class="json-editor" placeholder="Enter tool parameters in JSON format"></textarea>
+                            <div class="json-error" id="json-error"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Tool Result</div>
+                    <div class="tool-result" id="tool-result">
+                        <!-- Tool result will be displayed here -->
+                    </div>
+                </div>
+                <div class="controls">
+                    <button id="call-tool">Call Tool</button>
+                    <button id="validate-tool" class="btn-secondary">Validate</button>
+                </div>
+            </section>
+
+            <section id="batch" class="section">
+                <h2 class="section-title">Batch Processing</h2>
+                <div class="card">
+                    <div class="card-title">Batch Configuration</div>
+                    <div class="batch-config">
+                        <div class="form-group">
+                            <label for="batch-name">Batch Name</label>
+                            <input type="text" id="batch-name" placeholder="Enter batch name">
+                        </div>
+                        <div class="form-group">
+                            <label for="batch-description">Description</label>
+                            <textarea id="batch-description" placeholder="Enter batch description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="batch-model">Model</label>
+                            <select id="batch-model">
+                                <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
+                                <option value="claude-3-opus">Claude 3 Opus</option>
+                                <option value="claude-3-haiku">Claude 3 Haiku</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="batch-input">Input File</label>
+                            <div class="file-upload">
+                                <input type="file" id="batch-input" accept=".csv,.json">
+                                <div class="file-info">
+                                    <div id="file-name">No file selected</div>
+                                    <div id="file-size"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button id="create-batch">Create Batch</button>
+                        <button id="clear-batch" class="btn-secondary">Clear</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Batch Status</div>
+                    <div class="batch-status">
+                        <div class="status-item">
+                            <div class="status-label">Status:</div>
+                            <div class="status-value" id="batch-status">Not Started</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">Progress:</div>
+                            <div class="status-value" id="batch-progress">0%</div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="batch-progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Batch Results</div>
+                    <div class="batch-result" id="batch-result">
+                        <!-- Batch results will be displayed here -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="organization" class="section">
+                <h2 class="section-title">Organization Info</h2>
+                <div class="card">
+                    <div class="card-title">Usage Limits</div>
+                    <div class="usage-limits" id="usage-limits">
+                        <!-- Usage limits will be displayed here -->
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Team Members</div>
+                    <div class="team-members" id="team-members">
+                        <!-- Team members will be displayed here -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="usage" class="section">
+                <h2 class="section-title">Usage Statistics</h2>
+                <div class="card">
+                    <div class="card-title">Usage Overview</div>
+                    <div class="usage-stats">
+                        <div class="chart-container">
+                            <canvas id="usage-chart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="cost-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Trend Analysis</div>
+                    <div class="chart-container">
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button id="export-report">Export Report</button>
+                </div>
+            </section>
+
+            <section id="models" class="section">
+                <h2 class="section-title">Model Selector</h2>
+                <div class="model-selector" id="model-selector">
+                    <div class="model-card" data-model="claude-3-5-sonnet">
+                        <div class="model-name">Claude 3.5 Sonnet</div>
+                        <div class="model-capabilities">
+                            <div class="capability">Advanced Reasoning</div>
+                            <div class="capability">Multilingual</div>
+                            <div class="capability">Context Window: 200k</div>
+                            <div class="capability">Vision</div>
+                            <div class="capability">Tool Use</div>
+                        </div>
+                    </div>
+                    <div class="model-card" data-model="claude-3-opus">
+                        <div class="model-name">Claude 3 Opus</div>
+                        <div class="model-capabilities">
+                            <div class="capability">Most Capable</div>
+                            <div class="capability">Multilingual</div>
+                            <div class="capability">Context Window: 200k</div>
+                            <div class="capability">Vision</div>
+                            <div class="capability">Tool Use</div>
+                        </div>
+                    </div>
+                    <div class="model-card" data-model="claude-3-haiku">
+                        <div class="model-name">Claude 3 Haiku</div>
+                        <div class="model-capabilities">
+                            <div class="capability">Fastest</div>
+                            <div class="capability">Multilingual</div>
+                            <div class="capability">Context Window: 200k</div>
+                            <div class="capability">Vision</div>
+                            <div class="capability">Tool Use</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="workflows" class="section">
+                <h2 class="section-title">Workflows</h2>
+                <div class="card">
+                    <div class="card-title">PDF Processing Workflow</div>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="form-group">
+                                    <label for="pdf-upload">Upload PDF</label>
+                                    <input type="file" id="pdf-upload" accept=".pdf">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="form-group">
+                                    <label for="pdf-page">Select Page</label>
+                                    <input type="number" id="pdf-page" min="1" value="1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="form-group">
+                                    <label for="pdf-summary">Summary</label>
+                                    <textarea id="pdf-summary" placeholder="Summary will appear here..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workflow-actions">
+                        <button id="process-pdf">Process PDF</button>
+                        <button id="clear-pdf" class="btn-secondary">Clear</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Batch Analysis Workflow</div>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="form-group">
+                                    <label for="batch-input">Input File</label>
+                                    <div class="file-upload">
+                                        <input type="file" id="batch-input" accept=".csv,.json">
+                                        <div class="file-info">
+                                            <div id="file-name">No file selected</div>
+                                            <div id="file-size"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="form-group">
+                                    <label for="batch-model">Model</label>
+                                    <select id="batch-model">
+                                        <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
+                                        <option value="claude-3-opus">Claude 3 Opus</option>
+                                        <option value="claude-3-haiku">Claude 3 Haiku</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="batch-status">
+                                    <div class="status-item">
+                                        <div class="status-label">Status:</div>
+                                        <div class="status-value" id="batch-status">Not Started</div>
+                                    </div>
+                                    <div class="status-item">
+                                        <div class="status-label">Progress:</div>
+                                        <div class="status-value" id="batch-progress">0%</div>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" id="batch-progress-bar"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workflow-actions">
+                        <button id="run-batch">Run Batch</button>
+                        <button id="export-batch" class="btn-secondary">Export Results</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="api" class="section">
+                <h2 class="section-title">API Key Management</h2>
+                <div class="card">
+                    <div class="card-title">API Key</div>
+                    <div class="api-key-management">
+                        <div class="api-key-input">
+                            <input type="password" id="api-key" placeholder="Enter your API key">
+                            <button id="test-api-key">Test</button>
+                        </div>
+                        <div class="api-key-status">
+                            <div class="status-indicator" id="api-key-status"></div>
+                            <div id="api-key-message">API key status will be displayed here</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <p>© 2023 Claude Professional Suite. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileNav = document.querySelector('.mobile-nav');
+
+            mobileMenu.addEventListener('click', function() {
+                mobileNav.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            // Section navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            const sections = document.querySelectorAll('.section');
+
+            function activateSection(sectionId) {
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                sidebarItems.forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                document.getElementById(sectionId).classList.add('active');
+                document.querySelector(`.nav-link[data-section="${sectionId}"]`).classList.add('active');
+                document.querySelector(`.sidebar-item[data-section="${sectionId}"]`).classList.add('active');
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    activateSection(sectionId);
+                    mobileNav.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    activateSection(sectionId);
+                });
+            });
+
+            // Messages section
+            const messageType = document.getElementById('message-type');
+            const messageContent = document.getElementById('message-content');
+            const contextWindow = document.getElementById('context-window');
+            const rangeValue = document.querySelector('.range-value');
+            const tokenCount = document.querySelector('.token-count');
+            const sendMessageBtn = document.getElementById('send-message');
+            const clearMessagesBtn = document.getElementById('clear-messages');
+            const messageHistory = document.getElementById('message-history');
+
+            contextWindow.addEventListener('input', function() {
+                rangeValue.textContent = `${this.value} messages`;
+            });
+
+            function updateTokenCount() {
+                const text = messageContent.value;
+                // Simulate token counting (in a real app, this would call the API)
+                const tokens = Math.ceil(text.length / 4);
+                tokenCount.textContent = tokens;
+
+                if (tokens > 1000) {
+                    tokenCount.classList.add('token-warning');
+                    tokenCount.classList.remove('token-safe');
+                } else {
+                    tokenCount.classList.add('token-safe');
+                    tokenCount.classList.remove('token-warning');
+                }
+            }
+
+            messageContent.addEventListener('input', updateTokenCount);
+
+            sendMessageBtn.addEventListener('click', function() {
+                const type = messageType.value;
+                const content = messageContent.value;
+
+                if (content.trim() === '') return;
+
+                // Add user message to history
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user-message';
+                userMessage.textContent = content;
+                messageHistory.appendChild(userMessage);
+
+                // Simulate assistant response
+                setTimeout(() => {
+                    const assistantMessage = document.createElement('div');
+                    assistantMessage.className = 'message assistant-message';
+                    assistantMessage.textContent = `This is a simulated response to your ${type} message. In a real application, this would be the response from the Claude API.`;
+                    messageHistory.appendChild(assistantMessage);
+                    messageHistory.scrollTop = messageHistory.scrollHeight;
+
+                    // Save conversation to localStorage
+                    saveConversation();
+                }, 1000);
+
+                // Clear input
+                messageContent.value = '';
+                updateTokenCount();
+
+                // Scroll to bottom
+                messageHistory.scrollTop = messageHistory.scrollHeight;
+            });
+
+            clearMessagesBtn.addEventListener('click', function() {
+                messageHistory.innerHTML = '';
+            });
+
+            // Vision section
+            const imageUpload = document.getElementById('image-upload');
+            const imagePreview = document.getElementById('image-preview');
+            const annotationTools = document.querySelectorAll('.annotation-tool');
+            const analyzeImageBtn = document.getElementById('analyze-image');
+            const clearAnnotationsBtn = document.getElementById('clear-annotations');
+            const extractedText = document.getElementById('extracted-text');
+
+            let activeTool = null;
+
+            annotationTools.forEach(tool => {
+                tool.addEventListener('click', function() {
+                    annotationTools.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    activeTool = this.getAttribute('data-tool');
+                });
+            });
+
+            imageUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        imagePreview.src = event.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            analyzeImageBtn.addEventListener('click', function() {
+                if (!imagePreview.src) return;
+
+                // Simulate image analysis
+                extractedText.textContent = 'Analyzing image...';
+
+                setTimeout(() => {
+                    extractedText.textContent = `This is a simulated analysis of the uploaded image. In a real application, this would contain the OCR text, diagram understanding, and other extracted information from the image. The active annotation tool is: ${activeTool || 'none'}.`;
+                }, 1500);
+            });
+
+            clearAnnotationsBtn.addEventListener('click', function() {
+                imagePreview.style.display = 'none';
+                imageUpload.value = '';
+                extractedText.textContent = '';
+                annotationTools.forEach(tool => tool.classList.remove('active'));
+                activeTool = null;
+            });
+
+            // Tokens section
+            const tokenText = document.getElementById('token-text');
+            const countTokensBtn = document.getElementById('count-tokens');
+            const optimizationSuggestions = document.getElementById('optimization-suggestions');
+
+            countTokensBtn.addEventListener('click', function() {
+                const text = tokenText.value;
+                if (text.trim() === '') return;
+
+                // Simulate token counting
+                const tokens = Math.ceil(text.length / 4);
+                tokenCount.textContent = tokens;
+
+                // Simulate optimization suggestions
+                optimizationSuggestions.innerHTML = `
+                    <p><strong>Optimization Suggestions:</strong></p>
+                    <ul>
+                        <li>Consider breaking this content into smaller chunks for better processing.</li>
+                        <li>Remove any unnecessary words or phrases to reduce token count.</li>
+                        <li>Use more concise language where possible.</li>
+                    </ul>
+                `;
+            });
+
+            // Initialize charts
+            const budgetChart = new Chart(document.getElementById('budget-chart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Used Tokens', 'Remaining Tokens'],
+                    datasets: [{
+                        data: [3000, 7000],
+                        backgroundColor: ['#FF6B35', '#F5E6CA'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#E0E0E0'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Tools section
+            const toolName = document.getElementById('tool-name');
+            const toolDescription = document.getElementById('tool-description');
+            const toolParameters = document.getElementById('tool-parameters');
+            const jsonError = document.getElementById('json-error');
+            const callToolBtn = document.getElementById('call-tool');
+            const validateToolBtn = document.getElementById('validate-tool');
+            const toolResult = document.getElementById('tool-result');
+
+            function validateJSON() {
+                try {
+                    JSON.parse(toolParameters.value);
+                    jsonError.textContent = '';
+                    return true;
+                } catch (e) {
+                    jsonError.textContent = `Invalid JSON: ${e.message}`;
+                    return false;
+                }
+            }
+
+            toolParameters.addEventListener('input', validateJSON);
+
+            validateToolBtn.addEventListener('click', validateJSON);
+
+            callToolBtn.addEventListener('click', function() {
+                if (!validateJSON()) return;
+
+                const name = toolName.value;
+                const description = toolDescription.value;
+                const parameters = JSON.parse(toolParameters.value);
+
+                // Simulate tool call
+                toolResult.innerHTML = `
+                    <p><strong>Tool Called:</strong> ${name}</p>
+                    <p><strong>Description:</strong> ${description}</p>
+                    <p><strong>Parameters:</strong></p>
+                    <pre>${JSON.stringify(parameters, null, 2)}</pre>
+                    <p><strong>Result:</strong> This is a simulated result from the tool call. In a real application, this would be the actual result from the tool execution.</p>
+                `;
+            });
+
+            // Batch section
+            const batchName = document.getElementById('batch-name');
+            const batchDescription = document.getElementById('batch-description');
+            const batchModel = document.getElementById('batch-model');
+            const batchInput = document.getElementById('batch-input');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+            const createBatchBtn = document.getElementById('create-batch');
+            const clearBatchBtn = document.getElementById('clear-batch');
+            const batchStatus = document.getElementById('batch-status');
+            const batchProgress = document.getElementById('batch-progress');
+            const batchProgressBar = document.getElementById('batch-progress-bar');
+            const batchResult = document.getElementById('batch-result');
+
+            batchInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    fileName.textContent = file.name;
+                    fileSize.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+                }
+            });
+
+            createBatchBtn.addEventListener('click', function() {
+                const name = batchName.value;
+                const description = batchDescription.value;
+                const model = batchModel.value;
+                const file = batchInput.files[0];
+
+                if (!file) {
+                    alert('Please select an input file');
+                    return;
+                }
+
+                // Simulate batch creation and processing
+                batchStatus.textContent = 'Processing';
+                batchProgress.textContent = '0%';
+                batchProgressBar.style.width = '0%';
+
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        batchStatus.textContent = 'Completed';
+
+                        // Simulate batch results
+                        batchResult.innerHTML = `
+                            <p><strong>Batch Name:</strong> ${name}</p>
+                            <p><strong>Description:</strong> ${description}</p>
+                            <p><strong>Model:</strong> ${model}</p>
+                            <p><strong>Input File:</strong> ${file.name}</p>
+                            <p><strong>Results:</strong></p>
+                            <table class="batch-table">
+                                <thead>
+                                    <tr>
+                                        <th>Input</th>
+                                        <th>Output</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Input 1</td>
+                                        <td>Output 1</td>
+                                        <td>Success</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Input 2</td>
+                                        <td>Output 2</td>
+                                        <td>Success</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Input 3</td>
+                                        <td>Output 3</td>
+                                        <td>Success</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        `;
+                    }
+
+                    batchProgress.textContent = `${Math.floor(progress)}%`;
+                    batchProgressBar.style.width = `${progress}%`;
+                }, 500);
+            });
+
+            clearBatchBtn.addEventListener('click', function() {
+                batchName.value = '';
+                batchDescription.value = '';
+                batchInput.value = '';
+                fileName.textContent = 'No file selected';
+                fileSize.textContent = '';
+                batchStatus.textContent = 'Not Started';
+                batchProgress.textContent = '0%';
+                batchProgressBar.style.width = '0%';
+                batchResult.innerHTML = '';
+            });
+
+            // Organization section
+            const usageLimits = document.getElementById('usage-limits');
+            const teamMembers = document.getElementById('team-members');
+
+            // Simulate organization data
+            usageLimits.innerHTML = `
+                <p><strong>Current Usage:</strong> 3,000 tokens</p>
+                <p><strong>Monthly Limit:</strong> 10,000 tokens</p>
+                <p><strong>Remaining:</strong> 7,000 tokens</p>
+            `;
+
+            teamMembers.innerHTML = `
+                <ul>
+                    <li>John Doe - Admin</li>
+                    <li>Jane Smith - Member</li>
+                    <li>Bob Johnson - Member</li>
+                </ul>
+            `;
+
+            // Usage section
+            const exportReportBtn = document.getElementById('export-report');
+
+            // Initialize charts
+            const usageChart = new Chart(document.getElementById('usage-chart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Tokens Used',
+                        data: [12000, 15000, 18000, 22000, 25000, 28000],
+                        backgroundColor: '#FF6B35',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#E0E0E0'
+                            },
+                            grid: {
+                                color: '#4A4A4A'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#E0E0E0'
+                            },
+                            grid: {
+                                color: '#4A4A4A'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#E0E0E0'
+                            }
+                        }
+                    }
+                }
+            });
+
+            const costChart = new Chart(document.getElementById('cost-chart'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Cost ($)',
+                        data: [120, 150, 180, 220, 250, 280],
+                        borderColor: '#FF6B35',
+                        backgroundColor: 'rgba(255, 107, 53, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#E0E0E0'
+                            },
+                            grid: {
+                                color: '#4A4A4A'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#E0E0E0'
+                            },
+                            grid: {
+                                color: '#4A4A4A'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#E0E0E0'
+                            }
+                        }
+                    }
+                }
+            });
+
+            const trendChart = new Chart(document.getElementById('trend-chart'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Usage Trend',
+                        data: [12000, 15000, 18000, 22000, 25000, 28000],
+                        borderColor: '#FF6B35',
+                        backgroundColor: 'rgba(255, 107, 53, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#E0E0E0'
+                            },
+                            grid: {
+                                color: '#4A4A4A'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#E0E0E0'
+                            },
+                            grid: {
+                                color: '#4A4A4A'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#E0E0E0'
+                            }
+                        }
+                    }
+                }
+            });
+
+            exportReportBtn.addEventListener('click', function() {
+                alert('Report exported successfully!');
+            });
+
+            // Models section
+            const modelCards = document.querySelectorAll('.model-card');
+
+            modelCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    modelCards.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Workflows section
+            const pdfUpload = document.getElementById('pdf-upload');
+            const pdfPage = document.getElementById('pdf-page');
+            const pdfSummary = document.getElementById('pdf-summary');
+            const processPdfBtn = document.getElementById('process-pdf');
+            const clearPdfBtn = document.getElementById('clear-pdf');
+            const runBatchBtn = document.getElementById('run-batch');
+            const exportBatchBtn = document.getElementById('export-batch');
+
+            processPdfBtn.addEventListener('click', function() {
+                const file = pdfUpload.files[0];
+                const page = pdfPage.value;
+
+                if (!file) {
+                    alert('Please select a PDF file');
+                    return;
+                }
+
+                // Simulate PDF processing
+                pdfSummary.value = `This is a simulated summary of page ${page} from ${file.name}. In a real application, this would contain the extracted and summarized text from the specified page of the PDF.`;
+            });
+
+            clearPdfBtn.addEventListener('click', function() {
+                pdfUpload.value = '';
+                pdfPage.value = '1';
+                pdfSummary.value = '';
+            });
+
+            runBatchBtn.addEventListener('click', function() {
+                const file = batchInput.files[0];
+                const model = batchModel.value;
+
+                if (!file) {
+                    alert('Please select an input file');
+                    return;
+                }
+
+                // Simulate batch processing
+                batchStatus.textContent = 'Processing';
+                batchProgress.textContent = '0%';
+                batchProgressBar.style.width = '0%';
+
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        batchStatus.textContent = 'Completed';
+
+                        // Simulate batch results
+                        batchResult.innerHTML = `
+                            <p><strong>Model:</strong> ${model}</p>
+                            <p><strong>Input File:</strong> ${file.name}</p>
+                            <p><strong>Results:</strong></p>
+                            <table class="batch-table">
+                                <thead>
+                                    <tr>
+                                        <th>Input</th>
+                                        <th>Output</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Input 1</td>
+                                        <td>Output 1</td>
+                                        <td>Success</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Input 2</td>
+                                        <td>Output 2</td>
+                                        <td>Success</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Input 3</td>
+                                        <td>Output 3</td>
+                                        <td>Success</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        `;
+                    }
+
+                    batchProgress.textContent = `${Math.floor(progress)}%`;
+                    batchProgressBar.style.width = `${progress}%`;
+                }, 500);
+            });
+
+            exportBatchBtn.addEventListener('click', function() {
+                alert('Batch results exported successfully!');
+            });
+
+            // API section
+            const apiKeyInput = document.getElementById('api-key');
+            const testApiKeyBtn = document.getElementById('test-api-key');
+            const apiKeyStatus = document.getElementById('api-key-status');
+            const apiKeyMessage = document.getElementById('api-key-message');
+
+            testApiKeyBtn.addEventListener('click', function() {
+                const apiKey = apiKeyInput.value;
+
+                if (apiKey.trim() === '') {
+                    apiKeyStatus.className = 'status-indicator status-unknown';
+                    apiKeyMessage.textContent = 'Please enter an API key';
+                    return;
+                }
+
+                // Simulate API key validation
+                apiKeyStatus.className = 'status-indicator status-unknown';
+                apiKeyMessage.textContent = 'Testing API key...';
+
+                setTimeout(() => {
+                    // Simulate a 50% chance of success
+                    if (Math.random() > 0.5) {
+                        apiKeyStatus.className = 'status-indicator status-valid';
+                        apiKeyMessage.textContent = 'API key is valid';
+                    } else {
+                        apiKeyStatus.className = 'status-indicator status-invalid';
+                        apiKeyMessage.textContent = 'Invalid API key';
+                    }
+                }, 1000);
+            });
+
+            // Conversation history
+            function saveConversation() {
+                const messages = Array.from(messageHistory.children).map(msg => ({
+                    type: msg.classList.contains('user-message') ? 'user' : 'assistant',
+                    content: msg.textContent
+                }));
+
+                localStorage.setItem('conversationHistory', JSON.stringify(messages));
+            }
+
+            function loadConversation() {
+                const savedMessages = localStorage.getItem('conversationHistory');
+                if (savedMessages) {
+                    const messages = JSON.parse(savedMessages);
+                    messages.forEach(msg => {
+                        const messageElement = document.createElement('div');
+                        messageElement.className = `message ${msg.type}-message`;
+                        messageElement.textContent = msg.content;
+                        messageHistory.appendChild(messageElement);
+                    });
+                }
+            }
+
+            // Load conversation history on page load
+            loadConversation();
+
+            // Save conversation history before page unload
+            window.addEventListener('beforeunload', saveConversation);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RapidAPI Business Intelligence Dashboard">
+    <title>RapidAPI Business Intelligence</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --dark-bg: #1a1a1a;
+            --light-bg: #2d2d2d;
+            --text-color: #ecf0f1;
+            --text-light: #bdc3c7;
+            --border-color: #34495e;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--secondary-color);
+            padding: 1rem;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color var(--transition-speed) ease;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+            background-color: var(--light-bg);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .tabs-container {
+            display: flex;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--dark-bg);
+        }
+
+        .tabs-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .tabs-container::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .tabs-container::-webkit-scrollbar-track {
+            background-color: var(--dark-bg);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--light-bg);
+            color: var(--text-light);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            border-radius: 4px 4px 0 0;
+            margin-right: 0.25rem;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: var(--dark-bg);
+            position: relative;
+        }
+
+        .tab:hover:not(.active) {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .tab-content {
+            display: none;
+            background-color: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 0 4px 4px 4px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-color);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .range-container {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .range-value {
+            margin-left: 1rem;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: var(--dark-bg);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition-speed) ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        button.secondary {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        button.secondary:hover {
+            background-color: #1a252f;
+        }
+
+        .results-container {
+            margin-top: 2rem;
+            background-color: var(--dark-bg);
+            border-radius: 4px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        .job-card, .news-card, .financial-card {
+            background-color: var(--light-bg);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .job-card:hover, .news-card:hover, .financial-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        .job-title {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .company-name {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .job-location, .salary-range {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .job-description {
+            color: var(--text-light);
+            margin-top: 1rem;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin: 2rem 0;
+            background-color: var(--dark-bg);
+            border-radius: 4px;
+            padding: 1rem;
+        }
+
+        .loading-spinner {
+            border: 4px solid var(--light-bg);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: var(--accent-color);
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .api-key-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: var(--light-bg);
+            border-radius: 4px;
+        }
+
+        .api-key-input {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .api-key-input input {
+            flex-grow: 1;
+        }
+
+        .usage-tracker {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .usage-item {
+            text-align: center;
+        }
+
+        .usage-value {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+
+        .usage-label {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .workflow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--light-bg);
+            border-radius: 4px;
+        }
+
+        .workflow-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: var(--dark-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .workflow-content {
+            flex-grow: 1;
+        }
+
+        .workflow-title {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-description {
+            color: var(--text-light);
+        }
+
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .autocomplete-results.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .autocomplete-item:hover {
+            background-color: var(--dark-bg);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        tr:hover {
+            background-color: var(--light-bg);
+        }
+
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .export-options select {
+            flex-grow: 1;
+        }
+
+        .sentiment-positive {
+            color: #2ecc71;
+        }
+
+        .sentiment-negative {
+            color: #e74c3c;
+        }
+
+        .sentiment-neutral {
+            color: #f39c12;
+        }
+
+        .favorites-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .favorite-card {
+            background-color: var(--light-bg);
+            border-radius: 4px;
+            padding: 1rem;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .favorite-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        .favorite-title {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .favorite-type {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tag {
+            background-color: var(--primary-color);
+            color: var(--dark-bg);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            .tabs-container {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                margin-bottom: 0.25rem;
+            }
+
+            .workflow-step {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .workflow-icon {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">RapidAPI BI</a>
+            <nav>
+                <ul>
+                    <li><a href="#jobs">Jobs</a></li>
+                    <li><a href="#finance">Finance</a></li>
+                    <li><a href="#search">Search</a></li>
+                    <li><a href="#scraper">Scraper</a></li>
+                    <li><a href="#workflow">Workflow</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="api-key-section">
+            <h2>API Key Management</h2>
+            <div class="api-key-input">
+                <input type="text" id="apiKey" placeholder="Enter your RapidAPI key">
+                <button id="saveApiKey">Save Key</button>
+            </div>
+            <div class="usage-tracker">
+                <div class="usage-item">
+                    <div class="usage-value" id="requestsUsed">0</div>
+                    <div class="usage-label">Requests Used</div>
+                </div>
+                <div class="usage-item">
+                    <div class="usage-value" id="requestsLimit">1000</div>
+                    <div class="usage-label">Monthly Limit</div>
+                </div>
+                <div class="usage-item">
+                    <div class="usage-value" id="rateLimit">60</div>
+                    <div class="usage-label">Requests/Minute</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs-container" id="tabs">
+            <button class="tab active" data-tab="jobs">Job Search</button>
+            <button class="tab" data-tab="finance">Financial Data</button>
+            <button class="tab" data-tab="search">Search</button>
+            <button class="tab" data-tab="scraper">Web Scraper</button>
+            <button class="tab" data-tab="workflow">Workflow</button>
+            <button class="tab" data-tab="favorites">Favorites</button>
+        </div>
+
+        <div class="tab-content active" id="jobs">
+            <h2 class="section-title">Job Search</h2>
+
+            <div class="form-group">
+                <label for="jobQuery">Job Query</label>
+                <input type="text" id="jobQuery" placeholder="e.g., Software Engineer">
+            </div>
+
+            <div class="form-group">
+                <label for="jobLocation">Location</label>
+                <input type="text" id="jobLocation" placeholder="e.g., New York, NY">
+            </div>
+
+            <div class="form-group">
+                <label for="jobIndustry">Industry</label>
+                <select id="jobIndustry">
+                    <option value="">All Industries</option>
+                    <option value="technology">Technology</option>
+                    <option value="finance">Finance</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="education">Education</option>
+                    <option value="manufacturing">Manufacturing</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="jobExperience">Experience Level</label>
+                <select id="jobExperience">
+                    <option value="">All Levels</option>
+                    <option value="entry">Entry Level</option>
+                    <option value="mid">Mid Level</option>
+                    <option value="senior">Senior Level</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="salaryRange">Salary Range</label>
+                <div class="range-container">
+                    <input type="range" id="salaryRange" min="30000" max="200000" value="50000" step="1000">
+                    <span class="range-value" id="salaryValue">$50,000</span>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="searchJobs">Search Jobs</button>
+                <button id="saveJobSearch" class="secondary">Save Search</button>
+            </div>
+
+            <div class="error-message" id="jobsError"></div>
+
+            <div class="loading-spinner" id="jobsLoading"></div>
+
+            <div class="results-container" id="jobsResults"></div>
+        </div>
+
+        <div class="tab-content" id="finance">
+            <h2 class="section-title">Financial Data</h2>
+
+            <div class="form-group autocomplete-container">
+                <label for="stockSymbol">Stock Symbol</label>
+                <input type="text" id="stockSymbol" placeholder="e.g., AAPL">
+                <div class="autocomplete-results" id="stockAutocomplete"></div>
+            </div>
+
+            <div class="button-group">
+                <button id="getFinancialData">Get Financial Data</button>
+                <button id="saveFinancialData" class="secondary">Save Data</button>
+            </div>
+
+            <div class="error-message" id="financeError"></div>
+
+            <div class="loading-spinner" id="financeLoading"></div>
+
+            <div class="results-container" id="financeResults">
+                <div class="chart-container" id="financialChart"></div>
+                <div class="table-container">
+                    <table id="financialTable">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Financial data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="export-options">
+                    <select id="exportFormat">
+                        <option value="csv">CSV</option>
+                        <option value="excel">Excel</option>
+                    </select>
+                    <button id="exportFinancialData">Export Data</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="search">
+            <h2 class="section-title">Search</h2>
+
+            <div class="form-group">
+                <label for="searchQuery">Search Query</label>
+                <input type="text" id="searchQuery" placeholder="Enter your search query">
+            </div>
+
+            <div class="form-group">
+                <label for="searchType">Search Type</label>
+                <select id="searchType">
+                    <option value="web">Web</option>
+                    <option value="image">Images</option>
+                    <option value="video">Videos</option>
+                    <option value="news">News</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="searchLanguage">Language</label>
+                <select id="searchLanguage">
+                    <option value="">All Languages</option>
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="zh">Chinese</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button id="performSearch">Search</button>
+                <button id="saveSearch" class="secondary">Save Search</button>
+            </div>
+
+            <div class="error-message" id="searchError"></div>
+
+            <div class="loading-spinner" id="searchLoading"></div>
+
+            <div class="results-container" id="searchResults"></div>
+        </div>
+
+        <div class="tab-content" id="scraper">
+            <h2 class="section-title">Web Scraper</h2>
+
+            <div class="form-group">
+                <label for="scrapeUrl">Target URL</label>
+                <input type="text" id="scrapeUrl" placeholder="https://example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="scrapeType">Scrape Type</label>
+                <select id="scrapeType">
+                    <option value="contacts">Contacts (Emails & Phones)</option>
+                    <option value="content">Content Extraction</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button id="startScraping">Start Scraping</button>
+                <button id="saveScrapedData" class="secondary">Save Data</button>
+            </div>
+
+            <div class="error-message" id="scraperError"></div>
+
+            <div class="loading-spinner" id="scraperLoading"></div>
+
+            <div class="results-container" id="scraperResults"></div>
+        </div>
+
+        <div class="tab-content" id="workflow">
+            <h2 class="section-title">Workflow Pipeline</h2>
+
+            <div class="workflow-container">
+                <div class="workflow-step">
+                    <div class="workflow-icon">1</div>
+                    <div class="workflow-content">
+                        <h3 class="workflow-title">Job Search</h3>
+                        <p class="workflow-description">Find relevant job listings based on your criteria.</p>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="workflow-icon">2</div>
+                    <div class="workflow-content">
+                        <h3 class="workflow-title">Salary Data</h3>
+                        <p class="workflow-description">Analyze salary information for the selected jobs.</p>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="workflow-icon">3</div>
+                    <div class="workflow-content">
+                        <h3 class="workflow-title">Company Financials</h3>
+                        <p class="workflow-description">Retrieve financial data for the companies hiring.</p>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="workflow-icon">4</div>
+                    <div class="workflow-content">
+                        <h3 class="workflow-title">Contact Scraper</h3>
+                        <p class="workflow-description">Extract contact information from company websites.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="startWorkflow">Start Workflow</button>
+            </div>
+
+            <div class="error-message" id="workflowError"></div>
+
+            <div class="loading-spinner" id="workflowLoading"></div>
+
+            <div class="results-container" id="workflowResults"></div>
+        </div>
+
+        <div class="tab-content" id="favorites">
+            <h2 class="section-title">Favorites</h2>
+
+            <div class="form-group">
+                <label for="favoritesFilter">Filter by Type</label>
+                <select id="favoritesFilter">
+                    <option value="all">All Types</option>
+                    <option value="job">Jobs</option>
+                    <option value="financial">Financial Data</option>
+                    <option value="search">Search Results</option>
+                    <option value="scraped">Scraped Data</option>
+                </select>
+            </div>
+
+            <div class="favorites-container" id="favoritesContainer">
+                <!-- Favorites will be inserted here -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 RapidAPI Business Intelligence. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // Salary range display
+            const salaryRange = document.getElementById('salaryRange');
+            const salaryValue = document.getElementById('salaryValue');
+
+            salaryRange.addEventListener('input', () => {
+                const value = parseInt(salaryRange.value);
+                salaryValue.textContent = `$${value.toLocaleString()}`;
+            });
+
+            // API Key management
+            const apiKeyInput = document.getElementById('apiKey');
+            const saveApiKeyBtn = document.getElementById('saveApiKey');
+            const requestsUsed = document.getElementById('requestsUsed');
+            const requestsLimit = document.getElementById('requestsLimit');
+            const rateLimit = document.getElementById('rateLimit');
+
+            saveApiKeyBtn.addEventListener('click', () => {
+                const apiKey = apiKeyInput.value.trim();
+                if (apiKey) {
+                    localStorage.setItem('rapidApiKey', apiKey);
+                    alert('API Key saved successfully!');
+                    // Simulate API key validation and usage tracking
+                    setTimeout(() => {
+                        requestsUsed.textContent = '50';
+                        requestsLimit.textContent = '1000';
+                        rateLimit.textContent = '60';
+                    }, 1000);
+                } else {
+                    alert('Please enter a valid API Key');
+                }
+            });
+
+            // Check for saved API key
+            const savedApiKey = localStorage.getItem('rapidApiKey');
+            if (savedApiKey) {
+                apiKeyInput.value = savedApiKey;
+                // Simulate API key validation and usage tracking
+                setTimeout(() => {
+                    requestsUsed.textContent = '50';
+                    requestsLimit.textContent = '1000';
+                    rateLimit.textContent = '60';
+                }, 500);
+            }
+
+            // Job search functionality
+            const searchJobsBtn = document.getElementById('searchJobs');
+            const jobsResults = document.getElementById('jobsResults');
+            const jobsLoading = document.getElementById('jobsLoading');
+            const jobsError = document.getElementById('jobsError');
+
+            searchJobsBtn.addEventListener('click', async () => {
+                const query = document.getElementById('jobQuery').value.trim();
+                const location = document.getElementById('jobLocation').value.trim();
+                const industry = document.getElementById('jobIndustry').value;
+                const experience = document.getElementById('jobExperience').value;
+                const salary = document.getElementById('salaryRange').value;
+
+                if (!query) {
+                    jobsError.textContent = 'Please enter a job query';
+                    jobsError.style.display = 'block';
+                    return;
+                }
+
+                jobsLoading.style.display = 'block';
+                jobsError.style.display = 'none';
+
+                try {
+                    // Simulate API call to JSearch jobs endpoint
+                    const response = await simulateJSearchJobsApiCall({
+                        query,
+                        location,
+                        industry,
+                        experience,
+                        salary
+                    });
+
+                    displayJobResults(response);
+                } catch (error) {
+                    jobsError.textContent = error.message;
+                    jobsError.style.display = 'block';
+                } finally {
+                    jobsLoading.style.display = 'none';
+                }
+            });
+
+            // Financial data functionality
+            const getFinancialDataBtn = document.getElementById('getFinancialData');
+            const financialResults = document.getElementById('financeResults');
+            const financeLoading = document.getElementById('financeLoading');
+            const financeError = document.getElementById('financeError');
+            const stockSymbolInput = document.getElementById('stockSymbol');
+            const stockAutocomplete = document.getElementById('stockAutocomplete');
+
+            getFinancialDataBtn.addEventListener('click', async () => {
+                const symbol = stockSymbolInput.value.trim().toUpperCase();
+
+                if (!symbol) {
+                    financeError.textContent = 'Please enter a stock symbol';
+                    financeError.style.display = 'block';
+                    return;
+                }
+
+                financeLoading.style.display = 'block';
+                financeError.style.display = 'none';
+
+                try {
+                    // Simulate API call to Yahoo Finance endpoints
+                    const keyStatistics = await simulateYahooFinanceApiCall('key-statistics', symbol);
+                    const financialAnalysis = await simulateYahooFinanceApiCall('financial-analysis', symbol);
+                    const earningsTrend = await simulateYahooFinanceApiCall('earnings-trend', symbol);
+                    const priceData = await simulateYahooFinanceApiCall('price', symbol);
+
+                    displayFinancialResults(keyStatistics, financialAnalysis, earningsTrend, priceData);
+                } catch (error) {
+                    financeError.textContent = error.message;
+                    financeError.style.display = 'block';
+                } finally {
+                    financeLoading.style.display = 'none';
+                }
+            });
+
+            // Stock symbol autocomplete
+            stockSymbolInput.addEventListener('input', async () => {
+                const query = stockSymbolInput.value.trim();
+
+                if (query.length < 2) {
+                    stockAutocomplete.classList.remove('show');
+                    return;
+                }
+
+                try {
+                    // Simulate API call to get stock symbol suggestions
+                    const suggestions = await simulateStockSymbolSuggestions(query);
+                    displayStockSuggestions(suggestions);
+                } catch (error) {
+                    console.error('Error fetching stock suggestions:', error);
+                }
+            });
+
+            // Search functionality
+            const performSearchBtn = document.getElementById('performSearch');
+            const searchResults = document.getElementById('searchResults');
+            const searchLoading = document.getElementById('searchLoading');
+            const searchError = document.getElementById('searchError');
+
+            performSearchBtn.addEventListener('click', async () => {
+                const query = document.getElementById('searchQuery').value.trim();
+                const type = document.getElementById('searchType').value;
+                const language = document.getElementById('searchLanguage').value;
+
+                if (!query) {
+                    searchError.textContent = 'Please enter a search query';
+                    searchError.style.display = 'block';
+                    return;
+                }
+
+                searchLoading.style.display = 'block';
+                searchError.style.display = 'none';
+
+                try {
+                    // Simulate API call to Google Search endpoint
+                    const response = await simulateGoogleSearchApiCall({
+                        query,
+                        type,
+                        language
+                    });
+
+                    displaySearchResults(response);
+                } catch (error) {
+                    searchError.textContent = error.message;
+                    searchError.style.display = 'block';
+                } finally {
+                    searchLoading.style.display = 'none';
+                }
+            });
+
+            // Web scraper functionality
+            const startScrapingBtn = document.getElementById('startScraping');
+            const scraperResults = document.getElementById('scraperResults');
+            const scraperLoading = document.getElementById('scraperLoading');
+            const scraperError = document.getElementById('scraperError');
+
+            startScrapingBtn.addEventListener('click', async () => {
+                const url = document.getElementById('scrapeUrl').value.trim();
+                const type = document.getElementById('scrapeType').value;
+
+                if (!url) {
+                    scraperError.textContent = 'Please enter a URL';
+                    scraperError.style.display = 'block';
+                    return;
+                }
+
+                if (!isValidUrl(url)) {
+                    scraperError.textContent = 'Please enter a valid URL';
+                    scraperError.style.display = 'block';
+                    return;
+                }
+
+                scraperLoading.style.display = 'block';
+                scraperError.style.display = 'none';
+
+                try {
+                    // Simulate API call to Web Scraper endpoint
+                    const response = await simulateWebScraperApiCall({
+                        url,
+                        type
+                    });
+
+                    displayScraperResults(response);
+                } catch (error) {
+                    scraperError.textContent = error.message;
+                    scraperError.style.display = 'block';
+                } finally {
+                    scraperLoading.style.display = 'none';
+                }
+            });
+
+            // Workflow functionality
+            const startWorkflowBtn = document.getElementById('startWorkflow');
+            const workflowResults = document.getElementById('workflowResults');
+            const workflowLoading = document.getElementById('workflowLoading');
+            const workflowError = document.getElementById('workflowError');
+
+            startWorkflowBtn.addEventListener('click', async () => {
+                workflowLoading.style.display = 'block';
+                workflowError.style.display = 'none';
+
+                try {
+                    // Simulate the complete workflow
+                    const jobQuery = document.getElementById('jobQuery').value.trim();
+                    const location = document.getElementById('jobLocation').value.trim();
+
+                    if (!jobQuery) {
+                        throw new Error('Please enter a job query in the Job Search tab');
+                    }
+
+                    // Step 1: Job Search
+                    const jobsResponse = await simulateJSearchJobsApiCall({
+                        query: jobQuery,
+                        location
+                    });
+
+                    // Step 2: Salary Data
+                    const salaryResponse = await simulateJSearchSalaryApiCall({
+                        query: jobQuery,
+                        location
+                    });
+
+                    // Step 3: Company Financials
+                    const companies = jobsResponse.data.slice(0, 3); // Get first 3 companies
+                    const financialResponses = await Promise.all(
+                        companies.map(async (job) => {
+                            const symbol = await getStockSymbolForCompany(job.employer_name);
+                            if (symbol) {
+                                return simulateYahooFinanceApiCall('key-statistics', symbol);
+                            }
+                            return null;
+                        })
+                    );
+
+                    // Step 4: Contact Scraper
+                    const scrapeResponses = await Promise.all(
+                        companies.map(async (job) => {
+                            const companyUrl = await getCompanyWebsite(job.employer_name);
+                            if (companyUrl) {
+                                return simulateWebScraperApiCall({
+                                    url: companyUrl,
+                                    type: 'contacts'
+                                });
+                            }
+                            return null;
+                        })
+                    );
+
+                    displayWorkflowResults(jobsResponse, salaryResponse, financialResponses, scrapeResponses);
+                } catch (error) {
+                    workflowError.textContent = error.message;
+                    workflowError.style.display = 'block';
+                } finally {
+                    workflowLoading.style.display = 'none';
+                }
+            });
+
+            // Favorites functionality
+            const favoritesFilter = document.getElementById('favoritesFilter');
+            const favoritesContainer = document.getElementById('favoritesContainer');
+
+            favoritesFilter.addEventListener('change', () => {
+                displayFavorites();
+            });
+
+            // Save buttons functionality
+            const saveJobSearchBtn = document.getElementById('saveJobSearch');
+            const saveFinancialDataBtn = document.getElementById('saveFinancialData');
+            const saveSearchBtn = document.getElementById('saveSearch');
+            const saveScrapedDataBtn = document.getElementById('saveScrapedData');
+
+            saveJobSearchBtn.addEventListener('click', () => {
+                const query = document.getElementById('jobQuery').value.trim();
+                if (query) {
+                    saveFavorite('job', {
+                        query,
+                        location: document.getElementById('jobLocation').value.trim(),
+                        industry: document.getElementById('jobIndustry').value,
+                        experience: document.getElementById('jobExperience').value,
+                        salary: document.getElementById('salaryRange').value
+                    });
+                    alert('Job search saved to favorites!');
+                } else {
+                    alert('Please enter a job query to save');
+                }
+            });
+
+            saveFinancialDataBtn.addEventListener('click', () => {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                if (symbol) {
+                    saveFavorite('financial', {
+                        symbol,
+                        data: getCurrentFinancialData()
+                    });
+                    alert('Financial data saved to favorites!');
+                } else {
+                    alert('Please enter a stock symbol to save');
+                }
+            });
+
+            saveSearchBtn.addEventListener('click', () => {
+                const query = document.getElementById('searchQuery').value.trim();
+                if (query) {
+                    saveFavorite('search', {
+                        query,
+                        type: document.getElementById('searchType').value,
+                        language: document.getElementById('searchLanguage').value
+                    });
+                    alert('Search saved to favorites!');
+                } else {
+                    alert('Please enter a search query to save');
+                }
+            });
+
+            saveScrapedDataBtn.addEventListener('click', () => {
+                const url = document.getElementById('scrapeUrl').value.trim();
+                if (url && isValidUrl(url)) {
+                    saveFavorite('scraped', {
+                        url,
+                        type: document.getElementById('scrapeType').value
+                    });
+                    alert('Scraped data saved to favorites!');
+                } else {
+                    alert('Please enter a valid URL to save');
+                }
+            });
+
+            // Export financial data
+            const exportFinancialDataBtn = document.getElementById('exportFinancialData');
+
+            exportFinancialDataBtn.addEventListener('click', () => {
+                const format = document.getElementById('exportFormat').value;
+                const data = getCurrentFinancialData();
+
+                if (data) {
+                    exportData(data, format);
+                } else {
+                    alert('No financial data to export. Please get financial data first.');
+                }
+            });
+
+            // Initialize favorites display
+            displayFavorites();
+
+            // Helper functions
+            function isValidUrl(string) {
+                try {
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+
+            function saveFavorite(type, data) {
+                const favorites = JSON.parse(localStorage.getItem('rapidApiFavorites')) || [];
+                favorites.push({
+                    type,
+                    data,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('rapidApiFavorites', JSON.stringify(favorites));
+                displayFavorites();
+            }
+
+            function displayFavorites() {
+                const favorites = JSON.parse(localStorage.getItem('rapidApiFavorites')) || [];
+                const filter = favoritesFilter.value;
+                favoritesContainer.innerHTML = '';
+
+                favorites.forEach((favorite, index) => {
+                    if (filter === 'all' || favorite.type === filter) {
+                        const favoriteCard = document.createElement('div');
+                        favoriteCard.className = 'favorite-card';
+
+                        let title = '';
+                        let description = '';
+                        let tags = [];
+
+                        switch (favorite.type) {
+                            case 'job':
+                                title = favorite.data.query;
+                                description = `Location: ${favorite.data.location || 'Any'}`;
+                                tags = ['job', favorite.data.industry || 'all-industries', favorite.data.experience || 'all-levels'];
+                                break;
+                            case 'financial':
+                                title = favorite.data.symbol;
+                                description = 'Financial Data';
+                                tags = ['financial', 'stock'];
+                                break;
+                            case 'search':
+                                title = favorite.data.query;
+                                description = `Type: ${favorite.data.type}, Language: ${favorite.data.language || 'All'}`;
+                                tags = ['search', favorite.data.type];
+                                break;
+                            case 'scraped':
+                                title = new URL(favorite.data.url).hostname;
+                                description = `Type: ${favorite.data.type}`;
+                                tags = ['scraped', favorite.data.type];
+                                break;
+                        }
+
+                        favoriteCard.innerHTML = `
+                            <h3 class="favorite-title">${title}</h3>
+                            <p class="favorite-type">${favorite.type.charAt(0).toUpperCase() + favorite.type.slice(1)}</p>
+                            <p>${description}</p>
+                            <div class="tags-container">
+                                ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                            <button class="remove-favorite" data-index="${index}">Remove</button>
+                        `;
+
+                        favoritesContainer.appendChild(favoriteCard);
+                    }
+                });
+
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-favorite').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.getAttribute('data-index'));
+                        removeFavorite(index);
+                    });
+                });
+            }
+
+            function removeFavorite(index) {
+                const favorites = JSON.parse(localStorage.getItem('rapidApiFavorites')) || [];
+                favorites.splice(index, 1);
+                localStorage.setItem('rapidApiFavorites', JSON.stringify(favorites));
+                displayFavorites();
+            }
+
+            function getCurrentFinancialData() {
+                const table = document.getElementById('financialTable');
+                if (!table) return null;
+
+                const rows = table.querySelectorAll('tbody tr');
+                const data = [];
+
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    data.push({
+                        metric: cells[0].textContent,
+                        value: cells[1].textContent
+                    });
+                });
+
+                return data;
+            }
+
+            function exportData(data, format) {
+                if (format === 'csv') {
+                    exportAsCSV(data);
+                } else if (format === 'excel') {
+                    exportAsExcel(data);
+                }
+            }
+
+            function exportAsCSV(data) {
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Metric,Value\n";
+
+                data.forEach(item => {
+                    const row = `${item.metric},${item.value}`;
+                    csvContent += row + "\n";
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "financial_data.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            function exportAsExcel(data) {
+                // In a real application, you would use a library like SheetJS to export to Excel
+                // This is a simplified version that creates a CSV with Excel MIME type
+                let csvContent = "data:application/vnd.ms-excel;charset=utf-8,";
+                csvContent += "Metric\tValue\n";
+
+                data.forEach(item => {
+                    const row = `${item.metric}\t${item.value}`;
+                    csvContent += row + "\n";
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "financial_data.xls");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            // Simulated API calls
+            async function simulateJSearchJobsApiCall(params) {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Simulate API response
+                return {
+                    status: 'OK',
+                    request_id: '12345',
+                    parameters: params,
+                    data: [
+                        {
+                            employer_name: 'Tech Corp',
+                            job_id: 'job1',
+                            job_title: 'Software Engineer',
+                            job_apply_link: 'https://example.com/apply/job1',
+                            job_description: 'Develop and maintain software applications...',
+                            job_is_remote: false,
+                            job_posted_at_timestamp: 1625097600,
+                            job_posted_at_datetime_utc: '2021-06-30T00:00:00.000Z',
+                            job_city: 'New York',
+                            job_state: 'NY',
+                            job_country: 'USA',
+                            job_latitude: 40.7128,
+                            job_longitude: -74.0060,
+                            job_employment_type: 'FULLTIME',
+                            job_min_salary: 80000,
+                            job_max_salary: 120000,
+                            job_salary_currency: 'USD',
+                            job_salary_period: 'YEAR',
+                            job_highlights: {
+                                Qualifications: [
+                                    'Bachelor\'s degree in Computer Science',
+                                    '3+ years of experience in software development'
+                                ],
+                                Responsibilities: [
+                                    'Design and implement software solutions',
+                                    'Write clean, efficient code'
+                                ]
+                            }
+                        },
+                        {
+                            employer_name: 'Innovate Inc',
+                            job_id: 'job2',
+                            job_title: 'Senior Developer',
+                            job_apply_link: 'https://example.com/apply/job2',
+                            job_description: 'Lead software development projects...',
+                            job_is_remote: true,
+                            job_posted_at_timestamp: 1624492800,
+                            job_posted_at_datetime_utc: '2021-06-23T00:00:00.000Z',
+                            job_city: 'San Francisco',
+                            job_state: 'CA',
+                            job_country: 'USA',
+                            job_latitude: 37.7749,
+                            job_longitude: -122.4194,
+                            job_employment_type: 'FULLTIME',
+                            job_min_salary: 100000,
+                            job_max_salary: 150000,
+                            job_salary_currency: 'USD',
+                            job_salary_period: 'YEAR',
+                            job_highlights: {
+                                Qualifications: [
+                                    'Master\'s degree in Computer Science',
+                                    '5+ years of experience in software development'
+                                ],
+                                Responsibilities: [
+                                    'Lead development teams',
+                                    'Architect software solutions'
+                                ]
+                            }
+                        }
+                    ],
+                    server: 'server1'
+                };
+            }
+
+            async function simulateJSearchSalaryApiCall(params) {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Simulate API response
+                return {
+                    status: 'OK',
+                    request_id: '67890',
+                    parameters: params,
+                    data: {
+                        job_title: params.query,
+                        location: params.location || 'National',
+                        salary_percentile_25: 70000,
+                        salary_percentile_50: 90000,
+                        salary_percentile_75: 110000,
+                        salary_percentile_90: 130000,
+                        salary_histogram: [
+                            { range: '50,000-70,000', count: 12 },
+                            { range: '70,001-90,000', count: 25 },
+                            { range: '90,001-110,000', count: 38 },
+                            { range: '110,001-130,000', count: 15 },
+                            { range: '130,001+', count: 10 }
+                        ],
+                        salary_trend: [
+                            { year: 2019, salary: 85000 },
+                            { year: 2020, salary: 88000 },
+                            { year: 2021, salary: 92000 },
+                            { year: 2022, salary: 95000 }
+                        ]
+                    },
+                    server: 'server2'
+                };
+            }
+
+            async function simulateYahooFinanceApiCall(endpoint, symbol) {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1200));
+
+                // Simulate different API responses based on endpoint
+                if (endpoint === 'key-statistics') {
+                    return {
+                        symbol: symbol,
+                        price: 150.25,
+                        marketCap: 2500000000000,
+                        beta: 1.2,
+                        peRatio: 25.5,
+                        eps: 6.25,
+                        forwardPe: 22.8,
+                        dividendYield: 1.5,
+                        exDividendDate: '2023-06-30',
+                        earningsTimestamp: 1688172800,
+                        earningsTimestampStart: 1688172800,
+                        earningsTimestampEnd: 1688172800,
+                        trailingAnnualDividendRate: 2.25,
+                        trailingAnnualDividendYield: 1.5,
+                        payoutRatio: 0.36,
+                        fiveYearAvgDividendYield: 2.1,
+                        bookValue: 12.5,
+                        priceToBook: 12.02,
+                        lastFiscalYearEnd: 1656636800,
+                        nextFiscalYearEnd: 1688172800,
+                        mostRecentQuarter: 1656636800,
+                        profitMargins: 0.25,
+                        enterpriseToRevenue: 3.2,
+                        enterpriseToEbitda: 12.5,
+                        fiftyTwoWeekLow: 120.5,
+                        fiftyTwoWeekHigh: 180.75,
+                        fiftyDayAverage: 145.3,
+                        twoHundredDayAverage: 155.2,
+                        averageVolume: 25000000,
+                        averageVolume10days: 26000000,
+                        sharesOutstanding: 16666666667,
+                        floatShares: 15000000000,
+                        heldPercentInsiders: 0.15,
+                        heldPercentInstitutions: 0.8,
+                        shortRatio: 2.5,
+                        shortPercentOfFloat: 0.05,
+                        beta3Year: 1.1,
+                        morningStarRiskRating: 'Medium',
+                        morningStarOverallRating: 'Fair',
+                        earningsQuarterlyGrowth: 0.1,
+                        netIncomeToCommon: 5000000000,
+                        trailingEps: 6.25,
+                        forwardEps: 7.5,
+                        pegRatio: 2.8,
+                        lastSplitFactor: '2:1',
+                        lastSplitDate: 1420070400,
+                        enterpriseValue: 2600000000000,
+                        priceToSalesTrailing12Months: 4.5,
+                        lastCapGain: 0.5,
+                        fiveYearAverageReturn: 0.12
+                    };
+                } else if (endpoint === 'financial-analysis') {
+                    return {
+                        symbol: symbol,
+                        recommendationKey: 'buy',
+                        recommendationMean: 1.8,
+                        numberOfAnalystOpinions: 25,
+                        totalCash: 5000000000,
+                        totalCashPerShare: 30.5,
+                        ebitda: 10000000000,
+                        totalDebt: 8000000000,
+                        quickRatio: 1.2,
+                        currentRatio: 1.5,
+                        totalRevenue: 50000000000,
+                        debtToEquity: 1.6,
+                        revenuePerShare: 3.0,
+                        returnOnAssets: 0.15,
+                        returnOnEquity: 0.25,
+                        grossProfits: 30000000000,
+                        freeCashflow: 2000000000,
+                        operatingCashflow: 8000000000,
+                        earningsGrowth: 0.1,
+                        revenueGrowth: 0.08,
+                        grossMargins: 0.6,
+                        ebitdaMargins: 0.2,
+                        operatingMargins: 0.15,
+                        profitMargins: 0.1,
+                        financialCurrency: 'USD'
+                    };
+                } else if (endpoint === 'earnings-trend') {
+                    return {
+                        symbol: symbol,
+                        trend: [
+                            {
+                                maxAge: 1,
+                                period: '0Q2023',
+                                endDate: '2023-06-30',
+                                revenueEstimate: {
+                                    avg: 12000000000,
+                                    low: 11000000000,
+                                    high: 13000000000,
+                                    numberOfAnalysts: 25
+                                },
+                                earningsEstimate: {
+                                    avg: 3.0,
+                                    low: 2.5,
+                                    high: 3.5,
+                                    numberOfAnalysts: 25
+                                },
+                                epsTrend: {
+                                    current: 2.8,
+                                    7daysAgo: 2.7,
+                                    30daysAgo: 2.6,
+                                    60daysAgo: 2.5,
+                                    90daysAgo: 2.4
+                                },
+                                epsRevisions: {
+                                    upLast7days: 5,
+                                    upLast30days: 10,
+                                    downLast7days: 2,
+                                    downLast30days: 3
+                                }
+                            },
+                            {
+                                maxAge: 1,
+                                period: '1Q2023',
+                                endDate: '2023-09-30',
+                                revenueEstimate: {
+                                    avg: 12500000000,
+                                    low: 11500000000,
+                                    high: 13500000000,
+                                    numberOfAnalysts: 25
+                                },
+                                earningsEstimate: {
+                                    avg: 3.1,
+                                    low: 2.6,
+                                    high: 3.6,
+                                    numberOfAnalysts: 25
+                                },
+                                epsTrend: {
+                                    current: 2.9,
+                                    7daysAgo: 2.8,
+                                    30daysAgo: 2.7,
+                                    60daysAgo: 2.6,
+                                    90daysAgo: 2.5
+                                },
+                                epsRevisions: {
+                                    upLast7days: 6,
+                                    upLast30days: 12,
+                                    downLast7days: 1,
+                                    downLast30days: 2
+                                }
+                            }
+                        ],
+                        financialsTemplate: {
+                            code: 'annual',
+                            maxAge: 8
+                        }
+                    };
+                } else if (endpoint === 'price') {
+                    return {
+                        symbol: symbol,
+                        chart: {
+                            result: [
+                                {
+                                    meta: {
+                                        currency: 'USD',
+                                        symbol: symbol,
+                                        exchangeName: 'NASDAQ',
+                                        instrumentType: 'EQUITY',
+                                        firstTradeDate: 345479400,
+                                        regularMarketTime: 1688172800,
+                                        gmtoffset: -14400,
+                                        timezone: 'EST',
+                                        exchangeTimezoneName: 'America/New_York',
+                                        regularMarketPrice: 150.25,
+                                        chartPreviousClose: 148.5,
+                                        previousClose: 148.5,
+                                        scale: 3,
+                                        priceHint: 2,
+                                        currentTradingPeriod: {
+                                            pre: {
+                                                timezone: 'EST',
+                                                start: 1688151200,
+                                                end: 1688169200,
+                                                gmtoffset: -14400
+                                            },
+                                            regular: {
+                                                timezone: 'EST',
+                                                start: 1688169200,
+                                                end: 1688190800,
+                                                gmtoffset: -14400
+                                            },
+                                            post: {
+                                                timezone: 'EST',
+                                                start: 1688190800,
+                                                end: 1688212400,
+                                                gmtoffset: -14400
+                                            }
+                                        },
+                                        tradingPeriods: [
+                                            [
+                                                {
+                                                    timezone: 'EST',
+                                                    start: 1688151200,
+                                                    end: 1688169200,
+                                                    gmtoffset: -14400
+                                                },
+                                                {
+                                                    timezone: 'EST',
+                                                    start: 1688169200,
+                                                    end: 1688190800,
+                                                    gmtoffset: -14400
+                                                },
+                                                {
+                                                    timezone: 'EST',
+                                                    start: 1688190800,
+                                                    end: 1688212400,
+                                                    gmtoffset: -14400
+                                                }
+                                            ]
+                                        ],
+                                        dataGranularity: '1d',
+                                        range: '1mo',
+                                        validRanges: [
+                                            '1d',
+                                            '5d',
+                                            '1mo',
+                                            '3mo',
+                                            '6mo',
+                                            '1y',
+                                            '2y',
+                                            '5y',
+                                            '10y',
+                                            'ytd',
+                                            'max'
+                                        ]
+                                    },
+                                    timestamp: [
+                                        1685548800, 1685635200, 1685721600, 1685808000,
+                                        1685894400, 1685980800, 1686067200, 1686153600,
+                                        1686499200, 1686585600, 1686672000, 1686758400,
+                                        1686844800, 1686931200, 1687017600, 1687104000,
+                                        1687363200, 1687449600, 1687536000, 1687622400,
+                                        1687708800, 1687795200, 1687881600, 1687968000,
+                                        1688054400, 1688140800
+                                    ],
+                                    indicators: {
+                                        quote: [
+                                            {
+                                                open: [
+                                                    145.25, 146.75, 147.5, 148.25, 149.0,
+                                                    149.75, 150.5, 151.25, 152.0, 152.75,
+                                                    153.5, 154.25, 155.0, 155.75, 156.5,
+                                                    157.25, 158.0, 158.75, 159.5, 160.25,
+                                                    161.0, 161.75, 162.5, 163.25, 164.0,
+                                                    164.75
+                                                ],
+                                                high: [
+                                                    147.5, 148.25, 149.0, 149.75, 150.5,
+                                                    151.25, 152.0, 152.75, 153.5, 154.25,
+                                                    155.0, 155.75, 156.5, 157.25, 158.0,
+                                                    158.75, 159.5, 160.25, 161.0, 161.75,
+                                                    162.5, 163.25, 164.0, 164.75, 165.5,
+                                                    166.25
+                                                ],
+                                                low: [
+                                                    144.5, 145.75, 146.5, 147.25, 148.0,
+                                                    148.75, 149.5, 150.25, 151.0, 151.75,
+                                                    152.5, 153.25, 154.0, 154.75, 155.5,
+                                                    156.25, 157.0, 157.75, 158.5, 159.25,
+                                                    160.0, 160.75, 161.5, 162.25, 163.0,
+                                                    163.75
+                                                ],
+                                                close: [
+                                                    146.75, 147.5, 148.25, 149.0, 149.75,
+                                                    150.5, 151.25, 152.0, 152.75, 153.5,
+                                                    154.25, 155.0, 155.75, 156.5, 157.25,
+                                                    158.0, 158.75, 159.5, 160.25, 161.0,
+                                                    161.75, 162.5, 163.25, 164.0, 164.75,
+                                                    150.25
+                                                ],
+                                                volume: [
+                                                    25000000, 26000000, 27000000, 28000000,
+                                                    29000000, 30000000, 31000000, 32000000,
+                                                    33000000, 34000000, 35000000, 36000000,
+                                                    37000000, 38000000, 39000000, 40000000,
+                                                    41000000, 42000000, 43000000, 44000000,
+                                                    45000000, 46000000, 47000000, 48000000,
+                                                    49000000, 50000000
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            error: null
+                        }
+                    };
+                }
+            }
+
+            async function simulateGoogleSearchApiCall(params) {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1200));
+
+                // Simulate API response
+                return {
+                    status: 'OK',
+                    request_id: '54321',
+                    parameters: params,
+                    data: {
+                        results: [
+                            {
+                                title: `Latest ${params.query} News`,
+                                link: 'https://example.com/news',
+                                description: 'Find the most recent updates and developments in the field of ' + params.query,
+                                position: 1,
+                                type: 'news',
+                                snippet: 'Breaking news about ' + params.query + '. Stay informed with our comprehensive coverage...',
+                                date: '2023-06-30',
+                                source: 'Example News',
+                                sentiment: 'positive'
+                            },
+                            {
+                                title: `Best ${params.query} Tools and Software`,
+                                link: 'https://example.com/tools',
+                                description: 'Discover the top tools and software for ' + params.query + ' professionals',
+                                position: 2,
+                                type: 'organic',
+                                snippet: 'Our curated list of the best ' + params.query + ' tools to enhance your productivity...',
+                                date: '2023-06-28',
+                                source: 'Tech Review',
+                                sentiment: 'neutral'
+                            },
+                            {
+                                title: `${params.query} Tutorial for Beginners`,
+                                link: 'https://example.com/tutorial',
+                                description: 'Learn ' + params.query + ' from scratch with our comprehensive beginner tutorial',
+                                position: 3,
+                                type: 'video',
+                                snippet: 'Watch our step-by-step video tutorial to learn ' + params.query + ' in just 30 minutes...',
+                                date: '2023-06-25',
+                                source: 'Learn Coding',
+                                sentiment: 'positive'
+                            },
+                            {
+                                title: `${params.query} Community Forum`,
+                                link: 'https://example.com/forum',
+                                description: 'Join the largest ' + params.query + ' community and discuss with experts',
+                                position: 4,
+                                type: 'forum',
+                                snippet: 'Connect with thousands of ' + params.query + ' enthusiasts and professionals...',
+                                date: '2023-06-20',
+                                source: 'Dev Community',
+                                sentiment: 'neutral'
+                            },
+                            {
+                                title: `Top ${params.query} Books to Read in 2023`,
+                                link: 'https://example.com/books',
+                                description: 'Our expert picks for the best ' + params.query + ' books to add to your reading list',
+                                position: 5,
+                                type: 'organic',
+                                snippet: 'From classic texts to new releases, our curated list of ' + params.query + ' books...',
+                                date: '2023-06-15',
+                                source: 'Book Lovers',
+                                sentiment: 'positive'
+                            }
+                        ],
+                        total_results: 5000000,
+                        time_taken: 0.85,
+                        serp_features: {
+                            top_stories: [
+                                {
+                                    title: 'Breaking ' + params.query + ' News',
+                                    source: 'Example News',
+                                    link: 'https://example.com/news/breaking'
+                                },
+                                {
+                                    title: params.query + ' Market Update',
+                                    source: 'Financial Times',
+                                    link: 'https://example.com/market'
+                                }
+                            ],
+                            people_also_ask: [
+                                {
+                                    question: 'What is ' + params.query + '?',
+                                    snippet: params.query + ' is a field of study that focuses on...',
+                                    link: 'https://example.com/what-is',
+                                    title: 'What is ' + params.query + '?'
+                                },
+                                {
+                                    question: 'How to learn ' + params.query + '?',
+                                    snippet: 'Learning ' + params.query + ' requires dedication and practice...',
+                                    link: 'https://example.com/learn',
+                                    title: 'How to learn ' + params.query + '?'
+                                }
+                            ]
+                        }
+                    },
+                    server: 'server3'
+                };
+            }
+
+            async function simulateWebScraperApiCall(params) {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Simulate API response
+                return {
+                    status: 'OK',
+                    request_id: '98765',
+                    parameters: params,
+                    data: {
+                        url: params.url,
+                        type: params.type,
+                        contacts: [
+                            {
+                                type: 'email',
+                                value: 'contact@example.com',
+                                context: 'Contact form on the website',
+                                confidence: 0.95
+                            },
+                            {
+                                type: 'phone',
+                                value: '+1 (555) 123-4567',
+                                context: 'Footer contact information',
+                                confidence: 0.9
+                            },
+                            {
+                                type: 'email',
+                                value: 'info@example.com',
+                                context: 'About page',
+                                confidence: 0.85
+                            },
+                            {
+                                type: 'phone',
+                                value: '+1 (555) 987-6543',
+                                context: 'Services page',
+                                confidence: 0.8
+                            }
+                        ],
+                        validation: {
+                            emails: {
+                                valid: 3,
+                                invalid: 1,
+                                disposable: 0,
+                                role_based: 1
+                            },
+                            phones: {
+                                valid: 4,
+                                invalid: 0,
+                                mobile: 2,
+                                landline: 2
+                            }
+                        },
+                        visualization: {
+                            email_domains: [
+                                { domain: 'example.com', count: 2 },
+                                { domain: 'example.org', count: 1 }
+                            ],
+                            phone_numbers: [
+                                { country: 'US', count: 4 }
+                            ],
+                            contact_sources: [
+                                { source: 'Contact form', count: 1 },
+                                { source: 'Footer', count: 1 },
+                                { source: 'About page', count: 1 },
+                                { source: 'Services page', count: 1 }
+                            ]
+                        }
+                    },
+                    server: 'server4'
+                };
+            }
+
+            async function simulateStockSymbolSuggestions(query) {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Simulate API response with stock symbol suggestions
+                const suggestions = [
+                    { symbol: 'AAPL', name: 'Apple Inc.' },
+                    { symbol: 'MSFT', name: 'Microsoft Corporation' },
+                    { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+                    { symbol: 'AMZN', name: 'Amazon.com Inc.' },
+                    { symbol: 'FB', name: 'Meta Platforms Inc.' },
+                    { symbol: 'TSLA', name: 'Tesla Inc.' },
+                    { symbol: 'BRK.A', name: 'Berkshire Hathaway Inc.' },
+                    { symbol: 'JNJ', name: 'Johnson & Johnson' },
+                    { symbol: 'V', name: 'Visa Inc.' },
+                    { symbol: 'PG', name: 'Procter & Gamble Co.' }
+                ];
+
+                return suggestions.filter(item =>
+                    item.symbol.toLowerCase().includes(query.toLowerCase()) ||
+                    item.name.toLowerCase().includes(query.toLowerCase())
+                );
+            }
+
+            async function getStockSymbolForCompany(companyName) {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                // Simulate company to stock symbol mapping
+                const companySymbols = {
+                    'Tech Corp': 'AAPL',
+                    'Innovate Inc': 'MSFT',
+                    'Global Solutions': 'GOOGL',
+                    'NextGen Technologies': 'AMZN',
+                    'Digital Innovations': 'FB',
+                    'Smart Systems': 'TSLA',
+                    'Enterprise Holdings': 'BRK.A',
+                    'Healthcare Group': 'JNJ',
+                    'Financial Services': 'V',
+                    'Consumer Products': 'PG'
+                };
+
+                return companySymbols[companyName] || null;
+            }
+
+            async function getCompanyWebsite(companyName) {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 600));
+
+                // Simulate company to website mapping
+                const companyWebsites = {
+                    'Tech Corp': 'https://techcorp.com',
+                    'Innovate Inc': 'https://innovateinc.com',
+                    'Global Solutions': 'https://globalsolutions.com',
+                    'NextGen Technologies': 'https://nextgentech.com',
+                    'Digital Innovations': 'https://digitalinnovations.com',
+                    'Smart Systems': 'https://smartsystems.com',
+                    'Enterprise Holdings': 'https://enterpriseholdings.com',
+                    'Healthcare Group': 'https://healthcaregroup.com',
+                    'Financial Services': 'https://financialservices.com',
+                    'Consumer Products': 'https://consumerproducts.com'
+                };
+
+                return companyWebsites[companyName] || null;
+            }
+
+            // Display functions
+            function displayJobResults(response) {
+                jobsResults.innerHTML = '';
+
+                if (response.data && response.data.length > 0) {
+                    response.data.forEach(job => {
+                        const jobCard = document.createElement('div');
+                        jobCard.className = 'job-card';
+
+                        const salaryInfo = job.job_min_salary && job.job_max_salary
+                            ? `$${job.job_min_salary.toLocaleString()} - $${job.job_max_salary.toLocaleString()} ${job.job_salary_period}`
+                            : 'Salary not specified';
+
+                        jobCard.innerHTML = `
+                            <h3 class="job-title">${job.job_title}</h3>
+                            <p class="company-name">${job.employer_name}</p>
+                            <p class="job-location">${job.job_city}, ${job.job_state}, ${job.job_country}</p>
+                            <p class="salary-range">${salaryInfo}</p>
+                            <p class="job-description">${job.job_description}</p>
+                            <div class="button-group">
+                                <a href="${job.job_apply_link}" target="_blank" class="button">Apply Now</a>
+                                <button class="button secondary view-details" data-job-id="${job.job_id}">View Details</button>
+                            </div>
+                        `;
+
+                        jobsResults.appendChild(jobCard);
+                    });
+
+                    // Add event listeners to view details buttons
+                    document.querySelectorAll('.view-details').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const jobId = e.target.getAttribute('data-job-id');
+                            viewJobDetails(jobId);
+                        });
+                    });
+                } else {
+                    jobsResults.innerHTML = '<p>No jobs found matching your criteria.</p>';
+                }
+            }
+
+            function displayFinancialResults(keyStatistics, financialAnalysis, earningsTrend, priceData) {
+                // Display key statistics in table
+                const tableBody = document.querySelector('#financialTable tbody');
+                tableBody.innerHTML = '';
+
+                for (const [key, value] of Object.entries(keyStatistics)) {
+                    const row = document.createElement('tr');
+                    const metricCell = document.createElement('td');
+                    const valueCell = document.createElement('td');
+
+                    metricCell.textContent = formatMetricName(key);
+                    valueCell.textContent = formatMetricValue(key, value);
+
+                    row.appendChild(metricCell);
+                    row.appendChild(valueCell);
+                    tableBody.appendChild(row);
+                }
+
+                // Display chart (simplified - in a real app you would use a library like Chart.js)
+                const chartContainer = document.getElementById('financialChart');
+                chartContainer.innerHTML = '<p>Financial Chart (simulated)</p>';
+                chartContainer.style.backgroundColor = '#2d2d2d';
+                chartContainer.style.display = 'flex';
+                chartContainer.style.alignItems = 'center';
+                chartContainer.style.justifyContent = 'center';
+                chartContainer.style.color = '#3498db';
+                chartContainer.style.fontSize = '1.2rem';
+            }
+
+            function displaySearchResults(response) {
+                searchResults.innerHTML = '';
+
+                if (response.data && response.data.results && response.data.results.length > 0) {
+                    response.data.results.forEach(result => {
+                        const resultCard = document.createElement('div');
+                        resultCard.className = 'news-card';
+
+                        const sentimentClass = result.sentiment === 'positive'
+                            ? 'sentiment-positive'
+                            : result.sentiment === 'negative'
+                            ? 'sentiment-negative'
+                            : 'sentiment-neutral';
+
+                        resultCard.innerHTML = `
+                            <h3><a href="${result.link}" target="_blank">${result.title}</a></h3>
+                            <p class="source-info">${result.source} - ${result.date}</p>
+                            <p class="result-type">${result.type}</p>
+                            <p class="result-snippet">${result.snippet}</p>
+                            <p class="sentiment ${sentimentClass}">Sentiment: ${result.sentiment}</p>
+                        `;
+
+                        searchResults.appendChild(resultCard);
+                    });
+
+                    // Display SERP features if available
+                    if (response.data.serp_features) {
+                        const featuresSection = document.createElement('div');
+                        featuresSection.className = 'serp-features';
+                        featuresSection.innerHTML = '<h3>Additional Information</h3>';
+
+                        if (response.data.serp_features.top_stories) {
+                            const storiesSection = document.createElement('div');
+                            storiesSection.innerHTML = '<h4>Top Stories</h4>';
+
+                            response.data.serp_features.top_stories.forEach(story => {
+                                const storyItem = document.createElement('div');
+                                storyItem.className = 'story-item';
+                                storyItem.innerHTML = `
+                                    <h5><a href="${story.link}" target="_blank">${story.title}</a></h5>
+                                    <p>${story.source}</p>
+                                `;
+                                storiesSection.appendChild(storyItem);
+                            });
+
+                            featuresSection.appendChild(storiesSection);
+                        }
+
+                        if (response.data.serp_features.people_also_ask) {
+                            const questionsSection = document.createElement('div');
+                            questionsSection.innerHTML = '<h4>People Also Ask</h4>';
+
+                            response.data.serp_features.people_also_ask.forEach(question => {
+                                const questionItem = document.createElement('div');
+                                questionItem.className = 'question-item';
+                                questionItem.innerHTML = `
+                                    <h5>${question.question}</h5>
+                                    <p>${question.snippet}</p>
+                                    <a href="${question.link}" target="_blank">Read more</a>
+                                `;
+                                questionsSection.appendChild(questionItem);
+                            });
+
+                            featuresSection.appendChild(questionsSection);
+                        }
+
+                        searchResults.appendChild(featuresSection);
+                    }
+                } else {
+                    searchResults.innerHTML = '<p>No results found for your search.</p>';
+                }
+            }
+
+            function displayScraperResults(response) {
+                scraperResults.innerHTML = '';
+
+                if (response.data && response.data.contacts && response.data.contacts.length > 0) {
+                    const contactsSection = document.createElement('div');
+                    contactsSection.className = 'contacts-section';
+                    contactsSection.innerHTML = '<h3>Extracted Contacts</h3>';
+
+                    const contactsList = document.createElement('ul');
+                    contactsList.className = 'contacts-list';
+
+                    response.data.contacts.forEach(contact => {
+                        const contactItem = document.createElement('li');
+                        contactItem.className = 'contact-item';
+
+                        const contactType = contact.type === 'email' ? 'Email' : 'Phone';
+                        const contactIcon = contact.type === 'email' ? '✉️' : '📞';
+
+                        contactItem.innerHTML = `
+                            <div class="contact-icon">${contactIcon}</div>
+                            <div class="contact-info">
+                                <p class="contact-type">${contactType}</p>
+                                <p class="contact-value">${contact.value}</p>
+                                <p class="contact-context">Found in: ${contact.context}</p>
+                                <p class="contact-confidence">Confidence: ${(contact.confidence * 100).toFixed(0)}%</p>
+                            </div>
+                        `;
+
+                        contactsList.appendChild(contactItem);
+                    });
+
+                    contactsSection.appendChild(contactsList);
+                    scraperResults.appendChild(contactsSection);
+
+                    // Display validation results
+                    if (response.data.validation) {
+                        const validationSection = document.createElement('div');
+                        validationSection.className = 'validation-section';
+                        validationSection.innerHTML = '<h3>Validation Results</h3>';
+
+                        if (response.data.validation.emails) {
+                            const emailsValidation = document.createElement('div');
+                            emailsValidation.className = 'validation-item';
+                            emailsValidation.innerHTML = `
+                                <h4>Email Validation</h4>
+                                <p>Valid: ${response.data.validation.emails.valid}</p>
+                                <p>Invalid: ${response.data.validation.emails.invalid}</p>
+                                <p>Disposable: ${response.data.validation.emails.disposable}</p>
+                                <p>Role-based: ${response.data.validation.emails.role_based}</p>
+                            `;
+                            validationSection.appendChild(emailsValidation);
+                        }
+
+                        if (response.data.validation.phones) {
+                            const phonesValidation = document.createElement('div');
+                            phonesValidation.className = 'validation-item';
+                            phonesValidation.innerHTML = `
+                                <h4>Phone Validation</h4>
+                                <p>Valid: ${response.data.validation.phones.valid}</p>
+                                <p>Invalid: ${response.data.validation.phones.invalid}</p>
+                                <p>Mobile: ${response.data.validation.phones.mobile}</p>
+                                <p>Landline: ${response.data.validation.phones.landline}</p>
+                            `;
+                            validationSection.appendChild(phonesValidation);
+                        }
+
+                        scraperResults.appendChild(validationSection);
+                    }
+
+                    // Display visualization data
+                    if (response.data.visualization) {
+                        const visualizationSection = document.createElement('div');
+                        visualizationSection.className = 'visualization-section';
+                        visualizationSection.innerHTML = '<h3>Visualization Data</h3>';
+
+                        if (response.data.visualization.email_domains) {
+                            const domainsChart = document.createElement('div');
+                            domainsChart.className = 'chart-container';
+                            domainsChart.innerHTML = '<h4>Email Domains</h4>';
+
+                            // Simplified chart - in a real app you would use a library like Chart.js
+                            const domainsList = document.createElement('ul');
+                            response.data.visualization.email_domains.forEach(domain => {
+                                const item = document.createElement('li');
+                                item.textContent = `${domain.domain}: ${domain.count}`;
+                                domainsList.appendChild(item);
+                            });
+
+                            domainsChart.appendChild(domainsList);
+                            visualizationSection.appendChild(domainsChart);
+                        }
+
+                        if (response.data.visualization.phone_numbers) {
+                            const phonesChart = document.createElement('div');
+                            phonesChart.className = 'chart-container';
+                            phonesChart.innerHTML = '<h4>Phone Numbers by Country</h4>';
+
+                            // Simplified chart
+                            const phonesList = document.createElement('ul');
+                            response.data.visualization.phone_numbers.forEach(phone => {
+                                const item = document.createElement('li');
+                                item.textContent = `${phone.country}: ${phone.count}`;
+                                phonesList.appendChild(item);
+                            });
+
+                            phonesChart.appendChild(phonesList);
+                            visualizationSection.appendChild(phonesChart);
+                        }
+
+                        if (response.data.visualization.contact_sources) {
+                            const sourcesChart = document.createElement('div');
+                            sourcesChart.className = 'chart-container';
+                            sourcesChart.innerHTML = '<h4>Contact Sources</h4>';
+
+                            // Simplified chart
+                            const sourcesList = document.createElement('ul');
+                            response.data.visualization.contact_sources.forEach(source => {
+                                const item = document.createElement('li');
+                                item.textContent = `${source.source}: ${source.count}`;
+                                sourcesList.appendChild(item);
+                            });
+
+                            sourcesChart.appendChild(sourcesList);
+                            visualizationSection.appendChild(sourcesChart);
+                        }
+
+                        scraperResults.appendChild(visualizationSection);
+                    }
+                } else {
+                    scraperResults.innerHTML = '<p>No contacts found on the scraped page.</p>';
+                }
+            }
+
+            function displayWorkflowResults(jobsResponse, salaryResponse, financialResponses, scrapeResponses) {
+                workflowResults.innerHTML = '';
+
+                // Step 1: Job Search Results
+                const jobsSection = document.createElement('div');
+                jobsSection.className = 'workflow-step-results';
+                jobsSection.innerHTML = '<h3>Job Search Results</h3>';
+
+                if (jobsResponse.data && jobsResponse.data.length > 0) {
+                    const jobsList = document.createElement('ul');
+                    jobsResponse.data.forEach(job => {
+                        const jobItem = document.createElement('li');
+                        jobItem.textContent = `${job.job_title} at ${job.employer_name}`;
+                        jobsList.appendChild(jobItem);
+                    });
+                    jobsSection.appendChild(jobsList);
+                } else {
+                    jobsSection.innerHTML += '<p>No jobs found matching your criteria.</p>';
+                }
+
+                workflowResults.appendChild(jobsSection);
+
+                // Step 2: Salary Data
+                const salarySection = document.createElement('div');
+                salarySection.className = 'workflow-step-results';
+                salarySection.innerHTML = '<h3>Salary Data</h3>';
+
+                if (salaryResponse.data) {
+                    salarySection.innerHTML += `
+                        <p>Job Title: ${salaryResponse.data.job_title}</p>
+                        <p>Location: ${salaryResponse.data.location}</p>
+                        <p>Median Salary: $${salaryResponse.data.salary_percentile_50.toLocaleString()}</p>
+                    `;
+
+                    if (salaryResponse.data.salary_histogram) {
+                        const histogram = document.createElement('div');
+                        histogram.className = 'chart-container';
+                        histogram.innerHTML = '<h4>Salary Distribution</h4>';
+
+                        // Simplified chart
+                        const histogramList = document.createElement('ul');
+                        salaryResponse.data.salary_histogram.forEach(item => {
+                            const histogramItem = document.createElement('li');
+                            histogramItem.textContent = `${item.range}: ${item.count}`;
+                            histogramList.appendChild(histogramItem);
+                        });
+
+                        histogram.appendChild(histogramList);
+                        salarySection.appendChild(histogram);
+                    }
+                } else {
+                    salarySection.innerHTML += '<p>No salary data available.</p>';
+                }
+
+                workflowResults.appendChild(salarySection);
+
+                // Step 3: Company Financials
+                const financialsSection = document.createElement('div');
+                financialsSection.className = 'workflow-step-results';
+                financialsSection.innerHTML = '<h3>Company Financials</h3>';
+
+                if (financialResponses && financialResponses.length > 0) {
+                    financialResponses.forEach((financialData, index) => {
+                        if (financialData) {
+                            const companySection = document.createElement('div');
+                            companySection.className = 'financial-card';
+                            companySection.innerHTML = `
+                                <h4>${jobsResponse.data[index].employer_name} (${financialData.symbol})</h4>
+                                <p>Price: $${financialData.price.toFixed(2)}</p>
+                                <p>Market Cap: $${(financialData.marketCap / 1000000000).toFixed(2)}B</p>
+                                <p>PE Ratio: ${financialData.peRatio.toFixed(2)}</p>
+                                <p>Dividend Yield: ${financialData.dividendYield.toFixed(2)}%</p>
+                            `;
+                            financialsSection.appendChild(companySection);
+                        }
+                    });
+                } else {
+                    financialsSection.innerHTML += '<p>No financial data available for the selected companies.</p>';
+                }
+
+                workflowResults.appendChild(financialsSection);
+
+                // Step 4: Contact Scraper Results
+                const contactsSection = document.createElement('div');
+                contactsSection.className = 'workflow-step-results';
+                contactsSection.innerHTML = '<h3>Contact Information</h3>';
+
+                if (scrapeResponses && scrapeResponses.length > 0) {
+                    scrapeResponses.forEach((scrapeData, index) => {
+                        if (scrapeData && scrapeData.data && scrapeData.data.contacts && scrapeData.data.contacts.length > 0) {
+                            const companySection = document.createElement('div');
+                            companySection.className = 'financial-card';
+                            companySection.innerHTML = `<h4>${jobsResponse.data[index].employer_name}</h4>`;
+
+                            const contactsList = document.createElement('ul');
+                            scrapeData.data.contacts.forEach(contact => {
+                                const contactItem = document.createElement('li');
+                                contactItem.textContent = `${contact.type.toUpperCase()}: ${contact.value}`;
+                                contactsList.appendChild(contactItem);
+                            });
+
+                            companySection.appendChild(contactsList);
+                            contactsSection.appendChild(companySection);
+                        }
+                    });
+                } else {
+                    contactsSection.innerHTML += '<p>No contact information available for the selected companies.</p>';
+                }
+
+                workflowResults.appendChild(contactsSection);
+            }
+
+            function displayStockSuggestions(suggestions) {
+                const autocompleteResults = document.getElementById('stockAutocomplete');
+                autocompleteResults.innerHTML = '';
+
+                if (suggestions.length > 0) {
+                    suggestions.forEach(suggestion => {
+                        const item = document.createElement('div');
+                        item.className = 'autocomplete-item';
+                        item.textContent = `${suggestion.symbol} - ${suggestion.name}`;
+                        item.addEventListener('click', () => {
+                            document.getElementById('stockSymbol').value = suggestion.symbol;
+                            autocompleteResults.classList.remove('show');
+                        });
+                        autocompleteResults.appendChild(item);
+                    });
+                    autocompleteResults.classList.add('show');
+                } else {
+                    autocompleteResults.classList.remove('show');
+                }
+            }
+
+            function viewJobDetails(jobId) {
+                // In a real application, you would fetch detailed job information from the API
+                // For this example, we'll simulate it with a simple alert
+                alert(`Viewing details for job ID: ${jobId}`);
+            }
+
+            // Helper functions for financial data display
+            function formatMetricName(name) {
+                return name.split(/(?=[A-Z])/).join(' ');
+            }
+
+            function formatMetricValue(metric, value) {
+                if (typeof value === 'number') {
+                    // Format numbers with appropriate units
+                    if (metric.includes('Cap') || metric.includes('Value') || metric.includes('Revenue')) {
+                        if (value >= 1000000000) {
+                            return `$${(value / 1000000000).toFixed(2)}B`;
+                        } else if (value >= 1000000) {
+                            return `$${(value / 1000000).toFixed(2)}M`;
+                        } else if (value >= 1000) {
+                            return `$${(value / 1000).toFixed(2)}K`;
+                        } else {
+                            return `$${value.toFixed(2)}`;
+                        }
+                    } else if (metric.includes('Ratio') || metric.includes('Margins') || metric.includes('Yield')) {
+                        return `${(value * 100).toFixed(2)}%`;
+                    } else {
+                        return value.toFixed(2);
+                    }
+                } else if (value instanceof Date) {
+                    return value.toLocaleDateString();
+                } else if (typeof value === 'boolean') {
+                    return value ? 'Yes' : 'No';
+                } else {
+                    return value;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1160 @@
+```html
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Genitus Inc. - KI-Softwarelösungen der nächsten Generation für Unternehmen. Automatisierung, Datenanalyse und intelligente Systeme aus einer Hand.">
+    <title>Genitus Inc. | AI Software Factory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --primary: #00f7ff;
+    --primary-dark: #00b8c4;
+    --secondary: #8a2be2;
+    --secondary-dark: #6a1b9a;
+    --dark: #0a0a1a;
+    --darker: #05050d;
+    --light: #f5f5f5;
+    --glow: 0 0 15px var(--primary);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --shadow: 0 10px 30px rgba(0, 247, 255, 0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Rajdhani-serif;
+    background-color: var(--d: var(--light);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+}
+
+ul {
+    list-style: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.btn {
+    display: inline-block;
+    background-gradient(135deg, var(--primary), var(--secondary));
+    color: var(--dark);
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    transition: var(--transition);
+    z-index: -1;
+}
+
+.btn:hover::before {
+    transform: translateX(100%);
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0, 247, 255, 0.25);
+}
+
+.section {
+    padding: 100px 0;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 60px;
+    position: relative;
+    font-size: 2.5rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 3px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 0;
+    background-color: rgba(10, 10, 26, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+header.scrolled {
+    padding: 15px 0;
+    background-color: rgba(10, 10, 26, 0.98);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: var(--dark);
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links li a {
+    font-weight: 500;
+    position: relative;
+    padding: 5px 0;
+}
+
+.nav-links li a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary);
+    transition: var(--transition);
+}
+
+.nav-links li a:hover::after {
+    width: 100%;
+}
+
+.nav-links li a.active {
+    color: var(--primary);
+}
+
+.nav-links li a.active::after {
+    width: 100%;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background-color: var(--light);
+    margin: 3px 0;
+    transition: var(--transition);
+}
+
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(0, 247, 255, 0.1), rgba(138, 43, 226, 0.1)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%2300f7ff;stop-opacity:0.1" /><stop offset="100%" style="stop-color:%238a2be2;stop-opacity:0.1" /></linearGradient></defs><path d="M0,0 L100,0 L80,100 L0,100 Z" fill="url(%23grad)"/><path d="M100,0 L100,100 L20,100 Z" fill="url(%23grad)"/></svg>');
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 30%, rgba(10, 10, 26, 0.8) 90%);
+    pointer-events: none;
+}
+
+.hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-text h1 {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1.1;
+}
+
+.hero-text p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    filter: drop-shadow(0 0 20px rgba(0, 247, 255, 0.3));
+}
+
+.hero-image::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    border: 2px solid;
+    border-image: linear-gradient(13(--primary), var(--secondary)) 1;
+    border-radius: 20px;
+    opacity: 0.5;
+    z-index: -1;
+}
+
+.stats {
+    background-color: rgba(10, 10, 26, 0.5);
+    border-radius: 15px;
+    padding: 30px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 247, 255, 0.2);
+}
+
+.stat-item {
+    margin-bottom: 20px;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    display: block;
+}
+
+.stat-text {
+    opacity: 0.8;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+}
+
+.services {
+    background-color: var(--darker);
+    position: relative;
+}
+
+.services::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><defs><radialGradient id="grad" cx="50%%" cy="50%%" r="50%%" fx="30%%" fy="30%%"><stop offset="0%%" style="stop-color:%2300f7ff;stop-opacity:0.05"/><stop offset="100%%" style="stop-color:%238a2be2;stop-opacity:0.02"/></radialGradient></defs><circle cx="100" cy="100" r="80" fill="none" stroke="url(%23grad)" stroke-width="2" stroke-dasharray="5,5"/></svg>');
+}
+
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.service-card {
+    background: rgba(10, 10, 26, 0.6);
+    border-radius: 15px;
+    padding: 40px 30px;
+    text-align: center;
+    transition: var(--transition);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 247, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    z-index: -1;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow);
+}
+
+.service-card:hover::before {
+    height: 100%;
+    opacity: 0.1;
+}
+
+.service-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 50%;
+    margin: 0 auto 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.1);
+    box-shadow: 0 15px 35px rgba(0, 247, 255, 0.3);
+}
+
+.service-card h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.about {
+    background: linear-gradient(135deg, rgba(0, 247, 255, 0.05), rgba(138, 43, 226, 0.05));
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.about-text p {
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
+
+.skills {
+    margin-top: 40px;
+}
+
+.skill-item {
+    margin-bottom: 15px;
+}
+
+.skill-name {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.skill-bar {
+    height: 8px;
+    background-color: rgba(138, 43, 226, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.skill-progress {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 4px;
+    transition: width 1.5s ease-in-out;
+}
+
+.cta {
+    background: linear-gradient(135deg, rgba(0, 247, 255, 0.1), rgba(138, 43, 226, 0.1));
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta h2 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.cta p {
+    font-size: 1.2rem;
+    margin-bottom: 35px;
+    opacity: 0.9;
+}
+
+.cta .btn {
+    font-size: 1.1rem;
+    padding: 15px 40px;
+}
+
+.footer {
+    background-color: var(--darker);
+    padding: 60px 0 20px;
+    position: relative;
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.footer-logo {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.footer-text {
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+}
+
+.social-links a {
+    width: 40px;
+    height: 40px;
+    background: rgba(138, 43, 226, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.social-links a:hover {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    transform: translateY(-3px);
+}
+
+.footer-links h3 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-links h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: var(--primary);
+}
+
+.footer-links ul li {
+    margin-bottom: 10px;
+}
+
+.footer-links ul li a {
+    opacity: 0.8;
+    transition: var(--transition);
+}
+
+.footer-links ul li a:hover {
+    color: var(--primary);
+    opacity: 1;
+    transform: translateX(5px);
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid rgba(138, 43, 226, 0.2);
+    opacity: 0.6;
+    font-size: 0.9rem;
+}
+
+.floating-elements {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.floating-element {
+    position: absolute;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: float 20s infinite linear;
+}
+
+.floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 10%;
+    animation-duration: 25s;
+}
+
+.floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    left: 20%;
+    animation-duration: 30s;
+    border-radius: 40% 60% 60% 40% / 50% 50% 70% 30%;
+}
+
+.floating-element:nth-child(3) {
+    width: 70px;
+    height: 70px;
+    top: 30%;
+    left: 80%;
+    animation-duration: 20s;
+}
+
+.floating-element:nth-child(4) {
+    width: 200px;
+    height: 200px;
+    top: 70%;
+    left: 70%;
+    animation-duration: 35s;
+    border-radius: 50% 30% 50% 70% / 60% 30% 70% 40%;
+}
+
+.floating-element:nth-child(5) {
+    width: 90px;
+    height: 90px;
+    top: 20%;
+    left: 50%;
+    animation-duration: 18s;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-50px) rotate(180deg);
+    }
+    100% {
+        transform: translateY(0) rotate(360deg);
+    }
+}
+
+@media (max-width: 992px) {
+    .hero-content,
+    .about-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .hero-text h1 {
+        font-size: 3rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 80px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 80px);
+        background-color: rgba(10, 10, 26, 0.98);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+        transition: var(--transition);
+    }
+
+    .nav-links.active {
+        left: 0;
+    }
+
+    .nav-links li a {
+        font-size: 1.5rem;
+    }
+
+    .hamburger.active span:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+
+    .hamburger.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+
+    .hero-text h1 {
+        font-size: 2.5rem;
+    }
+
+    .service-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-text h1 {
+        font-size: 2rem;
+    }
+
+    .section {
+        padding: 60px 0;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+
+    .cta h2 {
+        font-size: 2rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <div class="logo-icon">G</div>
+                    <span>Genitus</span>
+                    <small style="font-family: 'Rajdhani', sans-serif; font-weight: 300; letter-spacing: normal; font-size: 0.7rem; display: block;">AI SOFTWARE FACTORY</small>
+                </a>
+
+                <ul class="nav-links">
+                    <li><a href="#" class="active">Startseite</a></li>
+                    <li><a href="#dienste">Dienstleistungen</a></li>
+                    <li><a href="#ueber-uns">Über Uns</a></li>
+                    <li><a href="#technologien">Technologien</a></li>
+                    <li><a href="#kontakt" class="btn">Kontakt</a></li>
+                </ul>
+
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="startseite">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>KI-Lösungen der nächsten Generation</h1>
+                    <p>Wir bei Genitus Inc. entwickeln maßgeschneiderte KI-Software, die Ihr Unternehmen in die Zukunft führt. Von automatisierten Workflows bis zu prädiktiver Datenanalyse - wir machen Science Fiction zur Realität.</p>
+                    <a href="#kontakt" class="btn">Jetzt Beratungstermin vereinbaren</a>
+
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-number" data-target="12">0</span>
+                            <span class="stat-text">Jahre Erfahrung</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-target="247">0</span>
+                            <span class="stat-text">Erfolgreiche Projekte</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-target="98">0</span>
+                            <span class="stat-text">Kundenzufriedenheit</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-image">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxuciaHR0cDovL3d3dy53MyvcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MDAgNjAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjYwMCUiIHkyPSI2MDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSJyZ2JhKDAsIDAsIDAsIDAuMjUpIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSJyZ2JhKDAsIDAsIDAsIDAuODUpIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSI2MDAiIGZpbGw9InVybCgjZ3JhZGllbnQpIj48cGF0aCBkPSJNMjQwLDUwQzE1MCw1MCAxMDAuMSw1MCAxMDAuMSwxMDAgMTUwLDEwMCAyNDAsMTAwIDI0MCw1MCAyNDAsNTB6IE0zMDAuNSwzMDAuNUMyOTNSwzMDAuNSAyOTAuNSwyOTAuNSAzMDAuNSwyOTAuNSAzMDAuNSwzMDAuNVpNMjUwLDEwMEMyMTAuMSwxMDAgMTUwLDE1MCAxNTAuMSwxNTAgMjUwLDE1MCAyNTAuMSwxMDAgMjUwLDEwMFpNMTUwLDI1MGMtMjAuNSwwIC0zNi42LDIwLjUtMzYuNiwzNi42czIwLjUsMzYuNiAzNi42LDM2LjYgMzYuNiwyMC41IDM2LjYsMzYuNiAzNi42LDM2LjYgMzYuNiwyMC41IDIwLjUsMzYuNiAyMC41LDM2LjYgMjUwLDI1MHogTTQ1MC4xLDEwMGgxMDAuM2MyNi44LDAsNDkuMywyMi45LDQ5LjMsNDkuM3MyMi45LTQ5LjMsNDkuMy00OS4zIDQ5LjMtMjIuOSA0OS4zLTQ5LjMgMTUwLDEwMGgxMDAuMnoiIGZpbGw9InVybCgjZ3JhZGllbnQpIj48L3BhdGg+PC9yZWN0PjxwYXRoIGQ9Ik0xNTAuMSwxMDBoOTAuM2MyNi44LDAsNDkuMywyMi45LDQ5LjMsNDkuM3MyMi45LTQ5LjMsNDkuMy00OS4zIDQ5LjMtMjIuOSA0OS4zLTQ5LjMgMTUwLDEwMGg5MC4zem0tNDkuMy00OS4zYy0yMi45LDAtNDkuMywyMi45LTQ5LjMsNDkuM3MyMi45LDQ5LjMsNDkuMywyMi45IDQ5LjMsNDkuMyA0OS4zLDIyLjkgMTUwLDUwLjFoLTkweiIgZmlsbD0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjIpIj48L3BhdGg+PHBhdGggZD0iTTE1MC4xLDEwMGg5MC4zYzI2LjgsMCw0OS4zLDIyLjksNDkuMyw0OS4zczIyLjktNDkuMyw0OS4zLTQ5LjMgNDkuMy0yMi45IDQ5LjMtNDkuMyAxNTAuMSwxMDBoOTAuM3ptLTQ5LjMtNDkuM2MtMjIuOSwwLTQ5LjMsMjIuOS00OS4zLDQ5LjNzMjIuOSw0OS4zLDQ5LjMsMjIuOSA0OS4zLDQ5LjMgNDkuMywyMi45IDE1MCw1MC4xaC05MHoiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4yKSI+PC9wYXRoPjxwYXRoIGQ9Ik0xOTAuMSwzMDAuNWMtMTcuOCwwIC0zMy41LDE1LjktMzMuNSwzMy41czE1LjksMzMuNSAzMy41LDMzLjUgMzMuNSwxNS45IDMzLjUsMzMuNSAxOTAuMSwzMDAuNXoiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC41KSI+PC9wYXRoPjxwYXRoIGQ9Ik0yOTAuNSwyOTAuNWMtMTcuOCwwIC0zMy41LDE1LjktMzMuNSwzMy41czE1LjksMzMuNSAzMy41LDMzLjUgMzMuNSwxNS45IDMzLjUsMzMuNSAyOTAuNSwyOTAuNXoiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC41KSI+PC9wYXRoPjxwYXRoIGQ9Ik00MDAuMSwxMDBoOTAuM2MyNi44LDAsNDkuMywyMi45LDQ5LjMsNDkuM3MyMi45LTQ5LjMsNDkuMy00OS4zIDQ5LjMtMjIuOSA0OS4zLTQ5LjMgMTUwLDEwMGg5MC4zem0tNDkuMy00OS4zYy0yMi45LDAtNDkuMywyMi45LTQ5LjMsNDkuM3MyMi45LDQ5LjMsNDkuMywyMi45IDQ5LjMsNDkuMyA0OS4zLDIyLjkgMTUwLDUwLjFoLTkweiIgZmlsbD0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjIpIj48L3BhdGg+PHBhdGggZD0iTTQ1MC4xLDEwMGg5MC4zYzI2LjgsMCw0OS4zLDIyLjksNDkuMyw0OS4zczIyLjktNDkuMyw0OS4zLTQ5LjMgNDkuMy0yMi45IDQ5LjMtNDkuMyAxNTAuMSwxMDBoOTAuM3ptLTQ5LjMtNDkuM2MtMjIuOSwwLTQ5LjMsMjIuOS00OS4zLDQ5LjNzMjIuOSw0OS4zLDQ5LjMsMjIuOSA0OS4zLDQ5LjMgNDkuMywyMi45IDE1MCw1MC4xaC05MHoiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4yKSI+PC9wYXRoPjxwYXRoIGQ9Ik00OTAuMSwzMDAuNWMtMTcuOCwwIC0zMy41LDE1LjktMzMuNSwzMy41czE1LjksMzMuNSAzMy41LDMzLjUgMzMuNSwxNS45IDMzLjUsMzMuNSA0OTAuMSwzMDAuNXoiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC41KSI+PC9wYXRoPjxwYXRoIGQ9Ik01OTAuNSwyOTAuNWMtMTcuOCwwIC0zMy41LDE1LjktMzMuNSwzMy41czE1LjksMzMuNSAzMy41LDMzLjUgMzMuNSwxNS45IDMzLjUsMzMuNSA1OTAuNSwyOTAuNXoiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC41KSI+PC9wYXRoPjxwYXRoIGQ9Ik0xMDAuMSwzMDAuNWMtMTcuOCwwIC0zMy41LDE1LjktMzMuNSwzMy41czE1LjksMzMuNSAzMy41LDMzLjUgMzMuNSwxNS45IDMzLjUsMzMuNSAxMDAuMSwzMDAuNXoiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC41KSI+PC9wYXRoPjwvc3ZnPg==" alt="AI Neural Network Visualization" width="500" height="500">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="services section" id="dienste">
+        <div class="container">
+            <h2 class="section-title">Unsere KI-Dienstleistungen</h2>
+            <p class="text-center" style="max-width: 800px; margin: 0 auto 60px; opacity: 0.9;">Von maschinellem Lernen bis zu vollständigen KI-Integrationen - wir bieten maßgeschneiderte Lösungen für Ihr Unternehmen, die Skalierbarkeit, Sicherheit und Innovation vereinen.</p>
+
+            <div class="service-grid">
+                <div class="service-card">
+                    <div class="service-icon">🤖</div>
+                    <h3>KI-Softwareentwicklung</h3>
+                    <p>Maßgeschneiderte KI-Anwendungen, die Ihre Geschäftsprozesse revolutionieren. Von Chatbots bis zu komplexen Vorhersagemodellen.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📊</div>
+                    <h3>Datenanalyse & Predictive AI</h3>
+                    <p>Transformieren Sie Ihre Daten in handlungsrelevante Erkenntnisse mit unseren fortschrittlichen Analysetools und prädiktiven Modellen.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🔄</div>
+                    <h3>Prozessautomatisierung</h3>
+                    <p>Steigern Sie die Effizienz durch intelligente Automatisierung repetitiver Aufgaben mit RPA und KI-gestützten Workflows.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🛡️</div>
+                    <h3>KI-Sicherheitslösungen</h3>
+                    <p>Schützen Sie Ihr Unternehmen mit KI-basierten Bedrohungserkennungssystemen und proaktiven Sicherheitsmaßnahmen.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🌐</div>
+                    <h3>Computer Vision</h3>
+                    <p>Bild- und Videoanalyse-Lösungen für Qualitätssicherung, Überwachung und erweiterte Realität (AR/VR).</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🗣️</div>
+                    <h3>NLP & Sprachverarbeitung</h3>
+                    <p>Natürliche Sprachverarbeitung für Chatbots, Sentiment-Analyse und intelligente Dokumentenverarbeitung.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about section" id="ueber-uns">
+        <div class="container">
+            <h2 class="section-title">Über Genitus Inc.</h2>
+
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Genitus Inc. wurde 2012 mit der Vision gegründet, künstliche Intelligenz für Unternehmen jeder Größe zugänglich zu machen. Was als kleines Team von KI-Enthusiasten begann, ist heute eine führende AI Software Factory mit über 50 Expert:innen, die weltweit operiert.</p>
+
+                    <p>Unser Ansatz kombiniert wissenschaftliche Exzellenz mit praktischer Umsetzung. Wir glauben, dass echte Innovation entsteht, wenn fortschrittliche Technologie auf tiefes Branchenwissen trifft. Deshalb arbeiten wir eng mit unseren Kunden zusammen, um Lösungen zu entwickeln, die nicht nur technisch brillant, sondern auch geschäftlich relevant sind.</p>
+
+                    <p>Mit Standorten in Berlin, San Francisco und Tokio bedienen wir Kunden von lokalen Startups bis zu globalen Fortune-500-Unternehmen. Unsere Erfolgsgeschichte spricht für sich: 98% Kundenzufriedenheit und über 200 erfolgreich umgesetzte KI-Projekte.</p>
+                </div>
+
+                <div class="skills">
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <span>KI & Machine Learning</span>
+                            <span>95%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 95%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <span>Datenwissenschaft</span>
+                            <span>90%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 90%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <span>Softwareentwicklung</span>
+                            <span>97%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 97%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <span>Cloud-Infrastruktur</span>
+                            <span>88%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 88%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <span>Cybersicherheit</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 85%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="technologien" style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.05), rgba(0, 247, 255, 0.05));">
+        <div class="container">
+            <h2 class="section-title">Unsere Technologie-Stacks</h2>
+            <p class="text-center" style="max-width: 800px; margin: 0 auto 60px; opacity: 0.9;">Wir setzen auf moderne, skalierbare Technologien, um Ihnen die besten KI-Lösungen zu bieten. Unser Stack wird kontinuierlich aktualisiert, um mit den neuesten Entwicklungen Schritt zu halten.</p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; margin-top: 50px;">
+                <div style="text-align: center; padding: 30px; background: rgba(10, 10, 26, 0.6); border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(0, 247, 255, 0.1); transition: all 0.3s ease;">
+                    <div style="font-size: 3rem; margin-bottom: 15px; background: linear-gradient(135deg, #00f7ff, #8a2be2); -webkit-background-clip: text; background-clip: text; color: transparent;">🤖</div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px;">Python</h3>
+                    <p style="opacity: 0.8; font-size: 0.9rem;">TensorFlow, PyTorch, scikit-learn</p>
+                </div>
+
+                <div style="text-align: center; padding: 30px; background: rgba(10, 10, 26, 0.6); border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(0, 247, 255, 0.1); transition: all 0.3s ease;">
+                    <div style="font-size: 3rem; margin-bottom: 15px; background: linear-gradient(135deg, #00f7ff, #8a2be2); -webkit-background-clip: text; background-clip: text; color: transparent;">🖥️</div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px;">Cloud Plattformen</h3>
+                    <p style="opacity: 0.8; font-size: 0.9rem;">AWS, Azure, Google Cloud</p>
+                </div>
+
+                <div style="text-align: center; padding: 30px; background: rgba(10, 10, 26, 0.6); border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(0, 247, 255, 0.1); transition: all 0.3s ease;">
+                    <div style="font-size: 3rem; margin-bottom: 15px; background: linear-gradient(135deg, #00f7ff, #8a2be2); -webkit-background-clip: text; background-clip: text; color: transparent;">📊</div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px;">Datenbanken</h3>
+                    <p style="opacity: 0.8; font-size: 0.9rem;">PostgreSQL, MongoDB, Redis</p>
+                </div>
+
+                <div style="text-align: center; padding: 30px; background: rgba(10, 10, 26, 0.6); border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(0, 247, 255, 0.1); transition: all 0.3s ease;">
+                    <div style="font-size: 3rem; margin-bottom: 15px; background: linear-gradient(135deg, #00f7ff, #8a2be2); -webkit-background-clip: text; background-clip: text; color: transparent;">🔧</div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px;">DevOps</h3>
+                    <p style="opacity: 0.8; font-size: 0.9rem;">Docker, Kubernetes, Terraform</p>
+                </div>
+
+                <div style="text-align: center; padding: 30px; background: rgba(10, 10, 26, 0.6); border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(0, 247, 255, 0.1); transition: all 0.3s ease;">
+                    <div style="font-size: 3rem; margin-bottom: 15px; background: linear-gradient(135deg, #00f7ff, #8a2be2); -webkit-background-clip: text; background-clip: text; color: transparent;">🌐</div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px;">Web Technologien</h3>
+                    <p style="opacity: 0.8; font-size: 0.9rem;">React, Node.js, Django</p>
+                </div>
+
+                <div style="text-align: center; padding: 30px; background: rgba(10, 10, 26, 0.6); border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(0, 247, 255, 0.1); transition: all 0.3s ease;">
+                    <div style="font-size: 3rem; margin-bottom: 15px; background: linear-gradient(135deg, #00f7ff, #8a2be2); -webkit-background-clip: text; background-clip: text; color: transparent;">🛡️</div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px;">Sicherheit</h3>
+                    <p style="opacity: 0.8; font-size: 0.9rem;">OAuth, JWT, End-to-End Verschlüsselung</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Bereit, Ihre KI-Reise zu beginnen?</h2>
+                <p>Ob Sie ein konkretes Projekt im Sinn haben oder einfach nur mehr über die Möglichkeiten von KI in Ihrem Unternehmen erfahren möchten - unser Expertenteam steht bereit, um Sie zu beraten.</p>
+                <a href="#kontakt" class="btn">Kostenlose Erstberatung buchen</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer" id="kontakt">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <a href="#" class="footer-logo">
+                        <div class="logo-icon">G</div>
+                        <span>Genitus</span>
+                        <small style="font-family: 'Rajdhani', sans-serif; font-weight: 300; letter-spacing: normal; font-size: 0.7rem; display: block;">AI SOFTWARE FACTORY</small>
+                    </a>
+                    <p class="footer-text">Genitus Inc. entwickelt maßgeschneiderte KI-Lösungen, die Unternehmen transformieren. Mit Standorten weltweit sind wir Ihr Partner für digitale Innovation.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="LinkedIn">💼</a>
+                        <a href="#" aria-label="Twitter">🐦</a>
+                        <a href="#" aria-label="GitHub">🐙</a>
+                        <a href="#" aria-label="Medium">📝</a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Dienstleistungen</h3>
+                    <ul>
+                        <li><a href="#dienste">KI-Softwareentwicklung</a></li>
+                        <li><a href="#dienste">Datenanalyse</a></li>
+                        <li><a href="#dienste">Prozessautomatisierung</a></li>
+                        <li><a href="#dienste">Computer Vision</a></li>
+                        <li><a href="#dienste">NLP-Lösungen</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Technologien</h3>
+                    <ul>
+                        <li><a href="#technologien">Python & ML-Frameworks</a></li>
+                        <li><a href="#technologien">Cloud-Plattformen</a></li>
+                        <li><a href="#technologien">Datenbanken</a></li>
+                        <li><a href="#technologien">DevOps Tools</a></li>
+                        <li><a href="#technologien">Sicherheitslösungen</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Kontakt</h3>
+                    <ul>
+                        <li><a href="tel:+493012345678">+49 30 12345678</a></li>
+                        <li><a href="mailto:info@genitus.ai">info@genitus.ai</a></li>
+                        <li>Genitus Inc.</li>
+                        <li>Friedrichstraße 68</li>
+                        <li>10117 Berlin, Deutschland</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; 2023 Genitus Inc. Alle Rechte vorbehalten. | <a href="#" style="opacity: 0.8;">Datenschutz</a> | <a href="#" style="opacity: 0.8;">Impressum</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile Navigation Toggle
+            const hamburger = document.querySelector('.hamburger');
+            const navLinks = document.querySelector('.nav-links');
+
+            hamburger.addEventListener('click', function() {
+                this.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // Close mobile menu if open
+                    if (navLinks.classList.contains('active')) {
+                        hamburger.classList.remove('active');
+                        navLinks.classList.remove('active');
+                    }
+
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Header scroll effect
+            const header = document.querySelector('header');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Animate stats counter
+            const statNumbers = document.querySelectorAll('.stat-number');
+            const statsSection = document.querySelector('.stats');
+
+            function animateStats() {
+                statNumbers.forEach(stat => {
+                    const target = +stat.getAttribute('data-target');
+                    const duration = 2000;
+                    const start = 0;
+                    const startTime = performance.now();
+
+                    function updateCounter(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const currentValue = Math.floor(progress * target);
+
+                        stat.textContent = currentValue;
+
+                        if (progress < 1) {
+                            requestAnimationFrame(updateCounter);
+                        }
+                    }
+
+                    requestAnimationFrame(updateCounter);
+                });
+            }
+
+            // Use Intersection Observer to trigger animation when section is visible
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateStats();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
+
+            // Initialize skill bars animation
+            const skillProgressBars = document.querySelectorAll('.skill-progress');
+            const skillsSection = document.querySelector('.skills');
+
+            function animateSkills() {
+                skillProgressBars.forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                });
+            }
+
+            const skillsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateSkills();
+                        skillsObserver.unobserve(entry.target });
+            }, { threshold: 0.3 });
+
+            if (skillsSection) {
+                skillsObserver.observe(skillsSection);
+            }
+
+            // Add hover effects to service cards and tech stacks
+            const cards = document.querySelectorAll('.service-card, [style*="text-align: center"]:not(.footer-logo)');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px)';
+                    this.style.boxShadow = '0 15px 35px rgba(0, 247, 255, 0.2)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+```

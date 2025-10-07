@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Perplexity Research Hub - Advanced AI-powered research tools">
+    <title>Perplexity Research Hub</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #0d9488;
+            --accent-color: #3b82f6;
+            --dark-bg: #1e293b;
+            --light-bg: #f8fafc;
+            --text-color: #f1f5f9;
+            --text-light: #e2e8f0;
+            --border-color: #334155;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            padding: 1rem;
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: var(--secondary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel {
+            background-color: #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px var(--shadow-color);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            color: var(--text-color);
+        }
+
+        .panel-content {
+            margin-bottom: 1rem;
+        }
+
+        .panel-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .chat-container {
+            background-color: #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .user-message {
+            background-color: var(--secondary-color);
+            margin-left: 20%;
+        }
+
+        .ai-message {
+            background-color: var(--primary-color);
+            margin-right: 20%;
+        }
+
+        .citation-badge {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            margin: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .citation-badge:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .credibility-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 0.5rem;
+        }
+
+        .high-credibility {
+            background-color: var(--success-color);
+        }
+
+        .medium-credibility {
+            background-color: var(--warning-color);
+        }
+
+        .low-credibility {
+            background-color: var(--error-color);
+        }
+
+        .search-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .search-result {
+            background-color: #334155;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .result-snippet {
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .result-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .chart-container {
+            height: 300px;
+            width: 100%;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background-color: #334155;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            color: var(--text-light);
+        }
+
+        .history-item {
+            background-color: #334155;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .history-item:hover {
+            background-color: #475569;
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .api-key-section {
+            background-color: #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .usage-tracker {
+            background-color: #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #475569;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--accent-color);
+            transition: width 0.3s;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--accent-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .panel {
+                margin-bottom: 1rem;
+            }
+
+            .chat-container {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">Perplexity Research Hub</a>
+            <nav>
+                <a href="#" id="sonar-chat-tab">Sonar Chat</a>
+                <a href="#" id="search-api-tab">Search API</a>
+                <a href="#" id="cache-stats-tab">Cache Stats</a>
+                <a href="#" id="api-key-tab">API Key</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="sonar-chat-panel" class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Sonar Chat</h2>
+                <div class="panel-actions">
+                    <button id="new-conversation-btn">New Conversation</button>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div class="form-group">
+                    <label for="model-select">Model:</label>
+                    <select id="model-select">
+                        <option value="llama-3.1-sonar-small">Llama 3.1 Sonar Small</option>
+                        <option value="llama-3.1-sonar-large">Llama 3.1 Sonar Large</option>
+                        <option value="llama-3.1-sonar-huge-128k-online">Llama 3.1 Sonar Huge 128k Online</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="chat-input">Your Question:</label>
+                    <textarea id="chat-input" placeholder="Ask me anything..."></textarea>
+                </div>
+                <div class="chat-container" id="chat-container">
+                    <!-- Chat messages will be added here -->
+                </div>
+                <div id="follow-up-suggestions" class="form-group" style="display: none;">
+                    <label>Follow-up Suggestions:</label>
+                    <div id="suggestions-container"></div>
+                </div>
+            </div>
+            <div class="panel-actions">
+                <button id="send-message-btn">Send</button>
+                <button id="fork-conversation-btn" style="display: none;">Fork Conversation</button>
+            </div>
+        </section>
+
+        <section id="search-api-panel" class="panel" style="display: none;">
+            <div class="panel-header">
+                <h2 class="panel-title">Search API</h2>
+            </div>
+            <div class="panel-content">
+                <div class="form-group">
+                    <label for="search-query">Search Query:</label>
+                    <input type="text" id="search-query" placeholder="Enter your search query">
+                </div>
+                <div class="form-group">
+                    <label for="domain-filter">Domain Filter:</label>
+                    <input type="text" id="domain-filter" placeholder="e.g., .edu, .gov">
+                </div>
+                <div class="form-group">
+                    <label for="date-range">Date Range:</label>
+                    <div style="display: flex; gap: 1rem;">
+                        <input type="date" id="start-date">
+                        <input type="date" id="end-date">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="media-type">Media Type:</label>
+                    <select id="media-type">
+                        <option value="all">All</option>
+                        <option value="news">News</option>
+                        <option value="images">Images</option>
+                        <option value="videos">Videos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="language">Language:</label>
+                    <select id="language">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="zh">Chinese</option>
+                    </select>
+                </div>
+                <div id="search-results" class="search-results">
+                    <!-- Search results will be added here -->
+                </div>
+            </div>
+            <div class="panel-actions">
+                <button id="search-btn">Search</button>
+            </div>
+        </section>
+
+        <section id="cache-stats-panel" class="panel" style="display: none;">
+            <div class="panel-header">
+                <h2 class="panel-title">Cache Statistics</h2>
+            </div>
+            <div class="panel-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="hit-rate">0%</div>
+                        <div class="stat-label">Cache Hit Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="token-savings">0</div>
+                        <div class="stat-label">Tokens Saved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cost-savings">$0.00</div>
+                        <div class="stat-label">Cost Savings</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="hit-rate-chart"></canvas>
+                </div>
+                <div class="form-group">
+                    <label for="ttl-input">Cache TTL (seconds):</label>
+                    <input type="number" id="ttl-input" value="3600">
+                </div>
+            </div>
+            <div class="panel-actions">
+                <button id="refresh-stats-btn">Refresh Stats</button>
+                <button id="purge-cache-btn">Purge Cache</button>
+                <button id="update-ttl-btn">Update TTL</button>
+            </div>
+        </section>
+
+        <section id="api-key-panel" class="panel" style="display: none;">
+            <div class="panel-header">
+                <h2 class="panel-title">API Key Management</h2>
+            </div>
+            <div class="panel-content">
+                <div class="form-group">
+                    <label for="api-key-input">API Key:</label>
+                    <input type="password" id="api-key-input" placeholder="Enter your API key">
+                </div>
+                <div class="usage-tracker">
+                    <h3>Usage Tracking</h3>
+                    <div class="form-group">
+                        <label>Monthly Usage:</label>
+                        <div class="progress-bar">
+                            <div class="progress" id="usage-progress" style="width: 0%;"></div>
+                        </div>
+                        <div id="usage-stats">0% of monthly limit used</div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="requests-count">0</div>
+                            <div class="stat-label">Requests</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="tokens-count">0</div>
+                            <div class="stat-label">Tokens</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="cost-count">$0.00</div>
+                            <div class="stat-label">Cost</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-actions">
+                <button id="save-api-key-btn">Save API Key</button>
+                <button id="refresh-usage-btn">Refresh Usage</button>
+            </div>
+        </section>
+
+        <section id="history-panel" class="panel">
+            <div class="panel-header">
+                <h2 class="panel-title">History</h2>
+                <div class="panel-actions">
+                    <button id="export-history-btn">Export</button>
+                    <button id="clear-history-btn">Clear</button>
+                </div>
+            </div>
+            <div class="panel-content" id="history-container">
+                <!-- History items will be added here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Perplexity Research Hub. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const sonarChatTab = document.getElementById('sonar-chat-tab');
+            const searchApiTab = document.getElementById('search-api-tab');
+            const cacheStatsTab = document.getElementById('cache-stats-tab');
+            const apiKeyTab = document.getElementById('api-key-tab');
+
+            const sonarChatPanel = document.getElementById('sonar-chat-panel');
+            const searchApiPanel = document.getElementById('search-api-panel');
+            const cacheStatsPanel = document.getElementById('cache-stats-panel');
+            const apiKeyPanel = document.getElementById('api-key-panel');
+
+            const newConversationBtn = document.getElementById('new-conversation-btn');
+            const modelSelect = document.getElementById('model-select');
+            const chatInput = document.getElementById('chat-input');
+            const chatContainer = document.getElementById('chat-container');
+            const sendMessageBtn = document.getElementById('send-message-btn');
+            const forkConversationBtn = document.getElementById('fork-conversation-btn');
+            const followUpSuggestions = document.getElementById('follow-up-suggestions');
+            const suggestionsContainer = document.getElementById('suggestions-container');
+
+            const searchQuery = document.getElementById('search-query');
+            const domainFilter = document.getElementById('domain-filter');
+            const startDate = document.getElementById('start-date');
+            const endDate = document.getElementById('end-date');
+            const mediaType = document.getElementById('media-type');
+            const language = document.getElementById('language');
+            const searchBtn = document.getElementById('search-btn');
+            const searchResults = document.getElementById('search-results');
+
+            const hitRate = document.getElementById('hit-rate');
+            const tokenSavings = document.getElementById('token-savings');
+            const costSavings = document.getElementById('cost-savings');
+            const refreshStatsBtn = document.getElementById('refresh-stats-btn');
+            const purgeCacheBtn = document.getElementById('purge-cache-btn');
+            const ttlInput = document.getElementById('ttl-input');
+            const updateTtlBtn = document.getElementById('update-ttl-btn');
+
+            const apiKeyInput = document.getElementById('api-key-input');
+            const saveApiKeyBtn = document.getElementById('save-api-key-btn');
+            const refreshUsageBtn = document.getElementById('refresh-usage-btn');
+            const usageProgress = document.getElementById('usage-progress');
+            const usageStats = document.getElementById('usage-stats');
+            const requestsCount = document.getElementById('requests-count');
+            const tokensCount = document.getElementById('tokens-count');
+            const costCount = document.getElementById('cost-count');
+
+            const historyContainer = document.getElementById('history-container');
+            const exportHistoryBtn = document.getElementById('export-history-btn');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+
+            // Chart.js initialization
+            const ctx = document.getElementById('hit-rate-chart').getContext('2d');
+            const hitRateChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Cache Hit Rate',
+                        data: [],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // State variables
+            let conversations = [];
+            let currentConversationIndex = -1;
+            let apiKey = '';
+            let history = JSON.parse(localStorage.getItem('researchHistory')) || [];
+
+            // Initialize the app
+            function init() {
+                // Load API key from localStorage if available
+                const savedApiKey = localStorage.getItem('apiKey');
+                if (savedApiKey) {
+                    apiKey = savedApiKey;
+                    apiKeyInput.value = savedApiKey;
+                }
+
+                // Load history
+                renderHistory();
+
+                // Set up event listeners
+                setupEventListeners();
+
+                // Load cache stats
+                loadCacheStats();
+
+                // Load usage data
+                loadUsageData();
+            }
+
+            // Set up event listeners
+            function setupEventListeners() {
+                // Tab navigation
+                sonarChatTab.addEventListener('click', () => showPanel(sonarChatPanel));
+                searchApiTab.addEventListener('click', () => showPanel(searchApiPanel));
+                cacheStatsTab.addEventListener('click', () => showPanel(cacheStatsPanel));
+                apiKeyTab.addEventListener('click', () => showPanel(apiKeyPanel));
+
+                // Sonar Chat
+                newConversationBtn.addEventListener('click', newConversation);
+                sendMessageBtn.addEventListener('click', sendMessage);
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+                forkConversationBtn.addEventListener('click', forkConversation);
+
+                // Search API
+                searchBtn.addEventListener('click', performSearch);
+
+                // Cache Stats
+                refreshStatsBtn.addEventListener('click', loadCacheStats);
+                purgeCacheBtn.addEventListener('click', purgeCache);
+                updateTtlBtn.addEventListener('click', updateTTL);
+
+                // API Key
+                saveApiKeyBtn.addEventListener('click', saveApiKey);
+                refreshUsageBtn.addEventListener('click', loadUsageData);
+
+                // History
+                exportHistoryBtn.addEventListener('click', exportHistory);
+                clearHistoryBtn.addEventListener('click', clearHistory);
+            }
+
+            // Show a specific panel
+            function showPanel(panel) {
+                // Hide all panels
+                sonarChatPanel.style.display = 'none';
+                searchApiPanel.style.display = 'none';
+                cacheStatsPanel.style.display = 'none';
+                apiKeyPanel.style.display = 'none';
+
+                // Show the selected panel
+                panel.style.display = 'block';
+            }
+
+            // Start a new conversation
+            function newConversation() {
+                conversations.push({
+                    messages: [],
+                    suggestions: []
+                });
+                currentConversationIndex = conversations.length - 1;
+                chatContainer.innerHTML = '';
+                followUpSuggestions.style.display = 'none';
+                forkConversationBtn.style.display = 'none';
+            }
+
+            // Send a message to the Sonar API
+            async function sendMessage() {
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                // Add user message to chat
+                addMessageToChat('user', message);
+                chatInput.value = '';
+
+                // Show loading indicator
+                const loadingIndicator = document.createElement('div');
+                loadingIndicator.className = 'message ai-message';
+                loadingIndicator.innerHTML = '<div class="loading-spinner"></div>';
+                chatContainer.appendChild(loadingIndicator);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                try {
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Generate mock response
+                    const response = generateMockResponse(message);
+
+                    // Remove loading indicator
+                    chatContainer.removeChild(loadingIndicator);
+
+                    // Add AI response to chat
+                    addMessageToChat('ai', response.text, response.citations, response.suggestions);
+
+                    // Save conversation to history
+                    saveToHistory(message, response.text);
+
+                    // Show follow-up suggestions if available
+                    if (response.suggestions && response.suggestions.length > 0) {
+                        showFollowUpSuggestions(response.suggestions);
+                    }
+
+                    // Show fork button if there are multiple messages
+                    if (conversations[currentConversationIndex].messages.length > 1) {
+                        forkConversationBtn.style.display = 'inline-block';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    loadingIndicator.innerHTML = 'Error: Failed to get response from Sonar API';
+                }
+            }
+
+            // Generate a mock response for demonstration
+            function generateMockResponse(message) {
+                const responses = [
+                    {
+                        text: "I'm an AI language model and I don't have personal experiences or feelings, but I can certainly help answer questions and provide information based on the data I've been trained on. How can I assist you today?",
+                        citations: [
+                            { id: 1, text: "Source 1", credibility: "high" },
+                            { id: 2, text: "Source 2", credibility: "medium" }
+                        ],
+                        suggestions: [
+                            "What are the benefits of using AI language models?",
+                            "How do AI language models work?",
+                            "What are the limitations of AI language models?"
+                        ]
+                    },
+                    {
+                        text: "The capital of France is Paris. Paris is known for its art, fashion, and culture. It's home to the Eiffel Tower, the Louvre Museum, and many other famous landmarks.",
+                        citations: [
+                            { id: 3, text: "Source 3", credibility: "high" },
+                            { id: 4, text: "Source 4", credibility: "high" }
+                        ],
+                        suggestions: [
+                            "What are the best tourist attractions in Paris?",
+                            "What is the history of Paris?",
+                            "What are the best neighborhoods to stay in Paris?"
+                        ]
+                    },
+                    {
+                        text: "The Great Wall of China is a series of fortifications made of stone, brick, tamped earth, wood, and other materials, generally built along an east-to-west line across the historical northern borders of China to protect the Chinese states and empires against the raids and invasions of the various nomadic groups of the Eurasian Steppe.",
+                        citations: [
+                            { id: 5, text: "Source 5", credibility: "high" },
+                            { id: 6, text: "Source 6", credibility: "medium" }
+                        ],
+                        suggestions: [
+                            "How long is the Great Wall of China?",
+                            "What are the best times to visit the Great Wall of China?",
+                            "What are the best tours of the Great Wall of China?"
+                        ]
+                    }
+                ];
+
+                // Select a random response
+                const randomIndex = Math.floor(Math.random() * responses.length);
+                return responses[randomIndex];
+            }
+
+            // Add a message to the chat container
+            function addMessageToChat(sender, text, citations = [], suggestions = []) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+
+                // Add message text
+                const textDiv = document.createElement('div');
+                textDiv.textContent = text;
+                messageDiv.appendChild(textDiv);
+
+                // Add citations if available
+                if (citations && citations.length > 0) {
+                    const citationsDiv = document.createElement('div');
+                    citationsDiv.style.marginTop = '10px';
+
+                    citations.forEach(citation => {
+                        const badge = document.createElement('span');
+                        badge.className = 'citation-badge';
+                        badge.textContent = citation.text;
+
+                        // Add credibility indicator
+                        const credibilityIndicator = document.createElement('span');
+                        credibilityIndicator.className = 'credibility-indicator';
+
+                        if (citation.credibility === 'high') {
+                            credibilityIndicator.classList.add('high-credibility');
+                        } else if (citation.credibility === 'medium') {
+                            credibilityIndicator.classList.add('medium-credibility');
+                        } else {
+                            credibilityIndicator.classList.add('low-credibility');
+                        }
+
+                        badge.appendChild(credibilityIndicator);
+                        citationsDiv.appendChild(badge);
+
+                        // Add click event to show citation details
+                        badge.addEventListener('click', () => showCitationDetails(citation));
+                    });
+
+                    messageDiv.appendChild(citationsDiv);
+                }
+
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                // Save message to current conversation
+                if (currentConversationIndex >= 0) {
+                    conversations[currentConversationIndex].messages.push({
+                        sender,
+                        text,
+                        citations,
+                        suggestions
+                    });
+                }
+            }
+
+            // Show citation details
+            function showCitationDetails(citation) {
+                alert(`Citation Details:\n\nID: ${citation.id}\nText: ${citation.text}\nCredibility: ${citation.credibility}`);
+            }
+
+            // Show follow-up suggestions
+            function showFollowUpSuggestions(suggestions) {
+                suggestionsContainer.innerHTML = '';
+
+                suggestions.forEach(suggestion => {
+                    const suggestionBtn = document.createElement('button');
+                    suggestionBtn.textContent = suggestion;
+                    suggestionBtn.style.marginRight = '10px';
+                    suggestionBtn.style.marginBottom = '10px';
+
+                    suggestionBtn.addEventListener('click', () => {
+                        chatInput.value = suggestion;
+                        sendMessage();
+                    });
+
+                    suggestionsContainer.appendChild(suggestionBtn);
+                });
+
+                followUpSuggestions.style.display = 'block';
+            }
+
+            // Fork the current conversation
+            function forkConversation() {
+                if (currentConversationIndex < 0 || conversations[currentConversationIndex].messages.length === 0) return;
+
+                // Create a new conversation with the same initial messages
+                const forkedConversation = {
+                    messages: [...conversations[currentConversationIndex].messages],
+                    suggestions: []
+                };
+
+                conversations.push(forkedConversation);
+                currentConversationIndex = conversations.length - 1;
+
+                // Update the chat display
+                chatContainer.innerHTML = '';
+                forkedConversation.messages.forEach(msg => {
+                    addMessageToChat(msg.sender, msg.text, msg.citations, msg.suggestions);
+                });
+
+                // Hide follow-up suggestions and fork button
+                followUpSuggestions.style.display = 'none';
+                forkConversationBtn.style.display = 'none';
+            }
+
+            // Perform a search using the Search API
+            async function performSearch() {
+                const query = searchQuery.value.trim();
+                if (!query) return;
+
+                // Show loading indicator
+                searchResults.innerHTML = '<div class="loading-spinner"></div>';
+
+                try {
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Generate mock search results
+                    const results = generateMockSearchResults(query);
+
+                    // Display search results
+                    displaySearchResults(results);
+
+                    // Save search to history
+                    saveToHistory(query, 'Search results displayed');
+                } catch (error) {
+                    console.error('Error:', error);
+                    searchResults.innerHTML = 'Error: Failed to get results from Search API';
+                }
+            }
+
+            // Generate mock search results for demonstration
+            function generateMockSearchResults(query) {
+                const results = [];
+
+                // Generate 5-10 mock results
+                const resultCount = Math.floor(Math.random() * 6) + 5;
+
+                for (let i = 0; i < resultCount; i++) {
+                    results.push({
+                        title: `Result ${i + 1} for "${query}"`,
+                        snippet: `This is a mock search result snippet for the query "${query}". It provides some information about the topic.`,
+                        url: `https://example.com/result-${i + 1}`,
+                        domain: `example${i + 1}.com`,
+                        date: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        credibility: Math.random() > 0.7 ? 'high' : Math.random() > 0.3 ? 'medium' : 'low'
+                    });
+                }
+
+                return results;
+            }
+
+            // Display search results
+            function displaySearchResults(results) {
+                searchResults.innerHTML = '';
+
+                results.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'search-result';
+
+                    const titleLink = document.createElement('a');
+                    titleLink.href = result.url;
+                    titleLink.target = '_blank';
+                    titleLink.className = 'result-title';
+                    titleLink.textContent = result.title;
+
+                    const snippetDiv = document.createElement('div');
+                    snippetDiv.className = 'result-snippet';
+                    snippetDiv.textContent = result.snippet;
+
+                    const metaDiv = document.createElement('div');
+                    metaDiv.className = 'result-meta';
+
+                    const domainSpan = document.createElement('span');
+                    domainSpan.textContent = result.domain;
+
+                    const dateSpan = document.createElement('span');
+                    dateSpan.textContent = result.date;
+
+                    const credibilitySpan = document.createElement('span');
+                    credibilitySpan.textContent = `Credibility: ${result.credibility}`;
+
+                    metaDiv.appendChild(domainSpan);
+                    metaDiv.appendChild(dateSpan);
+                    metaDiv.appendChild(credibilitySpan);
+
+                    resultDiv.appendChild(titleLink);
+                    resultDiv.appendChild(snippetDiv);
+                    resultDiv.appendChild(metaDiv);
+
+                    searchResults.appendChild(resultDiv);
+                });
+            }
+
+            // Load cache statistics
+            async function loadCacheStats() {
+                // Show loading indicator
+                hitRate.textContent = 'Loading...';
+                tokenSavings.textContent = 'Loading...';
+                costSavings.textContent = 'Loading...';
+
+                try {
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Generate mock cache stats
+                    const stats = generateMockCacheStats();
+
+                    // Update UI with stats
+                    hitRate.textContent = `${stats.hitRate}%`;
+                    tokenSavings.textContent = stats.tokenSavings.toLocaleString();
+                    costSavings.textContent = `$${stats.costSavings.toFixed(2)}`;
+
+                    // Update chart
+                    updateHitRateChart(stats.historicalData);
+                } catch (error) {
+                    console.error('Error:', error);
+                    hitRate.textContent = 'Error';
+                    tokenSavings.textContent = 'Error';
+                    costSavings.textContent = 'Error';
+                }
+            }
+
+            // Generate mock cache statistics for demonstration
+            function generateMockCacheStats() {
+                const hitRate = Math.floor(Math.random() * 31) + 70; // 70-100%
+                const tokenSavings = Math.floor(Math.random() * 900001) + 100000; // 100,000-1,000,000
+                const costSavings = tokenSavings * 0.00002; // Assuming $0.02 per 1000 tokens
+
+                // Generate historical data for the last 7 days
+                const historicalData = [];
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    historicalData.push({
+                        date: date.toISOString().split('T')[0],
+                        hitRate: Math.floor(Math.random() * 31) + 70 // 70-100%
+                    });
+                }
+
+                return {
+                    hitRate,
+                    tokenSavings,
+                    costSavings,
+                    historicalData
+                };
+            }
+
+            // Update the hit rate chart
+            function updateHitRateChart(data) {
+                const labels = data.map(item => item.date);
+                const values = data.map(item => item.hitRate);
+
+                hitRateChart.data.labels = labels;
+                hitRateChart.data.datasets[0].data = values;
+                hitRateChart.update();
+            }
+
+            // Purge the cache
+            async function purgeCache() {
+                try {
+                    // Show loading indicator
+                    purgeCacheBtn.textContent = 'Purging...';
+                    purgeCacheBtn.disabled = true;
+
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Refresh stats after purge
+                    await loadCacheStats();
+
+                    // Show success message
+                    alert('Cache purged successfully!');
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error: Failed to purge cache');
+                } finally {
+                    purgeCacheBtn.textContent = 'Purge Cache';
+                    purgeCacheBtn.disabled = false;
+                }
+            }
+
+            // Update the cache TTL
+            async function updateTTL() {
+                const ttl = ttlInput.value;
+                if (!ttl || isNaN(ttl) || ttl <= 0) {
+                    alert('Please enter a valid TTL in seconds');
+                    return;
+                }
+
+                try {
+                    // Show loading indicator
+                    updateTtlBtn.textContent = 'Updating...';
+                    updateTtlBtn.disabled = true;
+
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Show success message
+                    alert(`Cache TTL updated to ${ttl} seconds`);
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error: Failed to update cache TTL');
+                } finally {
+                    updateTtlBtn.textContent = 'Update TTL';
+                    updateTtlBtn.disabled = false;
+                }
+            }
+
+            // Save the API key
+            function saveApiKey() {
+                const newApiKey = apiKeyInput.value.trim();
+                if (!newApiKey) {
+                    alert('Please enter a valid API key');
+                    return;
+                }
+
+                apiKey = newApiKey;
+                localStorage.setItem('apiKey', apiKey);
+                alert('API key saved successfully!');
+            }
+
+            // Load usage data
+            async function loadUsageData() {
+                // Show loading indicator
+                usageProgress.style.width = '0%';
+                usageStats.textContent = 'Loading...';
+                requestsCount.textContent = 'Loading...';
+                tokensCount.textContent = 'Loading...';
+                costCount.textContent = 'Loading...';
+
+                try {
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Generate mock usage data
+                    const usage = generateMockUsageData();
+
+                    // Update UI with usage data
+                    usageProgress.style.width = `${usage.percentageUsed}%`;
+                    usageStats.textContent = `${usage.percentageUsed}% of monthly limit used`;
+                    requestsCount.textContent = usage.requests.toLocaleString();
+                    tokensCount.textContent = usage.tokens.toLocaleString();
+                    costCount.textContent = `$${usage.cost.toFixed(2)}`;
+                } catch (error) {
+                    console.error('Error:', error);
+                    usageStats.textContent = 'Error';
+                    requestsCount.textContent = 'Error';
+                    tokensCount.textContent = 'Error';
+                    costCount.textContent = 'Error';
+                }
+            }
+
+            // Generate mock usage data for demonstration
+            function generateMockUsageData() {
+                const percentageUsed = Math.floor(Math.random() * 61); // 0-60%
+                const requests = Math.floor(Math.random() * 9001) + 1000; // 1,000-10,000
+                const tokens = Math.floor(Math.random() * 900001) + 100000; // 100,000-1,000,000
+                const cost = tokens * 0.00002; // Assuming $0.02 per 1000 tokens
+
+                return {
+                    percentageUsed,
+                    requests,
+                    tokens,
+                    cost
+                };
+            }
+
+            // Save an action to history
+            function saveToHistory(query, response) {
+                const historyItem = {
+                    timestamp: new Date().toISOString(),
+                    query,
+                    response
+                };
+
+                history.unshift(historyItem);
+                localStorage.setItem('researchHistory', JSON.stringify(history));
+                renderHistory();
+            }
+
+            // Render the history
+            function renderHistory() {
+                historyContainer.innerHTML = '';
+
+                if (history.length === 0) {
+                    historyContainer.innerHTML = '<p>No history available</p>';
+                    return;
+                }
+
+                history.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+
+                    const queryDiv = document.createElement('div');
+                    queryDiv.textContent = item.query;
+
+                    const responseDiv = document.createElement('div');
+                    responseDiv.textContent = item.response.substring(0, 100) + (item.response.length > 100 ? '...' : '');
+                    responseDiv.style.color = '#94a3b8';
+                    responseDiv.style.marginTop = '5px';
+
+                    const metaDiv = document.createElement('div');
+                    metaDiv.className = 'history-meta';
+
+                    const timestampSpan = document.createElement('span');
+                    timestampSpan.textContent = new Date(item.timestamp).toLocaleString();
+
+                    const typeSpan = document.createElement('span');
+                    typeSpan.textContent = item.query.startsWith('Search: ') ? 'Search' : 'Chat';
+
+                    metaDiv.appendChild(timestampSpan);
+                    metaDiv.appendChild(typeSpan);
+
+                    historyItem.appendChild(queryDiv);
+                    historyItem.appendChild(responseDiv);
+                    historyItem.appendChild(metaDiv);
+
+                    // Add click event to load history item
+                    historyItem.addEventListener('click', () => loadHistoryItem(index));
+
+                    historyContainer.appendChild(historyItem);
+                });
+            }
+
+            // Load a history item
+            function loadHistoryItem(index) {
+                const item = history[index];
+
+                if (item.query.startsWith('Search: ')) {
+                    // Load search
+                    searchQuery.value = item.query.substring(8);
+                    showPanel(searchApiPanel);
+                    performSearch();
+                } else {
+                    // Load chat
+                    newConversation();
+                    addMessageToChat('user', item.query);
+                    addMessageToChat('ai', item.response);
+                    showPanel(sonarChatPanel);
+                }
+            }
+
+            // Export history
+            function exportHistory() {
+                if (history.length === 0) {
+                    alert('No history to export');
+                    return;
+                }
+
+                // Create a CSV string
+                let csvContent = 'data:text/csv;charset=utf-8,';
+                csvContent += 'Timestamp,Query,Response\n';
+
+                history.forEach(item => {
+                    const escapedQuery = `"${item.query.replace(/"/g, '""')}"`;
+                    const escapedResponse = `"${item.response.replace(/"/g, '""')}"`;
+                    csvContent += `${item.timestamp},${escapedQuery},${escapedResponse}\n`;
+                });
+
+                // Create a download link
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', 'research_history.csv');
+                document.body.appendChild(link);
+
+                // Trigger the download
+                link.click();
+
+                // Clean up
+                document.body.removeChild(link);
+            }
+
+            // Clear history
+            function clearHistory() {
+                if (confirm('Are you sure you want to clear your history?')) {
+                    history = [];
+                    localStorage.removeItem('researchHistory');
+                    renderHistory();
+                }
+            }
+
+            // Initialize the app
+            init();
+        });
+    </script>
+</body>
+</html>

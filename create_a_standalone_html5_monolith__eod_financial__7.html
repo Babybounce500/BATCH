@@ -1,0 +1,3839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EOD Financial Terminal</title>
+    <meta name="description" content="Professional financial dashboard with real-time data and analysis tools">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #121212;
+            --dark-bg-secondary: #1e1e1e;
+            --dark-text: #e0e0e0;
+            --dark-text-secondary: #a0a0a0;
+            --dark-green: #4caf50;
+            --dark-red: #f44336;
+            --dark-blue: #2196f3;
+            --dark-accent: #9c27b0;
+            --dark-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--dark-bg-secondary);
+            padding: 1rem;
+            box-shadow: var(--dark-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            color: var(--dark-green);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--dark-text);
+            text-decoration: none;
+            transition: color var(--transition-speed);
+            padding: 0.5rem;
+        }
+
+        nav ul li a:hover {
+            color: var(--dark-green);
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .sidebar {
+            background-color: var(--dark-bg-secondary);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--dark-shadow);
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-section h3 {
+            color: var(--dark-green);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .search-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-input {
+            padding: 0.5rem;
+            border: 1px solid var(--dark-text-secondary);
+            border-radius: 4px;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .search-results {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--dark-text-secondary);
+            border-radius: 4px;
+            background-color: var(--dark-bg);
+        }
+
+        .search-result-item {
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .search-result-item:hover {
+            background-color: var(--dark-bg-secondary);
+        }
+
+        .watchlist {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .watchlist-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--dark-text-secondary);
+        }
+
+        .watchlist-item:last-child {
+            border-bottom: none;
+        }
+
+        .watchlist-symbol {
+            color: var(--dark-blue);
+        }
+
+        .watchlist-price {
+            font-weight: 500;
+        }
+
+        .watchlist-change {
+            font-weight: 500;
+        }
+
+        .watchlist-change.positive {
+            color: var(--dark-green);
+        }
+
+        .watchlist-change.negative {
+            color: var(--dark-red);
+        }
+
+        .content {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .dashboard-card {
+            background-color: var(--dark-bg-secondary);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--dark-shadow);
+        }
+
+        .dashboard-card h2 {
+            color: var(--dark-green);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .dashboard-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-card-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dashboard-card-controls button {
+            padding: 0.3rem 0.6rem;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            border: 1px solid var(--dark-text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .dashboard-card-controls button:hover {
+            background-color: var(--dark-text-secondary);
+        }
+
+        .dashboard-card-controls button.active {
+            background-color: var(--dark-green);
+            border-color: var(--dark-green);
+        }
+
+        .chart-container {
+            height: 400px;
+            width: 100%;
+            position: relative;
+        }
+
+        .chart {
+            height: 100%;
+            width: 100%;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th, .data-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--dark-text-secondary);
+        }
+
+        .data-table th {
+            background-color: var(--dark-bg);
+            color: var(--dark-green);
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: var(--dark-bg-secondary);
+        }
+
+        .data-table tr:hover {
+            background-color: var(--dark-bg);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--dark-text-secondary);
+            border-radius: 4px;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--dark-green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .btn:hover {
+            background-color: #388e3c;
+        }
+
+        .btn-secondary {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            border: 1px solid var(--dark-text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--dark-text-secondary);
+        }
+
+        .price-positive {
+            color: var(--dark-green);
+        }
+
+        .price-negative {
+            color: var(--dark-red);
+        }
+
+        .market-hours {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .market-hours-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--dark-red);
+        }
+
+        .market-hours-indicator.open {
+            background-color: var(--dark-green);
+        }
+
+        .market-hours-text {
+            font-size: 0.9rem;
+        }
+
+        .alert-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .alert-form-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            background-color: var(--dark-bg-secondary);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: var(--dark-shadow);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .api-key-form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1rem;
+        }
+
+        .api-key-input {
+            padding: 0.5rem;
+            border: 1px solid var(--dark-text-secondary);
+            border-radius: 4px;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .api-key-usage {
+            font-size: 0.8rem;
+            color: var(--dark-text-secondary);
+        }
+
+        .loading-spinner {
+            border: 4px solid var(--dark-bg-secondary);
+            border-top: 4px solid var(--dark-green);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .sidebar.active {
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 80%;
+                height: 100%;
+                z-index: 1000;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            nav ul li {
+                margin-left: 0;
+            }
+
+            .dashboard-card-controls {
+                flex-wrap: wrap;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--dark-bg-secondary);
+            padding: 2rem;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            color: var(--dark-green);
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--dark-text);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .portfolio-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .portfolio-card {
+            background-color: var(--dark-bg-secondary);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--dark-shadow);
+        }
+
+        .portfolio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .portfolio-title {
+            color: var(--dark-blue);
+            font-size: 1.2rem;
+        }
+
+        .portfolio-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .portfolio-change {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .portfolio-change.positive {
+            color: var(--dark-green);
+        }
+
+        .portfolio-change.negative {
+            color: var(--dark-red);
+        }
+
+        .portfolio-allocation {
+            height: 200px;
+            margin-bottom: 1rem;
+        }
+
+        .portfolio-performance {
+            height: 200px;
+        }
+
+        .news-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--dark-text-secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-title {
+            color: var(--dark-blue);
+            font-size: 1.1rem;
+        }
+
+        .news-source {
+            font-size: 0.9rem;
+            color: var(--dark-text-secondary);
+        }
+
+        .news-date {
+            font-size: 0.8rem;
+            color: var(--dark-text-secondary);
+        }
+
+        .news-sentiment {
+            font-size: 0.9rem;
+        }
+
+        .news-sentiment.positive {
+            color: var(--dark-green);
+        }
+
+        .news-sentiment.negative {
+            color: var(--dark-red);
+        }
+
+        .news-sentiment.neutral {
+            color: var(--dark-text-secondary);
+        }
+
+        .news-content {
+            font-size: 0.95rem;
+        }
+
+        .news-related-symbols {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .news-related-symbol {
+            background-color: var(--dark-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .dividend-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dividend-table th, .dividend-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--dark-text-secondary);
+        }
+
+        .dividend-table th {
+            background-color: var(--dark-bg);
+            color: var(--dark-green);
+        }
+
+        .dividend-table tr:nth-child(even) {
+            background-color: var(--dark-bg-secondary);
+        }
+
+        .dividend-table tr:hover {
+            background-color: var(--dark-bg);
+        }
+
+        .dividend-calculator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .dividend-calculator-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dividend-result {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .exchange-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .exchange-table th, .exchange-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--dark-text-secondary);
+        }
+
+        .exchange-table th {
+            background-color: var(--dark-bg);
+            color: var(--dark-green);
+            cursor: pointer;
+        }
+
+        .exchange-table th:hover {
+            background-color: var(--dark-bg-secondary);
+        }
+
+        .exchange-table th.sort-asc::after {
+            content: " ↑";
+        }
+
+        .exchange-table th.sort-desc::after {
+            content: " ↓";
+        }
+
+        .exchange-table tr:nth-child(even) {
+            background-color: var(--dark-bg-secondary);
+        }
+
+        .exchange-table tr:hover {
+            background-color: var(--dark-bg);
+        }
+
+        .exchange-symbol {
+            color: var(--dark-blue);
+        }
+
+        .exchange-change.positive {
+            color: var(--dark-green);
+        }
+
+        .exchange-change.negative {
+            color: var(--dark-red);
+        }
+
+        .exchange-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .exchange-filter {
+            padding: 0.3rem 0.6rem;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            border: 1px solid var(--dark-text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .exchange-filter:hover {
+            background-color: var(--dark-text-secondary);
+        }
+
+        .exchange-filter.active {
+            background-color: var(--dark-green);
+            border-color: var(--dark-green);
+        }
+
+        .technical-analysis-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .technical-tool {
+            padding: 0.3rem 0.6rem;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            border: 1px solid var(--dark-text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .technical-tool:hover {
+            background-color: var(--dark-text-secondary);
+        }
+
+        .technical-tool.active {
+            background-color: var(--dark-blue);
+            border-color: var(--dark-blue);
+        }
+
+        .pattern-recognition {
+            margin-top: 1rem;
+        }
+
+        .pattern-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--dark-text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pattern-item:last-child {
+            border-bottom: none;
+        }
+
+        .pattern-name {
+            color: var(--dark-blue);
+        }
+
+        .pattern-confidence {
+            font-size: 0.9rem;
+        }
+
+        .pattern-confidence.high {
+            color: var(--dark-green);
+        }
+
+        .pattern-confidence.medium {
+            color: var(--dark-blue);
+        }
+
+        .pattern-confidence.low {
+            color: var(--dark-red);
+        }
+
+        .pattern-description {
+            font-size: 0.9rem;
+            color: var(--dark-text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .alerts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .alert-item {
+            padding: 0.5rem;
+            background-color: var(--dark-bg-secondary);
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alert-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .alert-symbol {
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .alert-condition {
+            font-size: 0.9rem;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .alert-actions button {
+            padding: 0.2rem 0.5rem;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            border: 1px solid var(--dark-text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .alert-actions button:hover {
+            background-color: var(--dark-text-secondary);
+        }
+
+        .alert-actions button.delete {
+            background-color: var(--dark-red);
+            border-color: var(--dark-red);
+        }
+
+        .alert-actions button.delete:hover {
+            background-color: #d32f2f;
+        }
+
+        .notifications-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+
+        .notification {
+            padding: 1rem;
+            background-color: var(--dark-bg-secondary);
+            border-radius: 4px;
+            box-shadow: var(--dark-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-width: 300px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--dark-green);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--dark-red);
+        }
+
+        .notification-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notification-title {
+            font-weight: 600;
+        }
+
+        .notification-message {
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--dark-text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">EOD Financial Terminal</a>
+            <nav>
+                <ul>
+                    <li><a href="#" data-section="dashboard">Dashboard</a></li>
+                    <li><a href="#" data-section="historical">Historical Data</a></li>
+                    <li><a href="#" data-section="realtime">Real-Time Quotes</a></li>
+                    <li><a href="#" data-section="intraday">Intraday Data</a></li>
+                    <li><a href="#" data-section="fundamentals">Fundamentals</a></li>
+                    <li><a href="#" data-section="news">News</a></li>
+                    <li><a href="#" data-section="dividends">Dividends</a></li>
+                    <li><a href="#" data-section="portfolio">Portfolio</a></li>
+                    <li><a href="#" data-section="exchanges">Exchanges</a></li>
+                    <li><a href="#" data-section="settings">Settings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3>Symbol Search</h3>
+                <form id="search-form" class="search-form">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search for a symbol...">
+                    <div id="search-results" class="search-results"></div>
+                </form>
+            </div>
+            <div class="sidebar-section">
+                <h3>Watchlist</h3>
+                <div id="watchlist" class="watchlist"></div>
+            </div>
+        </aside>
+
+        <main class="content">
+            <div id="dashboard" class="dashboard-section active">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Market Overview</h2>
+                        <div class="dashboard-card-controls">
+                            <button class="btn" id="refresh-market-overview">Refresh</button>
+                        </div>
+                    </div>
+                    <div class="market-hours">
+                        <div class="market-hours-indicator" id="market-hours-indicator"></div>
+                        <div class="market-hours-text" id="market-hours-text">Market Hours: Closed</div>
+                    </div>
+                    <div id="market-overview-chart" class="chart-container">
+                        <canvas id="market-overview-canvas" class="chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Top Movers</h2>
+                    </div>
+                    <table id="top-movers-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Price</th>
+                                <th>Change</th>
+                                <th>% Change</th>
+                                <th>Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-movers-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Recent News</h2>
+                        <div class="dashboard-card-controls">
+                            <button class="btn" id="view-all-news">View All</button>
+                        </div>
+                    </div>
+                    <div id="recent-news" class="news-container"></div>
+                </div>
+            </div>
+
+            <div id="historical" class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Historical Data</h2>
+                    </div>
+                    <form id="historical-form" class="form-group">
+                        <div class="form-group">
+                            <label for="historical-symbol">Symbol</label>
+                            <input type="text" id="historical-symbol" class="form-control" placeholder="Enter symbol">
+                        </div>
+                        <div class="form-group">
+                            <label for="historical-from">From Date</label>
+                            <input type="date" id="historical-from" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="historical-to">To Date</label>
+                            <input type="date" id="historical-to" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="historical-compare">Compare With</label>
+                            <input type="text" id="historical-compare" class="form-control" placeholder="Enter symbol to compare">
+                        </div>
+                        <div class="form-group">
+                            <label for="historical-indicator">Technical Indicator</label>
+                            <select id="historical-indicator" class="form-control">
+                                <option value="">None</option>
+                                <option value="sma">Simple Moving Average (SMA)</option>
+                                <option value="ema">Exponential Moving Average (EMA)</option>
+                                <option value="rsi">Relative Strength Index (RSI)</option>
+                                <option value="macd">MACD</option>
+                                <option value="bollinger">Bollinger Bands</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Get Historical Data</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Historical Chart</h2>
+                        <div class="dashboard-card-controls">
+                            <button class="btn" id="export-historical">Export</button>
+                        </div>
+                    </div>
+                    <div id="historical-chart" class="chart-container">
+                        <canvas id="historical-canvas" class="chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Historical Data Table</h2>
+                    </div>
+                    <table id="historical-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Open</th>
+                                <th>High</th>
+                                <th>Low</th>
+                                <th>Close</th>
+                                <th>Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historical-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="realtime" class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Real-Time Quotes</h2>
+                        <div class="dashboard-card-controls">
+                            <button class="btn" id="refresh-realtime">Refresh</button>
+                            <button class="btn btn-secondary" id="toggle-autorefresh">Auto-Refresh: Off</button>
+                        </div>
+                    </div>
+                    <form id="realtime-form" class="form-group">
+                        <div class="form-group">
+                            <label for="realtime-symbol">Symbol</label>
+                            <input type="text" id="realtime-symbol" class="form-control" placeholder="Enter symbol">
+                        </div>
+                        <button type="submit" class="btn">Get Real-Time Quote</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Quote Details</h2>
+                    </div>
+                    <div id="quote-details" class="quote-details"></div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Price Alerts</h2>
+                    </div>
+                    <form id="alert-form" class="alert-form">
+                        <div class="form-group">
+                            <label for="alert-symbol">Symbol</label>
+                            <input type="text" id="alert-symbol" class="form-control" placeholder="Enter symbol">
+                        </div>
+                        <div class="alert-form-group">
+                            <div class="form-group">
+                                <label for="alert-condition">Condition</label>
+                                <select id="alert-condition" class="form-control">
+                                    <option value="above">Price Above</option>
+                                    <option value="below">Price Below</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="alert-price">Price</label>
+                                <input type="number" id="alert-price" class="form-control" placeholder="Enter price">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">Set Alert</button>
+                    </form>
+                    <div id="alerts-container" class="alerts-container"></div>
+                </div>
+            </div>
+
+            <div id="intraday" class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Intraday Data</h2>
+                    </div>
+                    <form id="intraday-form" class="form-group">
+                        <div class="form-group">
+                            <label for="intraday-symbol">Symbol</label>
+                            <input type="text" id="intraday-symbol" class="form-control" placeholder="Enter symbol">
+                        </div>
+                        <div class="form-group">
+                            <label for="intraday-interval">Interval</label>
+                            <select id="intraday-interval" class="form-control">
+                                <option value="1m">1 Minute</option>
+                                <option value="5m">5 Minutes</option>
+                                <option value="1h">1 Hour</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Get Intraday Data</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Intraday Chart</h2>
+                        <div class="dashboard-card-controls">
+                            <div class="technical-analysis-tools">
+                                <button class="technical-tool" data-tool="trendline">Trend Line</button>
+                                <button class="technical-tool" data-tool="fibonacci">Fibonacci</button>
+                                <button class="technical-tool" data-tool="horizontal">Horizontal Line</button>
+                                <button class="technical-tool" data-tool="vertical">Vertical Line</button>
+                                <button class="technical-tool" data-tool="rectangle">Rectangle</button>
+                                <button class="technical-tool" data-tool="ellipse">Ellipse</button>
+                                <button class="technical-tool" data-tool="text">Text</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="intraday-chart" class="chart-container">
+                        <canvas id="intraday-canvas" class="chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Volume Analysis</h2>
+                    </div>
+                    <div id="volume-chart" class="chart-container">
+                        <canvas id="volume-canvas" class="chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Pattern Recognition</h2>
+                    </div>
+                    <div id="pattern-recognition" class="pattern-recognition"></div>
+                </div>
+            </div>
+
+            <div id="fundamentals" class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Company Fundamentals</h2>
+                    </div>
+                    <form id="fundamentals-form" class="form-group">
+                        <div class="form-group">
+                            <label for="fundamentals-symbol">Symbol</label>
+                            <input type="text" id="fundamentals-symbol" class="form-control" placeholder="Enter symbol">
+                        </div>
+                        <button type="submit" class="btn">Get Fundamentals</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Key Metrics</h2>
+                    </div>
+                    <div id="key-metrics" class="key-metrics"></div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Financial Ratios</h2>
+                    </div>
+                    <div id="financial-ratios" class="financial-ratios"></div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Growth Metrics</h2>
+                    </div>
+                    <div id="growth-metrics" class="growth-metrics"></div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Sector Comparison</h2>
+                    </div>
+                    <div id="sector-comparison" class="sector-comparison"></div>
+                </div>
+            </div>
+
+            <div id="news" class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Financial News</h2>
+                    </div>
+                    <form id="news-form" class="form-group">
+                        <div class="form-group">
+                            <label for="news-date">Date</label>
+                            <input type="date" id="news-date" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="news-keyword">Keyword</label>
+                            <input type="text" id="news-keyword" class="form-control" placeholder="Enter keyword">
+                        </div>
+                        <button type="submit" class="btn">Search News</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>News Feed</h2>
+                    </div>
+                    <div id="news-feed" class="news-feed"></div>
+                </div>
+            </div>
+
+            <div id="dividends" class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Dividend History</h2>
+                    </div>
+                    <form id="dividends-form" class="form-group">
+                        <div class="form-group">
+                            <label for="dividends-symbol">Symbol</label>
+                            <input type="text" id="dividends-symbol" class="form-control" placeholder="Enter symbol">
+                        </div>
+                        <button type="submit" class="btn">Get Dividend History</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Dividend Table</h2>
+                    </div>
+                    <table id="dividend-table" class="dividend-table">
+                        <thead>
+                            <tr>
+                                <th>Ex-Dividend Date</th>
+                                <th>Payment Date</th>
+                                <th>Record Date</th>
+                                <th>Declared Date</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dividend-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Dividend Calculator</h2>
+                    </div>
+                    <form id="dividend-calculator" class="dividend-calculator">
+                        <div class="dividend-calculator-group">
+                            <div class="form-group">
+                                <label for="dividend-amount">Dividend Amount</label>
+                                <input type="number" id="dividend-amount" class="form-control" placeholder="Enter amount">
+                            </div>
+                            <div class="form-group">
+                                <label for="dividend-frequency">Frequency</label>
+                                <select id="dividend-frequency" class="form-control">
+                                    <option value="annual">Annual</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="dividend-yield">Dividend Yield</label>
+                                <input type="number" id="dividend-yield" class="form-control" placeholder="Enter yield">
+                            </div>
+                        </div>
+                        <div class="dividend-calculator-group">
+                            <div class="form-group">
+                                <label for="dividend-shares">Number of Shares</label>
+                                <input type="number" id="dividend-shares" class="form-control" placeholder="Enter shares">
+                            </div>
+                            <div class="form-group">
+                                <label for="dividend-reinvest">Reinvestment</label>
+                                <select id="dividend-reinvest" class="form-control">
+                                    <option value="no">No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="dividend-period">Investment Period (years)</label>
+                                <input type="number" id="dividend-period" class="form-control" placeholder="Enter years">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">Calculate</button>
+                    </form>
+                    <div id="dividend-result" class="dividend-result"></div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Ex-Dividend Calendar</h2>
+                    </div>
+                    <div id="ex-dividend-calendar" class="ex-dividend-calendar"></div>
+                </div>
+            </div>
+
+            <div id="portfolio" class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Portfolio Analyzer</h2>
+                    </div>
+                    <form id="portfolio-form" class="form-group">
+                        <div class="form-group">
+                            <label for="portfolio-symbols">Symbols (comma separated)</label>
+                            <input type="text" id="portfolio-symbols" class="form-control" placeholder="Enter symbols">
+                        </div>
+                        <div class="form-group">
+                            <label for="portfolio-weights">Weights (comma separated)</label>
+                            <input type="text" id="portfolio-weights" class="form-control" placeholder="Enter weights">
+                        </div>
+                        <button type="submit" class="btn">Analyze Portfolio</button>
+                    </form>
+                </div>
+
+                <div id="portfolio-container" class="portfolio-container"></div>
+            </div>
+
+            <div id="exchanges" class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Exchange Browser</h2>
+                    </div>
+                    <form id="exchange-form" class="form-group">
+                        <div class="form-group">
+                            <label for="exchange-name">Exchange</label>
+                            <select id="exchange-name" class="form-control">
+                                <option value="US">US</option>
+                                <option value="LSE">LSE</option>
+                                <option value="NASDAQ">NASDAQ</option>
+                                <option value="NYSE">NYSE</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Browse Exchange</button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Exchange Symbols</h2>
+                        <div class="dashboard-card-controls">
+                            <div class="exchange-filters">
+                                <button class="exchange-filter" data-filter="all">All</button>
+                                <button class="exchange-filter" data-filter="technology">Technology</button>
+                                <button class="exchange-filter" data-filter="healthcare">Healthcare</button>
+                                <button class="exchange-filter" data-filter="finance">Finance</button>
+                                <button class="exchange-filter" data-filter="energy">Energy</button>
+                                <button class="exchange-filter" data-filter="consumer">Consumer</button>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="exchange-table" class="exchange-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="symbol">Symbol</th>
+                                <th data-sort="name">Name</th>
+                                <th data-sort="price">Price</th>
+                                <th data-sort="change">Change</th>
+                                <th data-sort="change_p">% Change</th>
+                                <th data-sort="volume">Volume</th>
+                                <th data-sort="market_cap">Market Cap</th>
+                                <th data-sort="sector">Sector</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exchange-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="settings" class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>API Key Management</h2>
+                    </div>
+                    <form id="api-key-form" class="api-key-form">
+                        <div class="form-group">
+                            <label for="api-key">API Key</label>
+                            <input type="text" id="api-key" class="api-key-input" placeholder="Enter API key">
+                        </div>
+                        <button type="submit" class="btn">Save API Key</button>
+                    </form>
+                    <div id="api-key-usage" class="api-key-usage"></div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Recent Searches</h2>
+                    </div>
+                    <div id="recent-searches" class="recent-searches"></div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Favorite Symbols</h2>
+                    </div>
+                    <div id="favorite-symbols" class="favorite-symbols"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2023 EOD Financial Terminal. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="loading-spinner" class="loading-spinner"></div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Modal Title</h3>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="notifications-container" class="notifications-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const dashboardSections = document.querySelectorAll('.dashboard-section');
+            const navLinks = document.querySelectorAll('nav ul li a');
+            const searchForm = document.getElementById('search-form');
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+            const watchlist = document.getElementById('watchlist');
+            const historicalForm = document.getElementById('historical-form');
+            const historicalSymbol = document.getElementById('historical-symbol');
+            const historicalFrom = document.getElementById('historical-from');
+            const historicalTo = document.getElementById('historical-to');
+            const historicalCompare = document.getElementById('historical-compare');
+            const historicalIndicator = document.getElementById('historical-indicator');
+            const historicalChartCanvas = document.getElementById('historical-canvas');
+            const historicalTableBody = document.getElementById('historical-body');
+            const exportHistoricalBtn = document.getElementById('export-historical');
+            const realtimeForm = document.getElementById('realtime-form');
+            const realtimeSymbol = document.getElementById('realtime-symbol');
+            const refreshRealtimeBtn = document.getElementById('refresh-realtime');
+            const toggleAutorefreshBtn = document.getElementById('toggle-autorefresh');
+            const quoteDetails = document.getElementById('quote-details');
+            const alertForm = document.getElementById('alert-form');
+            const alertSymbol = document.getElementById('alert-symbol');
+            const alertCondition = document.getElementById('alert-condition');
+            const alertPrice = document.getElementById('alert-price');
+            const alertsContainer = document.getElementById('alerts-container');
+            const intradayForm = document.getElementById('intraday-form');
+            const intradaySymbol = document.getElementById('intraday-symbol');
+            const intradayInterval = document.getElementById('intraday-interval');
+            const intradayChartCanvas = document.getElementById('intraday-canvas');
+            const volumeChartCanvas = document.getElementById('volume-canvas');
+            const technicalTools = document.querySelectorAll('.technical-tool');
+            const patternRecognition = document.getElementById('pattern-recognition');
+            const fundamentalsForm = document.getElementById('fundamentals-form');
+            const fundamentalsSymbol = document.getElementById('fundamentals-symbol');
+            const keyMetrics = document.getElementById('key-metrics');
+            const financialRatios = document.getElementById('financial-ratios');
+            const growthMetrics = document.getElementById('growth-metrics');
+            const sectorComparison = document.getElementById('sector-comparison');
+            const newsForm = document.getElementById('news-form');
+            const newsDate = document.getElementById('news-date');
+            const newsKeyword = document.getElementById('news-keyword');
+            const newsFeed = document.getElementById('news-feed');
+            const dividendsForm = document.getElementById('dividends-form');
+            const dividendsSymbol = document.getElementById('dividends-symbol');
+            const dividendTableBody = document.getElementById('dividend-body');
+            const dividendCalculator = document.getElementById('dividend-calculator');
+            const dividendAmount = document.getElementById('dividend-amount');
+            const dividendFrequency = document.getElementById('dividend-frequency');
+            const dividendYield = document.getElementById('dividend-yield');
+            const dividendShares = document.getElementById('dividend-shares');
+            const dividendReinvest = document.getElementById('dividend-reinvest');
+            const dividendPeriod = document.getElementById('dividend-period');
+            const dividendResult = document.getElementById('dividend-result');
+            const exDividendCalendar = document.getElementById('ex-dividend-calendar');
+            const portfolioForm = document.getElementById('portfolio-form');
+            const portfolioSymbols = document.getElementById('portfolio-symbols');
+            const portfolioWeights = document.getElementById('portfolio-weights');
+            const portfolioContainer = document.getElementById('portfolio-container');
+            const exchangeForm = document.getElementById('exchange-form');
+            const exchangeName = document.getElementById('exchange-name');
+            const exchangeFilters = document.querySelectorAll('.exchange-filter');
+            const exchangeTableBody = document.getElementById('exchange-body');
+            const exchangeTableHeaders = document.querySelectorAll('#exchange-table th[data-sort]');
+            const apiKeyForm = document.getElementById('api-key-form');
+            const apiKeyInput = document.getElementById('api-key');
+            const apiKeyUsage = document.getElementById('api-key-usage');
+            const recentSearches = document.getElementById('recent-searches');
+            const favoriteSymbols = document.getElementById('favorite-symbols');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const closeModalBtn = document.getElementById('close-modal');
+            const notificationsContainer = document.getElementById('notifications-container');
+            const marketHoursIndicator = document.getElementById('market-hours-indicator');
+            const marketHoursText = document.getElementById('market-hours-text');
+            const refreshMarketOverviewBtn = document.getElementById('refresh-market-overview');
+            const marketOverviewCanvas = document.getElementById('market-overview-canvas');
+            const topMoversBody = document.getElementById('top-movers-body');
+            const recentNews = document.getElementById('recent-news');
+            const viewAllNewsBtn = document.getElementById('view-all-news');
+
+            // State variables
+            let currentSymbol = '';
+            let currentSection = 'dashboard';
+            let autoRefreshInterval = null;
+            let isAutoRefreshing = false;
+            let alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+            let recentSearchesList = JSON.parse(localStorage.getItem('recentSearches')) || [];
+            let favoriteSymbolsList = JSON.parse(localStorage.getItem('favoriteSymbols')) || [];
+            let apiKey = localStorage.getItem('apiKey') || '';
+            let watchlistItems = JSON.parse(localStorage.getItem('watchlist')) || [];
+            let historicalChart = null;
+            let intradayChart = null;
+            let volumeChart = null;
+            let marketOverviewChart = null;
+
+            // Initialize the app
+            init();
+
+            function init() {
+                // Set up event listeners
+                setupEventListeners();
+
+                // Load saved data
+                loadSavedData();
+
+                // Initialize charts
+                initCharts();
+
+                // Update market hours
+                updateMarketHours();
+
+                // Load market overview data
+                loadMarketOverviewData();
+
+                // Load top movers data
+                loadTopMoversData();
+
+                // Load recent news
+                loadRecentNews();
+
+                // Render watchlist
+                renderWatchlist();
+
+                // Render alerts
+                renderAlerts();
+
+                // Check market hours periodically
+                setInterval(updateMarketHours, 60000); // Update every minute
+
+                // Check alerts periodically
+                setInterval(checkAlerts, 30000); // Check every 30 seconds
+            }
+
+            function setupEventListeners() {
+                // Navigation links
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const section = this.getAttribute('data-section');
+                        showSection(section);
+                    });
+                });
+
+                // Search form
+                searchForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        searchSymbols(query);
+                    }
+                });
+
+                // Historical data form
+                historicalForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const symbol = historicalSymbol.value.trim();
+                    const fromDate = historicalFrom.value;
+                    const toDate = historicalTo.value;
+                    const compareSymbol = historicalCompare.value.trim();
+                    const indicator = historicalIndicator.value;
+
+                    if (symbol && fromDate && toDate) {
+                        getHistoricalData(symbol, fromDate, toDate, compareSymbol, indicator);
+                    }
+                });
+
+                // Export historical data
+                exportHistoricalBtn.addEventListener('click', exportHistoricalData);
+
+                // Real-time quotes form
+                realtimeForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const symbol = realtimeSymbol.value.trim();
+                    if (symbol) {
+                        getRealTimeQuote(symbol);
+                    }
+                });
+
+                // Refresh real-time quotes
+                refreshRealtimeBtn.addEventListener('click', function() {
+                    const symbol = realtimeSymbol.value.trim();
+                    if (symbol) {
+                        getRealTimeQuote(symbol);
+                    }
+                });
+
+                // Toggle auto-refresh
+                toggleAutorefreshBtn.addEventListener('click', toggleAutoRefresh);
+
+                // Set price alert
+                alertForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const symbol = alertSymbol.value.trim();
+                    const condition = alertCondition.value;
+                    const price = parseFloat(alertPrice.value);
+
+                    if (symbol && !isNaN(price)) {
+                        setPriceAlert(symbol, condition, price);
+                    }
+                });
+
+                // Intraday data form
+                intradayForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const symbol = intradaySymbol.value.trim();
+                    const interval = intradayInterval.value;
+
+                    if (symbol) {
+                        getIntradayData(symbol, interval);
+                    }
+                });
+
+                // Technical analysis tools
+                technicalTools.forEach(tool => {
+                    tool.addEventListener('click', function() {
+                        const toolName = this.getAttribute('data-tool');
+                        activateTechnicalTool(toolName);
+                    });
+                });
+
+                // Fundamentals form
+                fundamentalsForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const symbol = fundamentalsSymbol.value.trim();
+
+                    if (symbol) {
+                        getFundamentals(symbol);
+                    }
+                });
+
+                // News form
+                newsForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const date = newsDate.value;
+                    const keyword = newsKeyword.value.trim();
+
+                    getNews(date, keyword);
+                });
+
+                // Dividends form
+                dividendsForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const symbol = dividendsSymbol.value.trim();
+
+                    if (symbol) {
+                        getDividendHistory(symbol);
+                    }
+                });
+
+                // Dividend calculator
+                dividendCalculator.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    calculateDividend();
+                });
+
+                // Portfolio form
+                portfolioForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const symbols = portfolioSymbols.value.trim().split(',').map(s => s.trim());
+                    const weights = portfolioWeights.value.trim().split(',').map(w => parseFloat(w.trim()));
+
+                    if (symbols.length > 0 && weights.length === symbols.length) {
+                        analyzePortfolio(symbols, weights);
+                    }
+                });
+
+                // Exchange form
+                exchangeForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const exchange = exchangeName.value;
+
+                    getExchangeSymbols(exchange);
+                });
+
+                // Exchange filters
+                exchangeFilters.forEach(filter => {
+                    filter.addEventListener('click', function() {
+                        const filterValue = this.getAttribute('data-filter');
+                        filterExchangeSymbols(filterValue);
+                    });
+                });
+
+                // Exchange table sorting
+                exchangeTableHeaders.forEach(header => {
+                    header.addEventListener('click', function() {
+                        const sortBy = this.getAttribute('data-sort');
+                        sortExchangeTable(sortBy);
+                    });
+                });
+
+                // API key form
+                apiKeyForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const key = apiKeyInput.value.trim();
+                    if (key) {
+                        saveApiKey(key);
+                    }
+                });
+
+                // Close modal
+                closeModalBtn.addEventListener('click', closeModal);
+
+                // Refresh market overview
+                refreshMarketOverviewBtn.addEventListener('click', loadMarketOverviewData);
+
+                // View all news
+                viewAllNewsBtn.addEventListener('click', function() {
+                    showSection('news');
+                });
+            }
+
+            function loadSavedData() {
+                // Load API key
+                if (apiKey) {
+                    apiKeyInput.value = apiKey;
+                    updateApiKeyUsage();
+                }
+
+                // Load recent searches
+                renderRecentSearches();
+
+                // Load favorite symbols
+                renderFavoriteSymbols();
+            }
+
+            function initCharts() {
+                // Initialize historical chart
+                historicalChart = new Chart(historicalChartCanvas, {
+                    type: 'candlestick',
+                    data: {
+                        datasets: [{
+                            label: 'Historical Data',
+                            data: [],
+                            color: {
+                                up: '#4caf50',
+                                down: '#f44336',
+                                unchanged: '#90a4ae'
+                            }
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day'
+                                }
+                            },
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+
+                // Initialize intraday chart
+                intradayChart = new Chart(intradayChartCanvas, {
+                    type: 'candlestick',
+                    data: {
+                        datasets: [{
+                            label: 'Intraday Data',
+                            data: [],
+                            color: {
+                                up: '#4caf50',
+                                down: '#f44336',
+                                unchanged: '#90a4ae'
+                            }
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'minute'
+                                }
+                            },
+                            y: {
+                                beginAtZero: false
+                            }
+                        },
+                        plugins: {
+                            zoom: {
+                                zoom: {
+                                    wheel: {
+                                        enabled: true
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+                                    mode: 'xy'
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'xy'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Initialize volume chart
+                volumeChart = new Chart(volumeChartCanvas, {
+                    type: 'bar',
+                    data: {
+                        datasets: [{
+                            label: 'Volume',
+                            data: [],
+                            backgroundColor: '#2196f3'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'minute'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                // Initialize market overview chart
+                marketOverviewChart = new Chart(marketOverviewCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: []
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day'
+                                }
+                            },
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            function showSection(section) {
+                // Hide all sections
+                dashboardSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // Show the selected section
+                document.getElementById(section).classList.add('active');
+
+                // Update current section
+                currentSection = section;
+
+                // Update active nav link
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('data-section') === section) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            function searchSymbols(query) {
+                showLoading();
+
+                // Simulate API call
+                setTimeout(() => {
+                    // In a real app, you would make an actual API call here
+                    // For demonstration, we'll use mock data
+                    const mockResults = [
+                        { symbol: 'AAPL', name: 'Apple Inc.' },
+                        { symbol: 'MSFT', name: 'Microsoft Corporation' },
+                        { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+                        { symbol: 'AMZN', name: 'Amazon.com Inc.' },
+                        { symbol: 'FB', name: 'Facebook Inc.' }
+                    ].filter(item =>
+                        item.symbol.toLowerCase().includes(query.toLowerCase()) ||
+                        item.name.toLowerCase().includes(query.toLowerCase())
+                    );
+
+                    // Update search results
+                    renderSearchResults(mockResults);
+
+                    // Add to recent searches
+                    addToRecentSearches(query);
+
+                    hideLoading();
+                }, 1000);
+            }
+
+            function renderSearchResults(results) {
+                searchResults.innerHTML = '';
+
+                if (results.length === 0) {
+                    searchResults.innerHTML = '<div class="search-result-item">No results found</div>';
+                    return;
+                }
+
+                results.forEach(result => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-result-item';
+                    resultItem.innerHTML = `
+                        <div>${result.symbol}</div>
+                        <div>${result.name}</div>
+                    `;
+                    resultItem.addEventListener('click', () => {
+                        searchInput.value = result.symbol;
+                        searchResults.innerHTML = '';
+                        currentSymbol = result.symbol;
+
+                        // Update the form in the current section with the selected symbol
+                        switch (currentSection) {
+                            case 'historical':
+                                historicalSymbol.value = result.symbol;
+                                break;
+                            case 'realtime':
+                                realtimeSymbol.value = result.symbol;
+                                break;
+                            case 'intraday':
+                                intradaySymbol.value = result.symbol;
+                                break;
+                            case 'fundamentals':
+                                fundamentalsSymbol.value = result.symbol;
+                                break;
+                            case 'news':
+                                newsKeyword.value = result.symbol;
+                                break;
+                            case 'dividends':
+                                dividendsSymbol.value = result.symbol;
+                                break;
+                        }
+
+                        // Add to watchlist
+                        addToWatchlist(result.symbol);
+                    });
+                    searchResults.appendChild(resultItem);
+                });
+            }
+
+            function addToRecentSearches(query) {
+                // Check if the query is already in recent searches
+                const index = recentSearchesList.findIndex(item => item.toLowerCase() === query.toLowerCase());
+
+                if (index !== -1) {
+                    // Remove the existing item
+                    recentSearchesList.splice(index, 1);
+                }
+
+                // Add the new query to the beginning of the array
+                recentSearchesList.unshift(query);
+
+                // Limit to 10 recent searches
+                if (recentSearchesList.length > 10) {
+                    recentSearchesList.pop();
+                }
+
+                // Save to localStorage
+                localStorage.setItem('recentSearches', JSON.stringify(recentSearchesList));
+
+                // Update the UI
+                renderRecentSearches();
+            }
+
+            function renderRecentSearches() {
+                recentSearches.innerHTML = '';
+
+                if (recentSearchesList.length === 0) {
+                    recentSearches.innerHTML = '<p>No recent searches</p>';
+                    return;
+                }
+
+                const ul = document.createElement('ul');
+                recentSearchesList.forEach(search => {
+                    const li = document.createElement('li');
+                    li.textContent = search;
+                    li.style.cursor = 'pointer';
+                    li.addEventListener('click', () => {
+                        searchInput.value = search;
+                        searchSymbols(search);
+                    });
+                    ul.appendChild(li);
+                });
+
+                recentSearches.appendChild(ul);
+            }
+
+            function addToWatchlist(symbol) {
+                // Check if the symbol is already in the watchlist
+                if (watchlistItems.some(item => item.symbol === symbol)) {
+                    return;
+                }
+
+                // Add the symbol to the watchlist
+                watchlistItems.push({ symbol, price: 0, change: 0 });
+
+                // Save to localStorage
+                localStorage.setItem('watchlist', JSON.stringify(watchlistItems));
+
+                // Update the UI
+                renderWatchlist();
+
+                // Get the current price for the symbol
+                getWatchlistPrice(symbol);
+            }
+
+            function renderWatchlist() {
+                watchlist.innerHTML = '';
+
+                if (watchlistItems.length === 0) {
+                    watchlist.innerHTML = '<p>Your watchlist is empty</p>';
+                    return;
+                }
+
+                watchlistItems.forEach(item => {
+                    const watchlistItem = document.createElement('div');
+                    watchlistItem.className = 'watchlist-item';
+
+                    const changeClass = item.change >= 0 ? 'positive' : 'negative';
+                    const changeSymbol = item.change >= 0 ? '+' : '';
+
+                    watchlistItem.innerHTML = `
+                        <div class="watchlist-symbol">${item.symbol}</div>
+                        <div class="watchlist-price">${item.price.toFixed(2)}</div>
+                        <div class="watchlist-change ${changeClass}">${changeSymbol}${item.change.toFixed(2)}</div>
+                    `;
+
+                    watchlistItem.addEventListener('click', () => {
+                        // Update the form in the current section with the selected symbol
+                        switch (currentSection) {
+                            case 'historical':
+                                historicalSymbol.value = item.symbol;
+                                break;
+                            case 'realtime':
+                                realtimeSymbol.value = item.symbol;
+                                break;
+                            case 'intraday':
+                                intradaySymbol.value = item.symbol;
+                                break;
+                            case 'fundamentals':
+                                fundamentalsSymbol.value = item.symbol;
+                                break;
+                            case 'news':
+                                newsKeyword.value = item.symbol;
+                                break;
+                            case 'dividends':
+                                dividendsSymbol.value = item.symbol;
+                                break;
+                        }
+                    });
+
+                    watchlist.appendChild(watchlistItem);
+                });
+            }
+
+            function getWatchlistPrice(symbol) {
+                // Simulate API call to get the current price
+                setTimeout(() => {
+                    // In a real app, you would make an actual API call here
+                    // For demonstration, we'll use mock data
+                    const mockPrices = {
+                        'AAPL': 150.25,
+                        'MSFT': 250.75,
+                        'GOOGL': 2750.50,
+                        'AMZN': 3300.75,
+                        'FB': 320.25
+                    };
+
+                    const price = mockPrices[symbol] || 0;
+                    const change = (Math.random() * 10 - 5).toFixed(2);
+
+                    // Update the watchlist item
+                    const index = watchlistItems.findIndex(item => item.symbol === symbol);
+                    if (index !== -1) {
+                        watchlistItems[index].price = price;
+                        watchlistItems[index].change = change;
+
+                        // Save to localStorage
+                        localStorage.setItem('watchlist', JSON.stringify(watchlistItems));
+
+                        // Update the UI
+                        renderWatchlist();
+                    }
+                }, 1000);
+            }
+
+            function getHistoricalData(symbol, fromDate, toDate, compareSymbol = '', indicator = '') {
+                showLoading();
+
+                // Simulate API call
+                setTimeout(() => {
+                    // In a real app, you would make an actual API call here
+                    // For demonstration, we'll use mock data
+                    const mockData = generateMockHistoricalData(symbol, fromDate, toDate);
+
+                    // Update the chart
+                    updateHistoricalChart(mockData, symbol, compareSymbol, indicator);
+
+                    // Update the table
+                    updateHistoricalTable(mockData);
+
+                    hideLoading();
+                }, 1500);
+            }
+
+            function generateMockHistoricalData(symbol, fromDate, toDate) {
+                const data = [];
+                const startDate = new Date(fromDate);
+                const endDate = new Date(toDate);
+                const days = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+                for (let i = 0; i < days; i++) {
+                    const date = new Date(startDate);
+                    date.setDate(date.getDate() + i);
+
+                    const open = 100 + Math.random() * 50;
+                    const close = open + (Math.random() * 10 - 5);
+                    const high = Math.max(open, close) + Math.random() * 5;
+                    const low = Math.min(open, close) - Math.random() * 5;
+                    const volume = Math.floor(Math.random() * 1000000);
+
+                    data.push({
+                        x: date.toISOString().split('T')[0],
+                        o: open.toFixed(2),
+                        h: high.toFixed(2),
+                        l: low.toFixed(2),
+                        c: close.toFixed(2),
+                        v: volume
+                    });
+                }
+
+                return data;
+            }
+
+            function updateHistoricalChart(data, symbol, compareSymbol = '', indicator = '') {
+                const datasets = [{
+                    label: symbol,
+                    data: data,
+                    color: {
+                        up: '#4caf50',
+                        down: '#f44336',
+                        unchanged: '#90a4ae'
+                    }
+                }];
+
+                if (compareSymbol) {
+                    // Generate mock data for the comparison symbol
+                    const compareData = data.map(item => {
+                        const open = parseFloat(item.o) * (0.8 + Math.random() * 0.4);
+                        const close = open + (Math.random() * 10 - 5);
+                        const high = Math.max(open, close) + Math.random() * 5;
+                        const low = Math.min(open, close) - Math.random() * 5;
+
+                        return {
+                            x: item.x,
+                            o: open.toFixed(2),
+                            h: high.toFixed(2),
+                            l: low.toFixed(2),
+                            c: close.toFixed(2)
+                        };
+                    });
+
+                    datasets.push({
+                        label: compareSymbol,
+                        data: compareData,
+                        color: {
+                            up: '#2196f3',
+                            down: '#9c27b0',
+                            unchanged: '#607d8b'
+                        }
+                    });
+                }
+
+                // Add indicator data if selected
+                if (indicator) {
+                    const indicatorData = calculateIndicatorData(data, indicator);
+                    datasets.push(indicatorData);
+                }
+
+                historicalChart.data.datasets = datasets;
+                historicalChart.update();
+            }
+
+            function calculateIndicatorData(data, indicator) {
+                const indicatorData = {
+                    label: '',
+                    data: [],
+                    type: 'line',
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true
+                };
+
+                switch (indicator) {
+                    case 'sma':
+                        // Simple Moving Average (10-day)
+                        indicatorData.label = 'SMA (10)';
+                        for (let i = 0; i < data.length; i++) {
+                            if (i < 9) {
+                                indicatorData.data.push(null);
+                                continue;
+                            }
+
+                            let sum = 0;
+                            for (let j = i - 9; j <= i; j++) {
+                                sum += parseFloat(data[j].c);
+                            }
+
+                            const sma = sum / 10;
+                            indicatorData.data.push({
+                                x: data[i].x,
+                                y: sma.toFixed(2)
+                            });
+                        }
+                        break;
+
+                    case 'ema':
+                        // Exponential Moving Average (10-day)
+                        indicatorData.label = 'EMA (10)';
+                        const multiplier = 2 / (10 + 1);
+
+                        let ema = parseFloat(data[0].c);
+                        indicatorData.data.push({
+                            x: data[0].x,
+                            y: ema.toFixed(2)
+                        });
+
+                        for (let i = 1; i < data.length; i++) {
+                            ema = (parseFloat(data[i].c) - ema) * multiplier + ema;
+                            indicatorData.data.push({
+                                x: data[i].x,
+                                y: ema.toFixed(2)
+                            });
+                        }
+                        break;
+
+                    case 'rsi':
+                        // Relative Strength Index (14-day)
+                        indicatorData.label = 'RSI (14)';
+                        const gains = [];
+                        const losses = [];
+
+                        for (let i = 1; i < data.length; i++) {
+                            const change = parseFloat(data[i].c) - parseFloat(data[i-1].c);
+                            if (change > 0) {
+                                gains.push(change);
+                                losses.push(0);
+                            } else {
+                                gains.push(0);
+                                losses.push(Math.abs(change));
+                            }
+                        }
+
+                        let avgGain = gains.slice(0, 14).reduce((a, b) => a + b, 0) / 14;
+                        let avgLoss = losses.slice(0, 14).reduce((a, b) => a + b, 0) / 14;
+
+                        for (let i = 0; i < data.length; i++) {
+                            if (i < 14) {
+                                indicatorData.data.push(null);
+                                continue;
+                            }
+
+                            avgGain = (avgGain * 13 + gains[i-1]) / 14;
+                            avgLoss = (avgLoss * 13 + losses[i-1]) / 14;
+
+                            const rs = avgGain / avgLoss;
+                            const rsi = 100 - (100 / (1 + rs));
+
+                            indicatorData.data.push({
+                                x: data[i].x,
+                                y: rsi.toFixed(2)
+                            });
+                        }
+                        break;
+
+                    case 'macd':
+                        // MACD (12, 26, 9)
+                        indicatorData.label = 'MACD (12, 26, 9)';
+                        const ema12 = [];
+                        const ema26 = [];
+                        const macdLine = [];
+                        const signalLine = [];
+
+                        // Calculate EMA(12) and EMA(26)
+                        let ema12Value = parseFloat(data[0].c);
+                        let ema26Value = parseFloat(data[0].c);
+
+                        for (let i = 0; i < data.length; i++) {
+                            if (i === 0) {
+                                ema12.push(ema12Value);
+                                ema26.push(ema26Value);
+                            } else {
+                                ema12Value = (parseFloat(data[i].c) - ema12Value) * (2 / (12 + 1)) + ema12Value;
+                                ema26Value = (parseFloat(data[i].c) - ema26Value) * (2 / (26 + 1)) + ema26Value;
+                                ema12.push(ema12Value);
+                                ema26.push(ema26Value);
+                            }
+                        }
+
+                        // Calculate MACD line and signal line
+                        for (let i = 0; i < data.length; i++) {
+                            const macd = ema12[i] - ema26[i];
+                            macdLine.push(macd);
+
+                            if (i === 0) {
+                                signalLine.push(macd);
+                            } else {
+                                const signal = (macd - signalLine[i-1]) * (2 / (9 + 1)) + signalLine[i-1];
+                                signalLine.push(signal);
+                            }
+                        }
+
+                        // Add MACD line and signal line to the chart
+                        indicatorData.data = macdLine.map((value, index) => ({
+                            x: data[index].x,
+                            y: value.toFixed(2)
+                        }));
+
+                        // Add signal line as a separate dataset
+                        const signalData = {
+                            label: 'Signal Line',
+                            data: signalLine.map((value, index) => ({
+                                x: data[index].x,
+                                y: value.toFixed(2)
+                            })),
+                            type: 'line',
+                            borderColor: '#ff5722',
+                            backgroundColor: 'rgba(255, 87, 34, 0.2)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: true
+                        };
+
+                        historicalChart.data.datasets.push(signalData);
+
+                        // Add histogram as a separate dataset
+                        const histogramData = {
+                            label: 'Histogram',
+                            data: macdLine.map((value, index) => ({
+                                x: data[index].x,
+                                y: (value - signalLine[index]).toFixed(2)
+                            })),
+                            type: 'bar',
+                            backgroundColor: context => {
+                                const value = context.raw.y;
+                                return value >= 0 ? 'rgba(76, 175, 80, 0.5)' : 'rgba(244, 67, 54, 0.5)';
+                            },
+                            borderColor: context => {
+                                const value = context.raw.y;
+                                return value >= 0 ? '#4caf50' : '#f44336';
+                            },
+                            borderWidth: 1
+                        };
+
+                        historicalChart.data.datasets.push(histogramData);
+                        break;
+
+                    case 'bollinger':
+                        // Bollinger Bands (20-day, 2 standard deviations)
+                        indicatorData.label = 'Bollinger Bands (20, 2)';
+                        const sma20 = [];
+                        const upperBand = [];
+                        const lowerBand = [];
+
+                        // Calculate SMA(20)
+                        for (let i = 0; i < data.length; i++) {
+                            if (i < 19) {
+                                sma20.push(null);
+                                upperBand.push(null);
+                                lowerBand.push(null);
+                                continue;
+                            }
+
+                            let sum = 0;
+                            for (let j = i - 19; j <= i; j++) {
+                                sum += parseFloat(data[j].c);
+                            }
+
+                            const sma = sum / 20;
+                            sma20.push(sma);
+
+                            // Calculate standard deviation
+                            let variance = 0;
+                            for (let j = i - 19; j <= i; j++) {
+                                variance += Math.pow(parseFloat(data[j].c) - sma, 2);
+                            }
+
+                            const stdDev = Math.sqrt(variance / 20);
+                            const upper = sma + (2 * stdDev);
+                            const lower = sma - (2 * stdDev);
+
+                            upperBand.push(upper);
+                            lowerBand.push(lower);
+                        }
+
+                        // Add upper band as a separate dataset
+                        const upperBandData = {
+                            label: 'Upper Band',
+                            data: upperBand.map((value, index) => ({
+                                x: data[index].x,
+                                y: value ? value.toFixed(2) : null
+                            })),
+                            type: 'line',
+                            borderColor: '#ff5722',
+                            backgroundColor: 'rgba(255, 87, 34, 0.2)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false
+                        };
+
+                        historicalChart.data.datasets.push(upperBandData);
+
+                        // Add lower band as a separate dataset
+                        const lowerBandData = {
+                            label: 'Lower Band',
+                            data: lowerBand.map((value, index) => ({
+                                x: data[index].x,
+                                y: value ? value.toFixed(2) : null
+                            })),
+                            type: 'line',
+                            borderColor: '#ff5722',
+                            backgroundColor: 'rgba(255, 87, 34, 0.2)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false
+                        };
+
+                        historicalChart.data.datasets.push(lowerBandData);
+
+                        // Add middle band (SMA) as the main indicator data
+                        indicatorData.data = sma20.map((value, index) => ({
+                            x: data[index].x,
+                            y: value ? value.toFixed(2) : null
+                        }));
+                        break;
+                }
+
+                return indicatorData;
+            }
+
+            function updateHistoricalTable(data) {
+                historicalTableBody.innerHTML = '';
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.x}</td>
+                        <td>${item.o}</td>
+                        <td>${item.h}</td>
+                        <td>${item.l}</td>
+                        <td>${item.c}</td>
+                        <td>${item.v}</td>
+                    `;
+                    historicalTableBody.appendChild(row);
+                });
+            }
+
+            function exportHistoricalData() {
+                // Get the data from the chart
+                const datasets = historicalChart.data.datasets;
+
+                if (datasets.length === 0) {
+                    showNotification('Error', 'No historical data to export', 'error');
+                    return;
+                }
+
+                // Prepare the CSV content
+                let csvContent = 'Date,Open,High,Low,Close,Volume\n';
+
+                // Get all unique dates from the first dataset
+                const dates = datasets[0].data.map(item => item.x);
+
+                // Add data for each date
+                dates.forEach(date => {
+                    const row = [date];
+
+                    // Add data for each dataset
+                    datasets.forEach(dataset => {
+                        const dataPoint = dataset.data.find(item => item.x === date);
+                        if (dataPoint) {
+                            row.push(dataPoint.o, dataPoint.h, dataPoint.l, dataPoint.c);
+                        } else {
+                            row.push('', '', '', '');
+                        }
+                    });
+
+                    // Add volume from the first dataset
+                    const volumeData = datasets[0].data.find(item => item.x === date);
+                    row.push(volumeData ? volumeData.v : '');
+
+                    csvContent += row.join(',') + '\n';
+                });
+
+                // Create a download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'historical_data.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            function getRealTimeQuote(symbol) {
+                showLoading();
+
+                // Simulate API call
+                setTimeout(() => {
+                    // In a real app, you would make an actual API call here
+                    // For demonstration, we'll use mock data
+                    const mockQuote = generateMockRealTimeQuote(symbol);
+
+                    // Update the quote details
+                    updateQuoteDetails(mockQuote);
+
+                    // Add to watchlist if not already there
+                    addToWatchlist(symbol);
+
+                    hideLoading();
+                }, 1000);
+            }
+
+            function generateMockRealTimeQuote(symbol) {
+                const price = 100 + Math.random() * 100;
+                const change = (Math.random() * 10 - 5).toFixed(2);
+                const percentChange = ((change / price) * 100).toFixed(2);
+                const volume = Math.floor(Math.random() * 1000000);
+                const open = (price - (Math.random() * 5)).toFixed(2);
+                const high = (price + (Math.random() * 5)).toFixed(2);
+                const low = (price - (Math.random() * 5)).toFixed(2);
+                const prevClose = (price - change).toFixed(2);
+                const marketCap = Math.floor(Math.random() * 1000000000000);
+                const peRatio = (Math.random() * 30 + 5).toFixed(2);
+                const eps = (price / peRatio).toFixed(2);
+                const beta = (Math.random() * 2 + 0.5).toFixed(2);
+                const dividendYield = (Math.random() * 5).toFixed(2);
+                const exDividendDate = new Date();
+                exDividendDate.setDate(exDividendDate.getDate() + Math.floor(Math.random() * 30));
+                const nextEarningsDate = new Date();
+                nextEarningsDate.setDate(nextEarningsDate.getDate() + Math.floor(Math.random() * 60));
+
+                return {
+                    symbol,
+                    price: price.toFixed(2),
+                    change,
+                    percentChange,
+                    volume,
+                    open,
+                    high,
+                    low,
+                    prevClose,
+                    marketCap,
+                    peRatio,
+                    eps,
+                    beta,
+                    dividendYield,
+                    exDividendDate: exDividendDate.toISOString().split('T')[0],
+                    nextEarningsDate: nextEarningsDate.toISOString().split('T')[0]
+                };
+            }
+
+            function updateQuoteDetails(quote) {
+                const changeClass = quote.change >= 0 ? 'price-positive' : 'price-negative';
+                const changeSymbol = quote.change >= 0 ? '+' : '';
+
+                quoteDetails.innerHTML = `
+                    <div class="quote-symbol">${quote.symbol}</div>
+                    <div class="quote-price">${quote.price}</div>
+                    <div class="quote-change ${changeClass}">${changeSymbol}${quote.change} (${changeSymbol}${quote.percentChange}%)</div>
+                    <div class="quote-details-grid">
+                        <div class="quote-detail">
+                            <div class="quote-label">Open</div>
+                            <div class="quote-value">${quote.open}</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">High</div>
+                            <div class="quote-value">${quote.high}</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">Low</div>
+                            <div class="quote-value">${quote.low}</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">Prev Close</div>
+                            <div class="quote-value">${quote.prevClose}</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">Volume</div>
+                            <div class="quote-value">${quote.volume.toLocaleString()}</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">Market Cap</div>
+                            <div class="quote-value">${formatMarketCap(quote.marketCap)}</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">P/E Ratio</div>
+                            <div class="quote-value">${quote.peRatio}</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">EPS</div>
+                            <div class="quote-value">${quote.eps}</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">Beta</div>
+                            <div class="quote-value">${quote.beta}</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">Dividend Yield</div>
+                            <div class="quote-value">${quote.dividendYield}%</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">Ex-Dividend Date</div>
+                            <div class="quote-value">${quote.exDividendDate}</div>
+                        </div>
+                        <div class="quote-detail">
+                            <div class="quote-label">Next Earnings Date</div>
+                            <div class="quote-value">${quote.nextEarningsDate}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function formatMarketCap(marketCap) {
+                if (marketCap >= 1000000000) {
+                    return (marketCap / 1000000000).toFixed(2) + 'B';
+                } else if (marketCap >= 1000000) {
+                    return (marketCap / 1000000).toFixed(2) + 'M';
+                } else {
+                    return marketCap.toLocaleString();
+                }
+            }
+
+            function toggleAutoRefresh() {
+                isAutoRefreshing = !isAutoRefreshing;
+
+                if (isAutoRefreshing) {
+                    toggleAutorefreshBtn.textContent = 'Auto-Refresh: On';
+                    toggleAutorefreshBtn.classList.remove('btn-secondary');
+                    toggleAutorefreshBtn.classList.add('btn');
+
+                    // Start auto-refresh
+                    const symbol = realtimeSymbol.value.trim();
+                    if (symbol) {
+                        autoRefreshInterval = setInterval(() => {
+                            getRealTimeQuote(symbol);
+                        }, 5000); // Refresh every 5 seconds
+                    }
+                } else {
+                    toggleAutorefreshBtn.textContent = 'Auto-Refresh: Off';
+                    toggleAutorefreshBtn.classList.remove('btn');
+                    toggleAutorefreshBtn.classList.add('btn-secondary');
+
+                    // Stop auto-refresh
+                    if (autoRefreshInterval) {
+                        clearInterval(autoRefreshInterval);
+                        autoRefreshInterval = null;
+                    }
+                }
+            }
+
+            function setPriceAlert(symbol, condition, price) {
+                // Create the alert object
+                const alert = {
+                    id: Date.now(),
+                    symbol,
+                    condition,
+                    price,
+                    active: true
+                };
+
+                // Add the alert to the alerts array
+                alerts.push(alert);
+
+                // Save to localStorage
+                localStorage.setItem('alerts', JSON.stringify(alerts));
+
+                // Update the UI
+                renderAlerts();
+
+                // Show notification
+                showNotification('Alert Set', `Price alert for ${symbol} ${condition} ${price} has been set`, 'success');
+
+                // Reset the form
+                alertForm.reset();
+            }
+
+            function renderAlerts() {
+                alertsContainer.innerHTML = '';
+
+                if (alerts.length === 0) {
+                    alertsContainer.innerHTML = '<p>No price alerts set</p>';
+                    return;
+                }
+
+                alerts.forEach(alert => {
+                    const alertItem = document.createElement('div');
+                    alertItem.className = 'alert-item';
+
+                    const conditionText = alert.condition === 'above' ? 'above' : 'below';
+
+                    alertItem.innerHTML = `
+                        <div class="alert-info">
+                            <div class="alert-symbol">${alert.symbol}</div>
+                            <div class="alert-condition">Price ${conditionText} ${alert.price}</div>
+                        </div>
+                        <div class="alert-actions">
+                            <button class="btn btn-secondary" data-id="${alert.id}">Edit</button>
+                            <button class="btn delete" data-id="${alert.id}">Delete</button>
+                        </div>
+                    `;
+
+                    alertsContainer.appendChild(alertItem);
+                });
+
+                // Add event listeners for edit and delete buttons
+                document.querySelectorAll('.alert-actions button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const alertId = parseInt(this.getAttribute('data-id'));
+
+                        if (this.classList.contains('delete')) {
+                            // Delete the alert
+                            deleteAlert(alertId);
+                        } else {
+                            // Edit the alert (for simplicity, we'll just delete and recreate)
+                            const alert = alerts.find(a => a.id === alertId);
+                            if (alert) {
+                                deleteAlert(alertId);
+                                alertSymbol.value = alert.symbol;
+                                alertCondition.value = alert.condition;
+                                alertPrice.value = alert.price;
+                            }
+                        }
+                    });
+                });
+            }
+
+            function deleteAlert(alertId) {
+                // Remove the alert from the alerts array
+                alerts = alerts.filter(alert => alert.id !== alertId);
+
+                // Save to localStorage
+                localStorage.setItem('alerts', JSON.stringify(alerts));
+
+                // Update the UI
+                renderAlerts();
+
+                // Show notification
+                showNotification('Alert Deleted', 'Price alert has been deleted', 'success');
+            }
+
+            function checkAlerts() {
+                // Check if there are any active alerts
+                if (alerts.length === 0 || !isMarketOpen()) {
+                    return;
+                }
+
+                // Get the current prices for the symbols in the alerts
+                const symbols = [...new Set(alerts.map(alert => alert.symbol))];
+
+                // Simulate API call to get current prices
+                setTimeout(() => {
+                    // In a real app, you would make an actual API call here
+                    // For demonstration, we'll use mock data
+                    const mockPrices = {
+                        'AAPL': 150.25,
+                        'MSFT': 250.75,
+                        'GOOGL': 2750.50,
+                        'AMZN': 3300.75,
+                        'FB': 320.25
+                    };
+
+                    // Check each alert
+                    alerts.forEach(alert => {
+                        const currentPrice = mockPrices[alert.symbol] || 0;
+
+                        if (alert.condition === 'above' && currentPrice >= alert.price) {
+                            // Price is above the alert threshold
+                            showNotification('Price Alert', `${alert.symbol} is now above ${alert.price}`, 'success');
+                            deleteAlert(alert.id);
+                        } else if (alert.condition === 'below' && currentPrice <= alert.price) {
+                            // Price is below the alert threshold
+                            showNotification('Price Alert', `${alert.symbol} is now below ${alert.price}`, 'success');
+                            deleteAlert(alert.id);
+                        }
+                    });
+                }, 1000);
+            }
+
+            function getIntradayData(symbol, interval) {
+                showLoading();
+
+                // Simulate API call
+                setTimeout(() => {
+                    // In a real app, you would make an actual API call here
+                    // For demonstration, we'll use mock data
+                    const mockData = generateMockIntradayData(symbol, interval);
+
+                    // Update the intraday chart
+                    updateIntradayChart(mockData, symbol);
+
+                    // Update the volume chart
+                    updateVolumeChart(mockData);
+
+                    // Recognize patterns
+                    recognizePatterns(mockData);
+
+                    hideLoading();
+                }, 1500);
+            }
+
+            function generateMockIntradayData(symbol, interval) {
+                const data = [];
+                const now = new Date();
+                const startTime = new Date(now);
+                startTime.setHours(9, 30, 0, 0); // Market open at 9:30 AM
+                const endTime = new Date(now);
+                endTime.setHours(16, 0, 0, 0); // Market close at 4:00 PM
+
+                let currentTime = new Date(startTime);
+
+                while (currentTime <= endTime) {
+                    const open = 100 + Math.random() * 50;
+                    const close = open + (Math.random() * 10 - 5);
+                    const high = Math.max(open, close) + Math.random() * 5;
+                    const low = Math.min(open, close) - Math.random() * 5;
+                    const volume = Math.floor(Math.random() * 100000);
+
+                    data.push({
+                        x: new Date(currentTime),
+                        o: open.toFixed(2),
+                        h: high.toFixed(2),
+                        l: low.toFixed(2),
+                        c: close.toFixed(2),
+                        v: volume
+                    });
+
+                    // Increment time based on interval
+                    switch (interval) {
+                        case '1m':
+                            currentTime.setMinutes(currentTime.getMinutes() + 1);
+                            break;
+                        case '5m':
+                            currentTime.setMinutes(currentTime.getMinutes() + 5);
+                            break;
+                        case '1h':
+                            currentTime.setHours(currentTime.getHours() + 1);
+                            break;
+                    }
+                }
+
+                return data;
+            }
+
+            function updateIntradayChart(data, symbol) {
+                intradayChart.data.datasets = [{
+                    label: symbol,
+                    data: data,
+                    color: {
+                        up: '#4caf50',
+                        down: '#f44336',
+                        unchanged: '#90a4ae'
+                    }
+                }];
+                intradayChart.update();
+            }
+
+            function updateVolumeChart(data) {
+                volumeChart.data.datasets = [{
+                    label: 'Volume',
+                    data: data.map(item => ({
+                        x: item.x,
+                        y: item.v
+                    })),
+                    backgroundColor: '#2196f3'
+                }];
+                volumeChart.update();
+            }
+
+            function activateTechnicalTool(toolName) {
+                // Deactivate all tools
+                technicalTools.forEach(tool => {
+                    tool.classList.remove('active');
+                });
+
+                // Activate the selected tool
+                const selectedTool = document.querySelector(`.technical-tool[data-tool="${toolName}"]`);
+                if (selectedTool) {
+                    selectedTool.classList.add('active');
+                }
+
+                // In a real app, you would implement the actual tool functionality here
+                // For demonstration, we'll just show a notification
+                showNotification('Tool Selected', `Technical analysis tool: ${toolName}`, 'info');
+            }
+
+            function recognizePatterns(data) {
+                // In a real app, you would implement actual pattern recognition here
+                // For demonstration, we'll use mock patterns
+                const mockPatterns = [
+                    { name: 'Head and Shoulders', confidence: 'high', description: 'A bearish reversal pattern that forms a triangle with a peak in the middle.' },
+                    { name: 'Double Top', confidence: 'medium', description: 'A bearish reversal pattern that forms two peaks at approximately the same price level.' },
+                    { name: 'Double Bottom', confidence: 'medium', description: 'A bullish reversal pattern that forms two troughs at approximately the same price level.' },
+                    { name: 'Triple Top', confidence: 'low', description: 'A bearish reversal pattern that forms three peaks at approximately the same price level.' },
+                    { name: 'Triple Bottom', confidence: 'low', description: 'A bullish reversal pattern that forms three troughs at approximately the same price level.' }
+                ];
+
+                // Randomly select some patterns to display
+                const selectedPatterns = [];
+                const numPatterns = Math.floor(Math.random() * 3) + 1; // 1-3 patterns
+
+                for (let i = 0; i < numPatterns; i++) {
+                    const randomIndex = Math.floor(Math.random() * mockPatterns.length);
+                    selectedPatterns.push(mockPatterns[randomIndex]);
+                }
+
+                // Update the pattern recognition section
+                updatePatternRecognition(selectedPatterns);
+            }
+
+            function updatePatternRecognition(patterns) {
+                patternRecognition.innerHTML = '';
+
+                if (patterns.length === 0) {
+                    patternRecognition.innerHTML = '<p>No patterns recognized</p>';
+                    return;
+                }
+
+                patterns.forEach(pattern => {
+                    const patternItem = document.createElement('div');
+                    patternItem.className = 'pattern-item';
+
+                    let confidenceClass = '';
+                    switch (pattern.confidence) {
+                        case 'high':
+                            confidenceClass = 'high';
+                            break;
+                        case 'medium':
+                            confidenceClass = 'medium';
+                            break;
+                        case 'low':
+                            confidenceClass = 'low';
+                            break;
+                    }
+
+                    patternItem.innerHTML = `
+                        <div class="pattern-info">
+                            <div class="pattern-name">${pattern.name}</div>
+                            <div class="pattern-confidence ${confidenceClass}">Confidence: ${pattern.confidence}</div>
+                        </div>
+                        <div class="pattern-description">${pattern.description}</div>
+                    `;
+
+                    patternRecognition.appendChild(patternItem);
+                });
+            }
+
+            function getFundamentals(symbol) {
+                showLoading();
+
+                // Simulate API call
+                setTimeout(() => {
+                    // In a real app, you would make an actual API call here
+                    // For demonstration, we'll use mock data
+                    const mockFundamentals = generateMockFundamentals(symbol);
+
+                    // Update the fundamentals sections
+                    updateKeyMetrics(mockFundamentals.keyMetrics);
+                    updateFinancialRatios(mockFundamentals.financialRatios);
+                    updateGrowthMetrics(mockFundamentals.growthMetrics);
+                    updateSectorComparison(mockFundamentals.sectorComparison);
+
+                    hideLoading();
+                }, 1500);
+            }
+
+            function generateMockFundamentals(symbol) {
+                const marketCap = Math.floor(Math.random() * 1000000000000);
+                const enterpriseValue = marketCap + (Math.random() * 0.5 * marketCap) - (0.25 * marketCap);
+                const peRatio = (Math.random() * 30 + 5).toFixed(2);
+                const pegRatio = (Math.random() * 2 + 0.5).toFixed(2);
+                const psRatio = (Math.random() * 10 + 2).toFixed(2);
+                const pbRatio = (Math.random() * 5 + 1).toFixed(2);
+                const priceToSales = (Math.random() * 5 + 1).toFixed(2);
+                const priceToBook = (Math.random() * 3 + 1).toFixed(2);
+                const priceToCashFlow = (Math.random() * 20 + 5).toFixed(2);
+                const priceToFreeCashFlow = (Math.random() * 30 + 10).toFixed(2);
+                const dividendYield = (Math.random() * 5).toFixed(2);
+                const payoutRatio = (Math.random() * 0.8).toFixed(2);
+                const eps = (Math.random() * 10 + 1).toFixed(2);
+                const epsGrowthThisYear = (Math.random() * 0.5).toFixed(2);
+                const epsGrowthNextYear = (Math.random() * 0.5).toFixed(2);
+                const epsGrowthNext5Years = (Math.random() * 0.2).toFixed(2);
+                const epsGrowthNext10Years = (Math.random() * 0.1).toFixed(2);
+                const salesGrowthThisYear = (Math.random() * 0.5).toFixed(2);
+                const salesGrowthNextYear = (Math.random() * 0.5).toFixed(2);
+                const salesGrowthNext5Years = (Math.random() * 0.2).toFixed(2);
+                const salesGrowthNext10Years = (Math.random() * 0.1).toFixed(2);
+                const roe = (Math.random() * 0.3 + 0.1).toFixed(2);
+                const roa = (Math.random() * 0.1 + 0.05).toFixed(2);
+                const roi = (Math.random() * 0.2 + 0.1).toFixed(2);
+                const currentRatio = (Math.random() * 3 + 1).toFixed(2);
+                const quickRatio = (Math.random() * 2 + 1).toFixed(2);
+                const debtToEquity = (Math.random() * 1 + 0.5).toFixed(2);
+                const longTermDebtToEquity = (Math.random() * 2 + 1).toFixed(2);
+                const totalDebtToEquity = (Math.random() * 1.5 + 0.5).toFixed(2);
+                const financialLeverage = (Math.random() * 0.5 + 0.1).toFixed(2);
+                const operatingCashFlowPerShare = (Math.random() * 5 + 1).toFixed(2);
+                const freeCashFlowPerShare = (Math.random() * 3 + 1).toFixed(2);
+                const cashPerShare = (Math.random() * 10 + 1).toFixed(2);
+                const bookValuePerShare = (Math.random() * 20 + 5).toFixed(2);
+                const tangibleBookValuePerShare = (Math.random() * 15 + 5).toFixed(2);
+                const shareholdersEquityPerShare = (Math.random() * 25 + 5).toFixed(2);
+                const interestDebtPerShare = (Math.random() * 0.5).toFixed(2);
+                const revenue = Math.floor(Math.random() * 100000000000);
+                const revenuePerShare = (Math.random() * 10 + 1).toFixed(2);
+                const netIncome = Math.floor(Math.random() * 50000000000);
+                const netIncomePerShare = (Math.random() * 5 + 1).toFixed(2);
+                const operatingCashFlow = Math.floor(Math.random() * 30000000000);
+                const freeCashFlow = Math.floor(Math.random() * 20000000000);
+                const ebitda = Math.floor(Math.random() * 40000000000);
+                const netDebt = Math.floor(Math.random() * 100000000000);
+                const totalCash = Math.floor(Math.random() * 50000000000);
+                const totalCashPerShare = (Math.random() * 10 + 1).toFixed(2);
+                const totalRevenue = Math.floor(Math.random() * 100000000000);
+                const costOfRevenue = Math.floor(Math.random() * 50000000000);
+                const grossProfit = totalRevenue - costOfRevenue;
+                const researchAndDevelopment = Math.floor(Math.random() * 10000000000);
+                const operatingIncome = Math.floor(Math.random() * 40000000000);
+                const operatingExpense = totalRevenue - operatingIncome;
+                const netResearchAndDevelopment = Math.floor(Math.random() * 5000000000);
+                const effectOfAccountingCharges = Math.floor(Math.random() * 2000000000);
+                const incomeBeforeTax = netIncome + Math.floor(Math.random() * 10000000000);
+                const incomeTaxExpense = incomeBeforeTax - netIncome;
+                const minorityInterest = Math.floor(Math.random() * 1000000000);
+                const netIncomeFromContinuingOperations = netIncome - minorityInterest;
+                const dilutedEps = (Math.random() * 10 + 1).toFixed(2);
+                const basicEps = (Math.random() * 10 + 1).toFixed(2);
+
+                return {
+                    keyMetrics: {
+                        marketCap,
+                        enterpriseValue,
+                        peRatio,
+                        pegRatio,
+                        psRatio,
+                        pbRatio,
+                        priceToSales,
+                        priceToBook,
+                        priceToCashFlow,
+                        priceToFreeCashFlow,
+                        dividendYield,
+                        payoutRatio,
+                        eps,
+                        epsGrowthThisYear,
+                        epsGrowthNextYear,
+                        epsGrowthNext5Years,
+                        epsGrowthNext10Years,
+                        salesGrowthThisYear,
+                        salesGrowthNextYear,
+                        salesGrowthNext5Years,
+                        salesGrowthNext10Years,
+                        roe,
+                        roa,
+                        roi,
+                        currentRatio,
+                        quickRatio,
+                        debtToEquity,
+                        longTermDebtToEquity,
+                        totalDebtToEquity,
+                        financialLeverage,
+                        operatingCashFlowPerShare,
+                        freeCashFlowPerShare,
+                        cashPerShare,
+                        bookValuePerShare,
+                        tangibleBookValuePerShare,
+                        shareholdersEquityPerShare,
+                        interestDebtPerShare,
+                        revenue,
+                        revenuePerShare,
+                        netIncome,
+                        netIncomePerShare,
+                        operatingCashFlow,
+                        freeCashFlow,
+                        ebitda,
+                        netDebt,
+                        totalCash,
+                        totalCashPerShare,
+                        totalRevenue,
+                        costOfRevenue,
+                        grossProfit,
+                        researchAndDevelopment,
+                        operatingIncome,
+                        operatingExpense,
+                        netResearchAndDevelopment,
+                        effectOfAccountingCharges,
+                        incomeBeforeTax,
+                        incomeTaxExpense,
+                        minorityInterest,
+                        netIncomeFromContinuingOperations,
+                        dilutedEps,
+                        basicEps
+                    },
+                    financialRatios: {
+                        currentRatio,
+                        quickRatio,
+                        cashRatio: (Math.random() * 0.5 + 0.1).toFixed(2),
+                        daysOfSalesOutstanding: Math.floor(Math.random() * 30 + 10),
+                        daysOfInventoryOutstanding: Math.floor(Math.random() * 60 + 20),
+                        operatingCycle: Math.floor(Math.random() * 90 + 30),
+                        daysOfPayablesOutstanding: Math.floor(Math.random() * 60 + 20),
+                        cashConversionCycle: Math.floor(Math.random() * 120 + 40),
+                        grossMargin: (Math.random() * 0.5 + 0.2).toFixed(2),
+                        operatingMargin: (Math.random() * 0.3 + 0.1).toFixed(2),
+                        pretaxMargin: (Math.random() * 0.4 + 0.1).toFixed(2),
+                        netProfitMargin: (Math.random() * 0.2 + 0.05).toFixed(2),
+                        effectiveTaxRate: (Math.random() * 0.3 + 0.1).toFixed(2),
+                        returnOnAssets: roa,
+                        returnOnEquity: roe,
+                        returnOnCapitalEmployed: roi,
+                        netIncomePerEBT: (Math.random() * 0.9 + 0.1).toFixed(2),
+                        ebtPerEbit: (Math.random() * 0.9 + 0.1).toFixed(2),
+                        ebitPerRevenue: (Math.random() * 0.1 + 0.05).toFixed(2),
+                        debtRatio: (Math.random() * 0.5 + 0.1).toFixed(2),
+                        debtEquityRatio: debtToEquity,
+                        longTermDebtToCapitalization: longTermDebtToEquity,
+                        totalDebtToCapitalization: totalDebtToEquity,
+                        interestCoverage: (Math.random() * 5 + 1).toFixed(2),
+                        cashFlowToDebtRatio: (Math.random() * 0.5 + 0.1).toFixed(2),
+                        companyEquityMultiplier: (Math.random() * 2 + 1).toFixed(2),
+                        receivablesTurnover: (Math.random() * 5 + 1).toFixed(2),
+                        payablesTurnover: (Math.random() * 3 + 1).toFixed(2),
+                        inventoryTurnover: (Math.random() * 10 + 2).toFixed(2),
+                        fixedAssetTurnover: (Math.random() * 2 + 0.5).toFixed(2),
+                        assetTurnover: (Math.random() * 0.5 + 0.1).toFixed(2),
+                        operatingCashFlowPerShare,
+                        freeCashFlowPerShare,
+                        cashPerShare,
+                        payoutRatio,
+                        operatingCashFlowSalesRatio: (Math.random() * 0.2 + 0.1).toFixed(2),
+                        freeCashFlowOperatingCashFlowRatio: (Math.random() * 0.8 + 0.2).toFixed(2),
+                        cashFlowCoverageRatios: (Math.random() * 0.5 + 0.1).toFixed(2),
+                        shortTermCoverageRatios: (Math.random() * 2 + 1).toFixed(2),
+                        capitalExpenditureCoverageRatio: (Math.random() * 0.3 + 0.1).toFixed(2),
+                        dividendPaidAndCapexCoverageRatio: (Math.random() * 0.5 + 0.1).toFixed(2),
+                        dividendPayoutRatio: payoutRatio,
+                        priceBookValueRatio: pbRatio,
+                        priceToBookRatio: priceToBook,
+                        priceToSalesRatio: priceToSales,
+                        priceEarningsRatio: peRatio,
+                        priceToFreeCashFlowsRatio: priceToFreeCashFlow,
+                        priceToOperatingCashFlowsRatio: (Math.random() * 10 + 2).toFixed(2),
+                        priceCashFlowRatio: priceToCashFlow,
+                        priceEarningsToGrowthRatio: pegRatio,
+                        priceSalesRatio: psRatio,
+                        dividendYield,
+                        enterpriseValueMultiple: (Math.random() * 10 + 2).toFixed(2),
+                        priceFairValue: (Math.random() * 200 + 50).toFixed(2)
+                    },
+                    growthMetrics: {
+                        revenueGrowth: (Math.random() * 0.2 + 0.05).toFixed(2),
+                        earningsGrowth: (Math.random() * 0.1 + 0.05).toFixed(2),
+                        earningsPerShareGrowth: (Math.random() * 0.1 + 0.05).toFixed(2),
+                        netIncomeGrowth: (Math.random() * 0.1 + 0.05).toFixed(2)
+                    },
+                    sectorComparison: {
+                        sector: 'Technology',
+                        sectorAveragePE: (Math.random() * 20 + 10).toFixed(2),
+                        sectorAveragePS: (Math.random() * 5 + 2).toFixed(2),
+                        sectorAveragePB: (Math.random() * 3 + 1).toFixed(2),
+                        sectorAverageDividendYield: (Math.random() * 3).toFixed(2),
+                        sectorAverageROE: (Math.random() * 0.2 + 0.1).toFixed(2),
+                        sectorAverageROA: (Math.random() * 0.05 + 0.02).toFixed(2),
+                        sectorAverageGrossMargin: (Math.random() * 0.3 + 0.1).toFixed(2),
+                        sectorAverageOperatingMargin: (Math.random() * 0.2 + 0.05).toFixed(2),
+                        sectorAverageNetProfitMargin: (Math.random() * 0.1 + 0.02).toFixed(2),
+                        sectorAverageCurrentRatio: (Math.random() * 2 + 1).toFixed(2),
+                        sectorAverageQuickRatio: (Math.random() * 1 + 0.5).toFixed(2),
+                        sectorAverageDebtToEquity: (Math.random() * 0.8 + 0.2).toFixed(2),
+                        sectorAverageRevenueGrowth: (Math.random() * 0.1 + 0.05).toFixed(2),
+                        sectorAverageEarningsGrowth: (Math.random() * 0.05 + 0.02).toFixed(2)
+                    }
+                };
+            }
+
+            function updateKeyMetrics(metrics) {
+                keyMetrics.innerHTML = `
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-label">Market Cap</div>
+                            <div class="metric-value">${formatMarketCap(metrics.marketCap)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Enterprise Value</div>
+                            <div class="metric-value">${formatMarketCap(metrics.enterpriseValue)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">P/E Ratio</div>
+                            <div class="metric-value">${metrics.peRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">PEG Ratio</div>
+                            <div class="metric-value">${metrics.pegRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">P/S Ratio</div>
+                            <div class="metric-value">${metrics.psRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">P/B Ratio</div>
+                            <div class="metric-value">${metrics.pbRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price to Sales</div>
+                            <div class="metric-value">${metrics.priceToSales}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price to Book</div>
+                            <div class="metric-value">${metrics.priceToBook}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price to Cash Flow</div>
+                            <div class="metric-value">${metrics.priceToCashFlow}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price to Free Cash Flow</div>
+                            <div class="metric-value">${metrics.priceToFreeCashFlow}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Dividend Yield</div>
+                            <div class="metric-value">${metrics.dividendYield}%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Payout Ratio</div>
+                            <div class="metric-value">${metrics.payoutRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">EPS</div>
+                            <div class="metric-value">${metrics.eps}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">EPS Growth (This Year)</div>
+                            <div class="metric-value">${metrics.epsGrowthThisYear}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">EPS Growth (Next Year)</div>
+                            <div class="metric-value">${metrics.epsGrowthNextYear}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">EPS Growth (Next 5 Years)</div>
+                            <div class="metric-value">${metrics.epsGrowthNext5Years}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">EPS Growth (Next 10 Years)</div>
+                            <div class="metric-value">${metrics.epsGrowthNext10Years}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sales Growth (This Year)</div>
+                            <div class="metric-value">${metrics.salesGrowthThisYear}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sales Growth (Next Year)</div>
+                            <div class="metric-value">${metrics.salesGrowthNextYear}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sales Growth (Next 5 Years)</div>
+                            <div class="metric-value">${metrics.salesGrowthNext5Years}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sales Growth (Next 10 Years)</div>
+                            <div class="metric-value">${metrics.salesGrowthNext10Years}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">ROE</div>
+                            <div class="metric-value">${metrics.roe}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">ROA</div>
+                            <div class="metric-value">${metrics.roa}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">ROI</div>
+                            <div class="metric-value">${metrics.roi}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Current Ratio</div>
+                            <div class="metric-value">${metrics.currentRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Quick Ratio</div>
+                            <div class="metric-value">${metrics.quickRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Debt to Equity</div>
+                            <div class="metric-value">${metrics.debtToEquity}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Long Term Debt to Equity</div>
+                            <div class="metric-value">${metrics.longTermDebtToEquity}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Total Debt to Equity</div>
+                            <div class="metric-value">${metrics.totalDebtToEquity}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Financial Leverage</div>
+                            <div class="metric-value">${metrics.financialLeverage}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Operating Cash Flow per Share</div>
+                            <div class="metric-value">${metrics.operatingCashFlowPerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Free Cash Flow per Share</div>
+                            <div class="metric-value">${metrics.freeCashFlowPerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Cash per Share</div>
+                            <div class="metric-value">${metrics.cashPerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Book Value per Share</div>
+                            <div class="metric-value">${metrics.bookValuePerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Tangible Book Value per Share</div>
+                            <div class="metric-value">${metrics.tangibleBookValuePerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Shareholders Equity per Share</div>
+                            <div class="metric-value">${metrics.shareholdersEquityPerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Interest Debt per Share</div>
+                            <div class="metric-value">${metrics.interestDebtPerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Revenue</div>
+                            <div class="metric-value">${formatMarketCap(metrics.revenue)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Revenue per Share</div>
+                            <div class="metric-value">${metrics.revenuePerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Net Income</div>
+                            <div class="metric-value">${formatMarketCap(metrics.netIncome)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Net Income per Share</div>
+                            <div class="metric-value">${metrics.netIncomePerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Operating Cash Flow</div>
+                            <div class="metric-value">${formatMarketCap(metrics.operatingCashFlow)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Free Cash Flow</div>
+                            <div class="metric-value">${formatMarketCap(metrics.freeCashFlow)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">EBITDA</div>
+                            <div class="metric-value">${formatMarketCap(metrics.ebitda)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Net Debt</div>
+                            <div class="metric-value">${formatMarketCap(metrics.netDebt)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Total Cash</div>
+                            <div class="metric-value">${formatMarketCap(metrics.totalCash)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Total Cash per Share</div>
+                            <div class="metric-value">${metrics.totalCashPerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Total Revenue</div>
+                            <div class="metric-value">${formatMarketCap(metrics.totalRevenue)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Cost of Revenue</div>
+                            <div class="metric-value">${formatMarketCap(metrics.costOfRevenue)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Gross Profit</div>
+                            <div class="metric-value">${formatMarketCap(metrics.grossProfit)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Research and Development</div>
+                            <div class="metric-value">${formatMarketCap(metrics.researchAndDevelopment)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Operating Income</div>
+                            <div class="metric-value">${formatMarketCap(metrics.operatingIncome)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Operating Expense</div>
+                            <div class="metric-value">${formatMarketCap(metrics.operatingExpense)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Net Research and Development</div>
+                            <div class="metric-value">${formatMarketCap(metrics.netResearchAndDevelopment)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Effect of Accounting Charges</div>
+                            <div class="metric-value">${formatMarketCap(metrics.effectOfAccountingCharges)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Income Before Tax</div>
+                            <div class="metric-value">${formatMarketCap(metrics.incomeBeforeTax)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Income Tax Expense</div>
+                            <div class="metric-value">${formatMarketCap(metrics.incomeTaxExpense)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Minority Interest</div>
+                            <div class="metric-value">${formatMarketCap(metrics.minorityInterest)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Net Income from Continuing Operations</div>
+                            <div class="metric-value">${formatMarketCap(metrics.netIncomeFromContinuingOperations)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Diluted EPS</div>
+                            <div class="metric-value">${metrics.dilutedEps}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Basic EPS</div>
+                            <div class="metric-value">${metrics.basicEps}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function updateFinancialRatios(ratios) {
+                financialRatios.innerHTML = `
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-label">Current Ratio</div>
+                            <div class="metric-value">${ratios.currentRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Quick Ratio</div>
+                            <div class="metric-value">${ratios.quickRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Cash Ratio</div>
+                            <div class="metric-value">${ratios.cashRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Days of Sales Outstanding</div>
+                            <div class="metric-value">${ratios.daysOfSalesOutstanding}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Days of Inventory Outstanding</div>
+                            <div class="metric-value">${ratios.daysOfInventoryOutstanding}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Operating Cycle</div>
+                            <div class="metric-value">${ratios.operatingCycle}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Days of Payables Outstanding</div>
+                            <div class="metric-value">${ratios.daysOfPayablesOutstanding}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Cash Conversion Cycle</div>
+                            <div class="metric-value">${ratios.cashConversionCycle}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Gross Margin</div>
+                            <div class="metric-value">${ratios.grossMargin}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Operating Margin</div>
+                            <div class="metric-value">${ratios.operatingMargin}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Pretax Margin</div>
+                            <div class="metric-value">${ratios.pretaxMargin}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Net Profit Margin</div>
+                            <div class="metric-value">${ratios.netProfitMargin}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Effective Tax Rate</div>
+                            <div class="metric-value">${ratios.effectiveTaxRate}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Return on Assets</div>
+                            <div class="metric-value">${ratios.returnOnAssets}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Return on Equity</div>
+                            <div class="metric-value">${ratios.returnOnEquity}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Return on Capital Employed</div>
+                            <div class="metric-value">${ratios.returnOnCapitalEmployed}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Net Income per EBT</div>
+                            <div class="metric-value">${ratios.netIncomePerEBT}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">EBT per EBIT</div>
+                            <div class="metric-value">${ratios.ebtPerEbit}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">EBIT per Revenue</div>
+                            <div class="metric-value">${ratios.ebitPerRevenue}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Debt Ratio</div>
+                            <div class="metric-value">${ratios.debtRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Debt Equity Ratio</div>
+                            <div class="metric-value">${ratios.debtEquityRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Long Term Debt to Capitalization</div>
+                            <div class="metric-value">${ratios.longTermDebtToCapitalization}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Total Debt to Capitalization</div>
+                            <div class="metric-value">${ratios.totalDebtToCapitalization}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Interest Coverage</div>
+                            <div class="metric-value">${ratios.interestCoverage}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Cash Flow to Debt Ratio</div>
+                            <div class="metric-value">${ratios.cashFlowToDebtRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Company Equity Multiplier</div>
+                            <div class="metric-value">${ratios.companyEquityMultiplier}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Receivables Turnover</div>
+                            <div class="metric-value">${ratios.receivablesTurnover}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Payables Turnover</div>
+                            <div class="metric-value">${ratios.payablesTurnover}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Inventory Turnover</div>
+                            <div class="metric-value">${ratios.inventoryTurnover}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Fixed Asset Turnover</div>
+                            <div class="metric-value">${ratios.fixedAssetTurnover}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Asset Turnover</div>
+                            <div class="metric-value">${ratios.assetTurnover}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Operating Cash Flow per Share</div>
+                            <div class="metric-value">${ratios.operatingCashFlowPerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Free Cash Flow per Share</div>
+                            <div class="metric-value">${ratios.freeCashFlowPerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Cash per Share</div>
+                            <div class="metric-value">${ratios.cashPerShare}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Payout Ratio</div>
+                            <div class="metric-value">${ratios.payoutRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Operating Cash Flow Sales Ratio</div>
+                            <div class="metric-value">${ratios.operatingCashFlowSalesRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Free Cash Flow Operating Cash Flow Ratio</div>
+                            <div class="metric-value">${ratios.freeCashFlowOperatingCashFlowRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Cash Flow Coverage Ratios</div>
+                            <div class="metric-value">${ratios.cashFlowCoverageRatios}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Short Term Coverage Ratios</div>
+                            <div class="metric-value">${ratios.shortTermCoverageRatios}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Capital Expenditure Coverage Ratio</div>
+                            <div class="metric-value">${ratios.capitalExpenditureCoverageRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Dividend Paid and Capex Coverage Ratio</div>
+                            <div class="metric-value">${ratios.dividendPaidAndCapexCoverageRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Dividend Payout Ratio</div>
+                            <div class="metric-value">${ratios.dividendPayoutRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price Book Value Ratio</div>
+                            <div class="metric-value">${ratios.priceBookValueRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price to Book Ratio</div>
+                            <div class="metric-value">${ratios.priceToBookRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price to Sales Ratio</div>
+                            <div class="metric-value">${ratios.priceToSalesRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price Earnings Ratio</div>
+                            <div class="metric-value">${ratios.priceEarningsRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price to Free Cash Flows Ratio</div>
+                            <div class="metric-value">${ratios.priceToFreeCashFlowsRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price to Operating Cash Flows Ratio</div>
+                            <div class="metric-value">${ratios.priceToOperatingCashFlowsRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price Cash Flow Ratio</div>
+                            <div class="metric-value">${ratios.priceCashFlowRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price Earnings to Growth Ratio</div>
+                            <div class="metric-value">${ratios.priceEarningsToGrowthRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price Sales Ratio</div>
+                            <div class="metric-value">${ratios.priceSalesRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Dividend Yield</div>
+                            <div class="metric-value">${ratios.dividendYield}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Enterprise Value Multiple</div>
+                            <div class="metric-value">${ratios.enterpriseValueMultiple}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price Fair Value</div>
+                            <div class="metric-value">${ratios.priceFairValue}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function updateGrowthMetrics(metrics) {
+                growthMetrics.innerHTML = `
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-label">Revenue Growth</div>
+                            <div class="metric-value">${metrics.revenueGrowth}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Earnings Growth</div>
+                            <div class="metric-value">${metrics.earningsGrowth}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Earnings per Share Growth</div>
+                            <div class="metric-value">${metrics.earningsPerShareGrowth}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Net Income Growth</div>
+                            <div class="metric-value">${metrics.netIncomeGrowth}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function updateSectorComparison(metrics) {
+                sectorComparison.innerHTML = `
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-label">Sector</div>
+                            <div class="metric-value">${metrics.sector}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average P/E</div>
+                            <div class="metric-value">${metrics.sectorAveragePE}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average P/S</div>
+                            <div class="metric-value">${metrics.sectorAveragePS}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average P/B</div>
+                            <div class="metric-value">${metrics.sectorAveragePB}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average Dividend Yield</div>
+                            <div class="metric-value">${metrics.sectorAverageDividendYield}%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average ROE</div>
+                            <div class="metric-value">${metrics.sectorAverageROE}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average ROA</div>
+                            <div class="metric-value">${metrics.sectorAverageROA}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average Gross Margin</div>
+                            <div class="metric-value">${metrics.sectorAverageGrossMargin}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average Operating Margin</div>
+                            <div class="metric-value">${metrics.sectorAverageOperatingMargin}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average Net Profit Margin</div>
+                            <div class="metric-value">${metrics.sectorAverageNetProfitMargin}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average Current Ratio</div>
+                            <div class="metric-value">${metrics.sectorAverageCurrentRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average Quick Ratio</div>
+                            <div class="metric-value">${metrics.sectorAverageQuickRatio}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average Debt to Equity</div>
+                            <div class="metric-value">${metrics.sectorAverageDebtToEquity}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average Revenue Growth</div>
+                            <div class="metric-value">${metrics.sectorAverageRevenueGrowth}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Sector Average Earnings Growth</div>
+                            <div class="metric-value">${metrics.sectorAverageEarningsGrowth}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function getNews(date, keyword) {
+                showLoading();
+
+                // Simulate API call
+                setTimeout(() => {
+                    // In a real app, you would make an actual API call here
+                    // For demonstration, we'll use mock data
+                    const mockNews = generateMockNews(date, keyword);
+
+                    // Update the news feed
+                    updateNewsFeed(mockNews);
+
+                    hideLoading();
+                }, 1500);
+            }
+
+            function generateMockNews(date, keyword) {
+                const newsItems = [];
+                const numItems = Math.floor(Math.random() * 5) + 1; // 1-5 news items
+
+                for (let i = 0; i < numItems; i++) {
+                    const sentiment = Math.random() > 0.5 ? 'positive' : 'negative';
+                    const relatedSymbols = [];
+
+                    // Randomly add some related symbols
+                    if (Math.random() > 0.5) {
+                        relatedSymbols.push('AAPL');
+                    }
+                    if (Math.random() > 0.5)

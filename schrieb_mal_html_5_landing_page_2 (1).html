@@ -1,0 +1,917 @@
+```html
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Moderne Lösung für Ihre digitalen Anforderungen. Leistungsstark, benutzerfreundlich und innovativ.">
+    <title>InnovateX | Digitale Lösungen der nächsten Generation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" type="image/svg+xml">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #121212;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            margin-left: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition);
+        }
+
+        header.scrolled {
+            padding: 0.5rem 0;
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+       amburger {
+            display: none;
+            cursor: pointer;
+        }
+
+        .hero {
+            padding: 8rem 0 4rem;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(72, 149, 239, 0.1) 100%);
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .hero-text h1 span {
+            color: var(--primary);
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-text {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .features {
+            padding: 5rem 0;
+            background-color: var(--light);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .section-header p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 3rem;
+            height: 3rem;
+            background-color: rgba(67, 97, 238, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+        }
+
+        .cta {
+            padding: 5rem 0;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 1rem;
+            margin: 3rem 0;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .cta p {
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        .btn-light {
+            background-color: white;
+            color: var(--primary);
+        }
+
+        .btn-light:hover {
+            background-color: #f8f9fa;
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .testimonials {
+            padding: 5rem 0;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: '"';
+            font-size: 4rem;
+            color: rgba(67, 97, 238, 0.1);
+            position: absolute;
+            top: -1rem;
+            left: 1rem;
+            font-family: 'Georgia', serif;
+        }
+
+        .testimonial-text {
+            margin-bottom: 1.5rem;
+            font-style: italic;
+            line-height: 1.7;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .author-info h4 {
+            font-weight: 600;
+        }
+
+        .author-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .pricing {
+            padding: 5rem 0;
+            background-color: var(--light);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .pricing-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .pricing-card.featured {
+            border: 2px solid var(--primary);
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pricing-icon {
+            width: 4rem;
+            height: 4rem;
+            background-color: rgba(67, 97, 238, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-card .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-card .period {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 3rem;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-section ul li a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #adb5bd;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: white;
+                padding: 1rem 0;
+                box-shadow: var(--shadow);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                padding: 0.75rem 2rem;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .stats {
+                justify-content: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">InnovateX</a>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#features">Funktionen</a></li>
+                    <li><a href="#pricing">Preise</a></li>
+                    <li><a href="#testimonials">Referenzen</a></li>
+                    <li><a href="#contact">Kontakt</a></li>
+                </ul>
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Transformieren Sie Ihr <span>Business</span> mit innovativen Lösungen</h1>
+                    <p>Entdecken Sie die nächste Generation digitaler Tools, die Ihr Unternehmen effizienter, produktiver und zukunftssicher machen.</p>
+                    <div class="hero-buttons">
+                        <a href="#contact" class="btn">Jetzt starten</a>
+                        <a href="#features" class="btn btn-secondary">Mehr erfahren</a>
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-number">10k+</div>
+                            <div class="stat-text">Zufriedene Kunden</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">250%</div>
+                            <div class="stat-text">Produktivitätssteigerung</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-text">Support verfügbar</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Digitale Business Lösung" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Leistungsstarke Funktionen</h2>
+                <p>Alles was Sie brauchen, um Ihr Business auf das nächste Level zu bringen - an einem Ort.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Blitzschnelle Performance</h3>
+                    <p>Optimiert für maximale Geschwindigkeit und Effizienz, damit Sie keine Zeit verlieren.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Enterprise-Sicherheit</h3>
+                    <p>Militärgrade Verschlüsselung und mehrstufige Authentifizierung für Ihre Daten.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Echtzeit-Analysen</h3>
+                    <p>Detaillierte Einblicke und Berichte in Echtzeit für datengetriebene Entscheidungen.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>KI-Integration</h3>
+                    <p>Intelligente Automatisierung und maschinelles Lernen für smartere Arbeitsabläufe.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Globale Skalierbarkeit</h3>
+                    <p>Wächst mit Ihrem Unternehmen - von lokalups bis zu globalen Konzernen.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Nahtlose Integration</h3>
+                    <p>Einfache Anbindung an Ihre bestehenden Systeme und Tools ohne Unterbrechungen.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h2>Bere den nächsten Schritt?</h2>
+            <p>Entdecken Sie, wie unsere Lösungen Ihr Business transformieren können. Starten Sie noch heute mit einer kostenlosen Beratung.</p>
+            <a href="#contact" class="btn btn-light">Kostenlose Beratung buchen</a>
+        </div>
+    </section>
+
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2>Was unsere Kunden sagen</h2>
+                <p>Erfahren Sie, wie wir Unternehmen dabei helfen, ihre Ziele zu erreichen.</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        <p>Seit wir auf InnovateX umgestiegen sind, haben wir unsere Produktivität um 200% gesteigert. Die Integration war nahtlos und das Team unglaublich unterstützend.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Sarah Müller" class="author-avatar" loading="lazy">
+                        <div class="author-info">
+                            <h4>Sarah Müller</h4>
+                            <p>CEO, TechSolutions GmbH</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        <p>Die KI-gestützten Analysen haben uns geholfen, neue Marktchancen zu identifizieren, die wir vorher übersehen hatten. Ein absoluter Game-Changer!</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Markus Bauer" class="author-avatar" loading="lazy">
+                        <div class="author-info">
+                            <h4>Markus Bauer</h4>
+                            <p>Marketing Director, GlobalCorp</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        <p>Als Startup war Skalierbarkeit unser größtes Anliegen. Mit InnovateX konnten wir von 10 auf 500 Nutzer wachsen, ohne jemals an Performance zu verlieren.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Lisa Wagner" class="author-avatar" loading="lazy">
+                        <div class="author-info">
+                            <h4>Lisa Wagner</h4>
+                            <p>Gründerin, StartUpX</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2>Transparente Preise</h2>
+                <p>Wählen Sie den Plan, der am besten zu Ihrem Unternehmen passt. Keine versteckten Kosten.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-icon">🚀</div>
+                    <h3>Starter</h3>
+                    <p>Perfekt für kleine Teams und Startups</p>
+                    <div class="price">€29<span class="period">/Monat</span></div>
+                    <ul class="pricing-features">
+                        <li>Bis zu 10 Nutzer</li>
+                        <li>Grundlegende Analysen</li>
+                        <li>E-Mail Support</li>
+                        <li>5GB Speicher</li>
+                        <li>Grundlegende Integrationen</li>
+                    </ul>
+                    <a href="#contact" class="btn">Jetzt buchen</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="featured-badge">Empfohlen</div>
+                    <div class="pricing-icon">💼</div>
+                    <h3>Professional</h3>
+                    <p>Ideal für wachsende Unternehmen</p>
+                    <div class="price">€99<span class="period">/Monat</span></div>
+                    <ul class="pricing-features">
+                        <li>Bis zu 50 Nutzer</li>
+                        <li>Erweiterte Analysen</li>
+                        <li>Priorisierter Support</li>
+                        <li>50GB Speicher</li>
+                        <li>API-Zugriff</li>
+                        <li>KI-Basisfunktionen</li>
+                    </ul>
+                    <a href="#contact" class="btn">Jetzt buchen</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-icon">🏢</div>
+                    <h3>Enterprise</h3>
+                    <p>Komplettlösung für große Unternehmen</p>
+                    <div class="price">€249<span class="period">/Monat</span></div>
+                    <ul class="pricing-features">
+                        <li>Unbegrenzte Nutzer</li>
+                        <li>Vollständige Analysen</li>
+                        <li>24/7 Premium-Support</li>
+                        <li>Unbegrenzter Speicher</li>
+                        <li>Vollständige API</li>
+                        <li>Alle KI-Funktionen</li>
+                        <li>Dedizierter Account Manager</li>
+                    </ul>
+                    <a href="#contact" class="btn">Jetzt buchen</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Kontaktieren Sie uns</h2>
+                <p>Bereit, Ihr Business zu transformieren? Wir sind hier, um zu helfen.</p>
+            </div>
+            <form class="contact-form">
+                <div class="form-group">
+                    <input type="text" placeholder="Ihr Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="Ihre E-Mail" required>
+                </div>
+                <div class="form-group">
+                    <input type="tel" placeholder="Ihre Telefonnummer">
+                </div>
+                <div class="form-group">
+                    <select required>
+                        <option value="" disabled selected>Interessengebiet</option>
+                        <option value="demo">Produktdemo</option>
+                        <option value="pricing">Preisanfrage</option>
+                        <option value="support">Technischer Support</option>
+                        <option value="other">Anderes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <textarea placeholder="Ihre Nachricht" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn">Nachricht senden</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>InnovateX</h3>
+                    <p>Transformieren Sie Ihr Business mit unseren innovativen digitalen Lösungen. Seit 2015 helfen wir Unternehmen dabei, effizienter und erfolgreicher zu werden.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">📘</a>
+                        <a href="#" aria-label="Twitter">🐦</a>
+                        <a href="#" aria-label="LinkedIn">💼</a>
+                        <a href="#" aria-label="Instagram">📷</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Lösungen</h3>
+                    <ul>
+                        <li><a href="#">KI-Analysen</a></li>
+                        <li><a href="#">Automatisierung</a></li>
+                        <li><a href="#">Cloud-Lösungen</a></li>
+                        <li><a href="#">Sicherheitslösungen</a></li>
+                        <li><a href="#">API-Integration</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Ressourcen</h3>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Fallstudien</a></li>
+                        <li><a href="#">Whitepapers</a></li>
+                        <li><a href="#">Webinare</a></li>
+                        <li><a href="#">Dokumentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Unternehmen</h3>
+                    <ul>
+                        <li><a href="#">Über uns</a></li>
+                        <li><a href="#">Karrieren</a></li>
+                        <li><a href="#">Presse</a></li>
+                        <li><a href="#">Partner</a></li>
+                        <li><a href="#">Kontakt</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 InnovateX Technologies GmbH. Alle Rechte vorbehalten.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.getElementById('header');
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+            const navItems = document.querySelectorAll('.nav-links a');
+
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            hamburger.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768) {
+                        navLinks.classList.remove('active');
+                    }
+
+                    const targetId = this.getAttribute('href');
+                    if (targetId.startsWith('#') && targetId !== '#') {
+                        e.preventDefault();
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+
+            const contactForm = document.querySelector('.contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('Vielen Dank für Ihre Nachricht! Wir werden uns innerhalb von 24 Stunden bei Ihnen melden.');
+                    this.reset();
+                });
+            }
+
+            const pricingCards = document.querySelectorAll('.pricing-card');
+           (card => {
+                card.addEventListener('click', function() {
+                    const btn = this.querySelector('.btn');
+                    if (btn) {
+                        window.location.href = btn.getAttribute('href');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+```

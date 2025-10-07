@@ -1,0 +1,2636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Professional Suite</title>
+    <style>
+        :root {
+            --primary-color: #ff7f50;
+            --secondary-color: #f5deb3;
+            --dark-color: #1a1a1a;
+            --light-color: #f5f5f5;
+            --text-color: #e0e0e0;
+            --accent-color: #ffa500;
+            --error-color: #ff6b6b;
+            --success-color: #51cf66;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        nav a {
+            color: var(--dark-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .active {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        aside {
+            background-color: rgba(26, 26, 26, 0.8);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-title {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-item {
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            background-color: rgba(26, 26, 26, 0.8);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: var(--dark-color);
+            color: var(--text-color);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0c8a8;
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #ff8787;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .system-message {
+            background-color: rgba(255, 127, 80, 0.2);
+            border-left: 3px solid var(--primary-color);
+            align-self: flex-start;
+        }
+
+        .user-message {
+            background-color: rgba(245, 222, 179, 0.2);
+            border-left: 3px solid var(--secondary-color);
+            align-self: flex-end;
+        }
+
+        .assistant-message {
+            background-color: rgba(255, 165, 0, 0.2);
+            border-left: 3px solid var(--accent-color);
+            align-self: flex-start;
+        }
+
+        .message-content {
+            white-space: pre-wrap;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--text-color);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .typing-dot {
+            width: 0.4rem;
+            height: 0.4rem;
+            background-color: var(--text-color);
+            border-radius: 50%;
+            animation: typing 1.5s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-0.3rem);
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .token-counter {
+            background-color: rgba(26, 26, 26, 0.5);
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+
+        .token-display {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .token-bar {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .token-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        .token-info {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 1rem;
+            border-radius: 4px;
+        }
+
+        .annotation-tools {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tool-btn {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+        }
+
+        .json-editor {
+            min-height: 200px;
+            font-family: monospace;
+        }
+
+        .json-error {
+            color: var(--error-color);
+            margin-top: 0.5rem;
+        }
+
+        .batch-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-pending {
+            background-color: rgba(255, 165, 0, 0.2);
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .status-completed {
+            background-color: rgba(81, 207, 102, 0.2);
+            border-left: 3px solid var(--success-color);
+        }
+
+        .status-failed {
+            background-color: rgba(255, 107, 107, 0.2);
+            border-left: 3px solid var(--error-color);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .model-card {
+            background-color: rgba(26, 26, 26, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #444;
+        }
+
+        .model-name {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .model-capabilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .capability {
+            background-color: rgba(255, 127, 80, 0.2);
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .model-description {
+            margin-bottom: 0.5rem;
+        }
+
+        .model-selector {
+            margin-top: 1rem;
+        }
+
+        .pdf-preview {
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pdf-page {
+            border: 1px solid #444;
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+
+        .pdf-text {
+            white-space: pre-wrap;
+        }
+
+        .summary {
+            background-color: rgba(245, 222, 179, 0.2);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+
+        .conversation-history {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .history-item {
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .history-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .active-history {
+            background-color: rgba(255, 127, 80, 0.2);
+        }
+
+        .workflow-step {
+            background-color: rgba(26, 26, 26, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #444;
+        }
+
+        .workflow-title {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .workflow-content {
+            margin-bottom: 1rem;
+        }
+
+        .workflow-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid #444;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            aside {
+                display: none;
+            }
+
+            .mobile-sidebar-toggle {
+                display: block;
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background-color: var(--primary-color);
+                color: var(--dark-color);
+                border: none;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                font-size: 1.5rem;
+                cursor: pointer;
+                z-index: 100;
+            }
+
+            .mobile-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(26, 26, 26, 0.9);
+                z-index: 99;
+                padding: 1rem;
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .mobile-sidebar.active {
+                transform: translateX(0);
+            }
+
+            .close-sidebar {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: none;
+                border: none;
+                color: var(--text-color);
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .api-key-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-valid {
+            background-color: var(--success-color);
+        }
+
+        .status-invalid {
+            background-color: var(--error-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Claude Professional Suite</div>
+        <nav>
+            <a href="#" class="active" data-section="messages">Messages</a>
+            <a href="#" data-section="vision">Vision</a>
+            <a href="#" data-section="token-counter">Token Counter</a>
+            <a href="#" data-section="tool-calling">Tool Calling</a>
+            <a href="#" data-section="batch-processing">Batch Processing</a>
+            <a href="#" data-section="organization">Organization</a>
+            <a href="#" data-section="usage-statistics">Usage Statistics</a>
+            <a href="#" data-section="model-selector">Model Selector</a>
+            <a href="#" data-section="workflows">Workflows</a>
+        </nav>
+    </header>
+
+    <main>
+        <aside>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Conversations</div>
+                <div class="sidebar-content" id="conversation-list">
+                    <!-- Conversation items will be added here -->
+                </div>
+                <button id="new-conversation" class="btn-secondary">New Conversation</button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">API Key</div>
+                <div class="sidebar-content">
+                    <input type="password" id="api-key" placeholder="Enter your API key">
+                    <div class="api-key-status">
+                        <span class="status-indicator" id="api-key-status"></span>
+                        <span id="api-key-message">Not validated</span>
+                    </div>
+                    <button id="validate-api-key" class="btn-secondary">Validate</button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-content">
+            <section id="messages" class="active-section">
+                <h2 class="section-title">Messages</h2>
+                <div class="form-group">
+                    <label for="model-select">Model</label>
+                    <select id="model-select">
+                        <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
+                        <option value="claude-3-opus">Claude 3 Opus</option>
+                        <option value="claude-3-haiku">Claude 3 Haiku</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="system-message">System Message</label>
+                    <textarea id="system-message" placeholder="Enter system message"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="user-message">User Message</label>
+                    <textarea id="user-message" placeholder="Enter user message"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="context-window">Context Window</label>
+                    <input type="range" id="context-window" min="1" max="100" value="20">
+                    <div id="context-value">20 messages</div>
+                </div>
+
+                <div class="form-group">
+                    <button id="send-message">Send Message</button>
+                    <button id="stream-message" class="btn-secondary">Stream Response</button>
+                </div>
+
+                <div class="message-container" id="message-container">
+                    <!-- Messages will be displayed here -->
+                </div>
+
+                <div class="token-counter">
+                    <div class="token-display">
+                        <span>Tokens: <span id="token-count">0</span></span>
+                        <span>Cost: $<span id="cost-estimate">0.00</span></span>
+                    </div>
+                    <div class="token-bar">
+                        <div class="token-fill" id="token-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="token-info">
+                        <span>Input: <span id="input-tokens">0</span></span>
+                        <span>Output: <span id="output-tokens">0</span></span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="vision" class="hidden-section">
+                <h2 class="section-title">Vision Analysis</h2>
+                <div class="form-group">
+                    <label for="image-upload">Upload Image</label>
+                    <input type="file" id="image-upload" accept="image/*">
+                </div>
+
+                <div id="image-preview-container">
+                    <img id="image-preview" class="image-preview" style="display: none;">
+                </div>
+
+                <div class="form-group">
+                    <label for="vision-prompt">Prompt</label>
+                    <textarea id="vision-prompt" placeholder="Enter your vision analysis prompt"></textarea>
+                </div>
+
+                <div class="annotation-tools">
+                    <button class="tool-btn" id="draw-rectangle">Rectangle</button>
+                    <button class="tool-btn" id="draw-circle">Circle</button>
+                    <button class="tool-btn" id="draw-arrow">Arrow</button>
+                    <button class="tool-btn" id="add-text">Text</button>
+                    <button class="tool-btn" id="clear-annotations">Clear</button>
+                </div>
+
+                <div class="form-group">
+                    <button id="analyze-image">Analyze Image</button>
+                </div>
+
+                <div class="message-container" id="vision-message-container">
+                    <!-- Vision analysis results will be displayed here -->
+                </div>
+
+                <div class="form-group">
+                    <button id="extract-text" class="btn-secondary">Extract Text</button>
+                    <button id="analyze-diagram" class="btn-secondary">Analyze Diagram</button>
+                </div>
+            </section>
+
+            <section id="token-counter" class="hidden-section">
+                <h2 class="section-title">Token Counter</h2>
+                <div class="form-group">
+                    <label for="token-text">Text to Analyze</label>
+                    <textarea id="token-text" placeholder="Enter text to count tokens"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <button id="count-tokens">Count Tokens</button>
+                </div>
+
+                <div class="token-counter">
+                    <div class="token-display">
+                        <span>Tokens: <span id="token-counter-count">0</span></span>
+                        <span>Cost: $<span id="token-counter-cost">0.00</span></span>
+                    </div>
+                    <div class="token-bar">
+                        <div class="token-fill" id="token-counter-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="token-info">
+                        <span>Characters: <span id="character-count">0</span></span>
+                        <span>Words: <span id="word-count">0</span></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="budget-allocation">Budget Allocation</label>
+                    <input type="range" id="budget-allocation" min="1" max="100" value="50">
+                    <div id="budget-value">50% of budget</div>
+                </div>
+
+                <div class="form-group">
+                    <button id="optimize-content" class="btn-secondary">Optimize Content</button>
+                </div>
+
+                <div id="optimization-suggestions" class="hidden-section">
+                    <h3>Optimization Suggestions</h3>
+                    <div id="suggestions-content"></div>
+                </div>
+            </section>
+
+            <section id="tool-calling" class="hidden-section">
+                <h2 class="section-title">Tool Calling</h2>
+                <div class="form-group">
+                    <label for="tool-json">Tool JSON</label>
+                    <textarea id="tool-json" class="json-editor" placeholder="Enter tool JSON"></textarea>
+                    <div id="json-error" class="json-error hidden-section"></div>
+                </div>
+
+                <div class="form-group">
+                    <button id="validate-json">Validate JSON</button>
+                    <button id="format-json" class="btn-secondary">Format JSON</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="function-docs">Function Documentation</label>
+                    <textarea id="function-docs" placeholder="Enter function documentation"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <button id="call-tool">Call Tool</button>
+                </div>
+
+                <div class="message-container" id="tool-message-container">
+                    <!-- Tool calling results will be displayed here -->
+                </div>
+
+                <div id="result-visualization" class="hidden-section">
+                    <h3>Result Visualization</h3>
+                    <div id="visualization-content"></div>
+                </div>
+            </section>
+
+            <section id="batch-processing" class="hidden-section">
+                <h2 class="section-title">Batch Processing</h2>
+                <div class="form-group">
+                    <label for="batch-config">Job Configuration</label>
+                    <textarea id="batch-config" class="json-editor" placeholder="Enter batch job configuration"></textarea>
+                    <div id="batch-json-error" class="json-error hidden-section"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="batch-input">Input Data</label>
+                    <input type="file" id="batch-input" accept=".csv,.json">
+                </div>
+
+                <div class="form-group">
+                    <button id="start-batch">Start Batch Processing</button>
+                    <button id="validate-batch" class="btn-secondary">Validate Configuration</button>
+                </div>
+
+                <div id="batch-status-container" class="hidden-section">
+                    <h3>Batch Status</h3>
+                    <div id="batch-status-list">
+                        <!-- Batch status items will be added here -->
+                    </div>
+                </div>
+
+                <div id="batch-results" class="hidden-section">
+                    <h3>Batch Results</h3>
+                    <div id="batch-result-content"></div>
+                    <div class="form-group">
+                        <button id="export-results" class="btn-secondary">Export Results</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="organization" class="hidden-section">
+                <h2 class="section-title">Organization</h2>
+                <div id="organization-info">
+                    <!-- Organization information will be displayed here -->
+                </div>
+
+                <div class="form-group">
+                    <button id="refresh-organization">Refresh Information</button>
+                </div>
+
+                <div id="team-management" class="hidden-section">
+                    <h3>Team Members</h3>
+                    <div id="team-list">
+                        <!-- Team members will be displayed here -->
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="new-member-email" placeholder="Enter email address">
+                        <select id="new-member-role">
+                            <option value="member">Member</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <button id="add-member" class="btn-secondary">Add Member</button>
+                    </div>
+                </div>
+
+                <div id="api-key-management" class="hidden-section">
+                    <h3>API Keys</h3>
+                    <div id="api-key-list">
+                        <!-- API keys will be displayed here -->
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="new-api-key-name" placeholder="Enter key name">
+                        <button id="create-api-key" class="btn-secondary">Create New Key</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="usage-statistics" class="hidden-section">
+                <h2 class="section-title">Usage Statistics</h2>
+                <div class="form-group">
+                    <label for="date-range">Date Range</label>
+                    <input type="date" id="start-date">
+                    <input type="date" id="end-date">
+                </div>
+
+                <div class="form-group">
+                    <button id="fetch-usage">Fetch Usage Data</button>
+                </div>
+
+                <div id="usage-charts" class="hidden-section">
+                    <div class="chart-container">
+                        <canvas id="usage-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="cost-chart"></canvas>
+                    </div>
+                </div>
+
+                <div id="cost-breakdown" class="hidden-section">
+                    <h3>Cost Breakdown</h3>
+                    <div id="cost-breakdown-content"></div>
+                </div>
+
+                <div class="form-group">
+                    <button id="export-report" class="btn-secondary">Export Report</button>
+                </div>
+            </section>
+
+            <section id="model-selector" class="hidden-section">
+                <h2 class="section-title">Model Selector</h2>
+                <div id="model-comparison">
+                    <div class="model-card">
+                        <h3 class="model-name">Claude 3.5 Sonnet</h3>
+                        <div class="model-capabilities">
+                            <div class="capability">Advanced Reasoning</div>
+                            <div class="capability">Complex Tasks</div>
+                            <div class="capability">High Accuracy</div>
+                            <div class="capability">Context Window</div>
+                        </div>
+                        <p class="model-description">Claude 3.5 Sonnet is the most powerful model in the Claude family, excelling at complex tasks and requiring fewer tokens for high accuracy responses.</p>
+                        <div class="model-selector">
+                            <button class="select-model" data-model="claude-3-5-sonnet">Select</button>
+                        </div>
+                    </div>
+
+                    <div class="model-card">
+                        <h3 class="model-name">Claude 3 Opus</h3>
+                        <div class="model-capabilities">
+                            <div class="capability">Creative Output</div>
+                            <div class="capability">Content Creation</div>
+                            <div class="capability">Multilingual Support</div>
+                        </div>
+                        <p class="model-description">Claude 3 Opus is optimized for creative and complex tasks, producing higher quality, more creative outputs than any of our models.</p>
+                        <div class="model-selector">
+                            <button class="select-model" data-model="claude-3-opus">Select</button>
+                        </div>
+                    </div>
+
+                    <div class="model-card">
+                        <h3 class="model-name">Claude 3 Haiku</h3>
+                        <div class="model-capabilities">
+                            <div class="capability">Speed</div>
+                            <div class="capability">Efficiency</div>
+                            <div class="capability">Quick Responses</div>
+                        </div>
+                        <p class="model-description">Claude 3 Haiku is the fastest and most compact model, designed for quick, efficient interactions.</p>
+                        <div class="model-selector">
+                            <button class="select-model" data-model="claude-3-haiku">Select</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="workflows" class="hidden-section">
+                <h2 class="section-title">Workflows</h2>
+                <div class="workflow-step">
+                    <h3 class="workflow-title">PDF Processing Workflow</h3>
+                    <div class="workflow-content">
+                        <div class="form-group">
+                            <label for="pdf-upload">Upload PDF</label>
+                            <input type="file" id="pdf-upload" accept=".pdf">
+                        </div>
+
+                        <div id="pdf-preview" class="pdf-preview hidden-section">
+                            <!-- PDF preview will be displayed here -->
+                        </div>
+
+                        <div class="form-group">
+                            <button id="extract-pdf-text" class="btn-secondary">Extract Text</button>
+                        </div>
+
+                        <div id="pdf-text-content" class="hidden-section">
+                            <h4>Extracted Text</h4>
+                            <div id="extracted-text"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <button id="summarize-pdf" class="btn-secondary">Summarize</button>
+                        </div>
+
+                        <div id="pdf-summary" class="summary hidden-section">
+                            <h4>Summary</h4>
+                            <div id="summary-content"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <button id="count-pdf-tokens" class="btn-secondary">Count Tokens</button>
+                        </div>
+
+                        <div id="pdf-token-info" class="hidden-section">
+                            <div class="token-counter">
+                                <div class="token-display">
+                                    <span>Tokens: <span id="pdf-token-count">0</span></span>
+                                    <span>Cost: $<span id="pdf-cost-estimate">0.00</span></span>
+                                </div>
+                                <div class="token-bar">
+                                    <div class="token-fill" id="pdf-token-fill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <h3 class="workflow-title">Batch Analysis Workflow</h3>
+                    <div class="workflow-content">
+                        <div class="form-group">
+                            <label for="batch-analysis-input">Input Data</label>
+                            <input type="file" id="batch-analysis-input" accept=".csv,.json">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="batch-analysis-config">Configuration</label>
+                            <textarea id="batch-analysis-config" class="json-editor" placeholder="Enter batch analysis configuration"></textarea>
+                        </div>
+
+                        <div class="workflow-actions">
+                            <button id="start-batch-analysis">Start Analysis</button>
+                            <button id="track-progress" class="btn-secondary">Track Progress</button>
+                        </div>
+
+                        <div id="batch-progress" class="hidden-section">
+                            <h4>Progress</h4>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="batch-progress-fill" style="width: 0%;"></div>
+                            </div>
+                            <div id="batch-progress-info">0% complete</div>
+                        </div>
+
+                        <div id="batch-analysis-results" class="hidden-section">
+                            <h4>Results</h4>
+                            <div id="batch-analysis-content"></div>
+                            <div class="form-group">
+                                <button id="export-batch-results" class="btn-secondary">Export Results</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Claude Professional Suite. All rights reserved.</p>
+    </footer>
+
+    <button class="mobile-sidebar-toggle">☰</button>
+    <div class="mobile-sidebar">
+        <button class="close-sidebar">×</button>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Conversations</div>
+            <div class="sidebar-content" id="mobile-conversation-list">
+                <!-- Conversation items will be added here -->
+            </div>
+            <button id="mobile-new-conversation" class="btn-secondary">New Conversation</button>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">API Key</div>
+            <div class="sidebar-content">
+                <input type="password" id="mobile-api-key" placeholder="Enter your API key">
+                <div class="api-key-status">
+                    <span class="status-indicator" id="mobile-api-key-status"></span>
+                    <span id="mobile-api-key-message">Not validated</span>
+                </div>
+                <button id="mobile-validate-api-key" class="btn-secondary">Validate</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const navLinks = document.querySelectorAll('nav a');
+            const sections = document.querySelectorAll('section');
+            const mobileSidebarToggle = document.querySelector('.mobile-sidebar-toggle');
+            const mobileSidebar = document.querySelector('.mobile-sidebar');
+            const closeSidebar = document.querySelector('.close-sidebar');
+            const newConversationBtn = document.getElementById('new-conversation');
+            const mobileNewConversationBtn = document.getElementById('mobile-new-conversation');
+            const conversationList = document.getElementById('conversation-list');
+            const mobileConversationList = document.getElementById('mobile-conversation-list');
+            const apiKeyInput = document.getElementById('api-key');
+            const mobileApiKeyInput = document.getElementById('mobile-api-key');
+            const validateApiKeyBtn = document.getElementById('validate-api-key');
+            const mobileValidateApiKeyBtn = document.getElementById('mobile-validate-api-key');
+            const apiKeyStatus = document.getElementById('api-key-status');
+            const mobileApiKeyStatus = document.getElementById('mobile-api-key-status');
+            const apiKeyMessage = document.getElementById('api-key-message');
+            const mobileApiKeyMessage = document.getElementById('mobile-api-key-message');
+            const modelSelect = document.getElementById('model-select');
+            const systemMessage = document.getElementById('system-message');
+            const userMessage = document.getElementById('user-message');
+            const contextWindow = document.getElementById('context-window');
+            const contextValue = document.getElementById('context-value');
+            const sendMessageBtn = document.getElementById('send-message');
+            const streamMessageBtn = document.getElementById('stream-message');
+            const messageContainer = document.getElementById('message-container');
+            const tokenCount = document.getElementById('token-count');
+            const costEstimate = document.getElementById('cost-estimate');
+            const tokenFill = document.getElementById('token-fill');
+            const inputTokens = document.getElementById('input-tokens');
+            const outputTokens = document.getElementById('output-tokens');
+            const imageUpload = document.getElementById('image-upload');
+            const imagePreview = document.getElementById('image-preview');
+            const visionPrompt = document.getElementById('vision-prompt');
+            const analyzeImageBtn = document.getElementById('analyze-image');
+            const visionMessageContainer = document.getElementById('vision-message-container');
+            const extractTextBtn = document.getElementById('extract-text');
+            const analyzeDiagramBtn = document.getElementById('analyze-diagram');
+            const tokenText = document.getElementById('token-text');
+            const countTokensBtn = document.getElementById('count-tokens');
+            const tokenCounterCount = document.getElementById('token-counter-count');
+            const tokenCounterCost = document.getElementById('token-counter-cost');
+            const tokenCounterFill = document.getElementById('token-counter-fill');
+            const characterCount = document.getElementById('character-count');
+            const wordCount = document.getElementById('word-count');
+            const budgetAllocation = document.getElementById('budget-allocation');
+            const budgetValue = document.getElementById('budget-value');
+            const optimizeContentBtn = document.getElementById('optimize-content');
+            const optimizationSuggestions = document.getElementById('optimization-suggestions');
+            const suggestionsContent = document.getElementById('suggestions-content');
+            const toolJson = document.getElementById('tool-json');
+            const jsonError = document.getElementById('json-error');
+            const validateJsonBtn = document.getElementById('validate-json');
+            const formatJsonBtn = document.getElementById('format-json');
+            const functionDocs = document.getElementById('function-docs');
+            const callToolBtn = document.getElementById('call-tool');
+            const toolMessageContainer = document.getElementById('tool-message-container');
+            const resultVisualization = document.getElementById('result-visualization');
+            const visualizationContent = document.getElementById('visualization-content');
+            const batchConfig = document.getElementById('batch-config');
+            const batchJsonError = document.getElementById('batch-json-error');
+            const batchInput = document.getElementById('batch-input');
+            const startBatchBtn = document.getElementById('start-batch');
+            const validateBatchBtn = document.getElementById('validate-batch');
+            const batchStatusContainer = document.getElementById('batch-status-container');
+            const batchStatusList = document.getElementById('batch-status-list');
+            const batchResults = document.getElementById('batch-results');
+            const batchResultContent = document.getElementById('batch-result-content');
+            const exportResultsBtn = document.getElementById('export-results');
+            const organizationInfo = document.getElementById('organization-info');
+            const refreshOrganizationBtn = document.getElementById('refresh-organization');
+            const teamManagement = document.getElementById('team-management');
+            const teamList = document.getElementById('team-list');
+            const newMemberEmail = document.getElementById('new-member-email');
+            const newMemberRole = document.getElementById('new-member-role');
+            const addMemberBtn = document.getElementById('add-member');
+            const apiKeyManagement = document.getElementById('api-key-management');
+            const apiKeyList = document.getElementById('api-key-list');
+            const newApiKeyName = document.getElementById('new-api-key-name');
+            const createApiKeyBtn = document.getElementById('create-api-key');
+            const startDate = document.getElementById('start-date');
+            const endDate = document.getElementById('end-date');
+            const fetchUsageBtn = document.getElementById('fetch-usage');
+            const usageCharts = document.getElementById('usage-charts');
+            const costBreakdown = document.getElementById('cost-breakdown');
+            const costBreakdownContent = document.getElementById('cost-breakdown-content');
+            const exportReportBtn = document.getElementById('export-report');
+            const modelComparison = document.getElementById('model-comparison');
+            const selectModelBtns = document.querySelectorAll('.select-model');
+            const pdfUpload = document.getElementById('pdf-upload');
+            const pdfPreview = document.getElementById('pdf-preview');
+            const extractPdfTextBtn = document.getElementById('extract-pdf-text');
+            const pdfTextContent = document.getElementById('pdf-text-content');
+            const extractedText = document.getElementById('extracted-text');
+            const summarizePdfBtn = document.getElementById('summarize-pdf');
+            const pdfSummary = document.getElementById('pdf-summary');
+            const summaryContent = document.getElementById('summary-content');
+            const countPdfTokensBtn = document.getElementById('count-pdf-tokens');
+            const pdfTokenInfo = document.getElementById('pdf-token-info');
+            const pdfTokenCount = document.getElementById('pdf-token-count');
+            const pdfCostEstimate = document.getElementById('pdf-cost-estimate');
+            const pdfTokenFill = document.getElementById('pdf-token-fill');
+            const batchAnalysisInput = document.getElementById('batch-analysis-input');
+            const batchAnalysisConfig = document.getElementById('batch-analysis-config');
+            const startBatchAnalysisBtn = document.getElementById('start-batch-analysis');
+            const trackProgressBtn = document.getElementById('track-progress');
+            const batchProgress = document.getElementById('batch-progress');
+            const batchProgressFill = document.getElementById('batch-progress-fill');
+            const batchProgressInfo = document.getElementById('batch-progress-info');
+            const batchAnalysisResults = document.getElementById('batch-analysis-results');
+            const batchAnalysisContent = document.getElementById('batch-analysis-content');
+            const exportBatchResultsBtn = document.getElementById('export-batch-results');
+
+            // State variables
+            let currentConversation = null;
+            let conversations = JSON.parse(localStorage.getItem('conversations')) || [];
+            let apiKey = localStorage.getItem('apiKey') || '';
+            let isStreaming = false;
+            let streamController = null;
+            let currentBatchId = null;
+            let currentPdfText = '';
+            let currentBatchAnalysisId = null;
+
+            // Initialize the app
+            initApp();
+
+            // Event listeners
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    this.classList.add('active');
+
+                    sections.forEach(section => {
+                        if (section.id === sectionId) {
+                            section.classList.remove('hidden-section');
+                            section.classList.add('active-section');
+                        } else {
+                            section.classList.remove('active-section');
+                            section.classList.add('hidden-section');
+                        }
+                    });
+                });
+            });
+
+            mobileSidebarToggle.addEventListener('click', function() {
+                mobileSidebar.classList.add('active');
+            });
+
+            closeSidebar.addEventListener('click', function() {
+                mobileSidebar.classList.remove('active');
+            });
+
+            newConversationBtn.addEventListener('click', createNewConversation);
+            mobileNewConversationBtn.addEventListener('click', createNewConversation);
+
+            contextWindow.addEventListener('input', function() {
+                contextValue.textContent = `${this.value} messages`;
+            });
+
+            sendMessageBtn.addEventListener('click', sendMessage);
+            streamMessageBtn.addEventListener('click', toggleStreaming);
+
+            imageUpload.addEventListener('change', previewImage);
+            analyzeImageBtn.addEventListener('click', analyzeImage);
+            extractTextBtn.addEventListener('click', extractText);
+            analyzeDiagramBtn.addEventListener('click', analyzeDiagram);
+
+            countTokensBtn.addEventListener('click', countTokens);
+            budgetAllocation.addEventListener('input', function() {
+                budgetValue.textContent = `${this.value}% of budget`;
+            });
+            optimizeContentBtn.addEventListener('click', optimizeContent);
+
+            validateJsonBtn.addEventListener('click', validateJson);
+            formatJsonBtn.addEventListener('click', formatJson);
+            callToolBtn.addEventListener('click', callTool);
+
+            startBatchBtn.addEventListener('click', startBatch);
+            validateBatchBtn.addEventListener('click', validateBatch);
+            exportResultsBtn.addEventListener('click', exportResults);
+
+            refreshOrganizationBtn.addEventListener('click', refreshOrganization);
+            addMemberBtn.addEventListener('click', addMember);
+            createApiKeyBtn.addEventListener('click', createApiKey);
+
+            fetchUsageBtn.addEventListener('click', fetchUsage);
+            exportReportBtn.addEventListener('click', exportReport);
+
+            selectModelBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const model = this.getAttribute('data-model');
+                    modelSelect.value = model;
+                    alert(`Selected model: ${model}`);
+                });
+            });
+
+            pdfUpload.addEventListener('change', previewPdf);
+            extractPdfTextBtn.addEventListener('click', extractPdfText);
+            summarizePdfBtn.addEventListener('click', summarizePdf);
+            countPdfTokensBtn.addEventListener('click', countPdfTokens);
+
+            startBatchAnalysisBtn.addEventListener('click', startBatchAnalysis);
+            trackProgressBtn.addEventListener('click', trackProgress);
+            exportBatchResultsBtn.addEventListener('click', exportBatchResults);
+
+            apiKeyInput.value = apiKey;
+            mobileApiKeyInput.value = apiKey;
+
+            if (apiKey) {
+                validateApiKey();
+            }
+
+            // Functions
+            function initApp() {
+                // Set current date for usage statistics
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                startDate.valueAsDate = yesterday;
+                endDate.valueAsDate = today;
+
+                // Load conversations
+                loadConversations();
+
+                // Initialize Chart.js if needed
+                if (typeof Chart !== 'undefined') {
+                    // Chart initialization code would go here
+                }
+            }
+
+            function createNewConversation() {
+                const conversationId = Date.now().toString();
+                const conversation = {
+                    id: conversationId,
+                    title: `Conversation ${conversations.length + 1}`,
+                    messages: [],
+                    createdAt: new Date().toISOString()
+                };
+
+                conversations.unshift(conversation);
+                currentConversation = conversation;
+                localStorage.setItem('conversations', JSON.stringify(conversations));
+
+                updateConversationList();
+                updateMobileConversationList();
+
+                // Clear message container
+                messageContainer.innerHTML = '';
+
+                // Reset form fields
+                systemMessage.value = '';
+                userMessage.value = '';
+            }
+
+            function updateConversationList() {
+                conversationList.innerHTML = '';
+
+                conversations.forEach(conversation => {
+                    const conversationItem = document.createElement('div');
+                    conversationItem.className = `sidebar-item ${conversation.id === currentConversation?.id ? 'active-history' : ''}`;
+                    conversationItem.textContent = conversation.title;
+                    conversationItem.dataset.id = conversation.id;
+
+                    conversationItem.addEventListener('click', function() {
+                        loadConversation(conversation.id);
+                    });
+
+                    conversationList.appendChild(conversationItem);
+                });
+            }
+
+            function updateMobileConversationList() {
+                mobileConversationList.innerHTML = '';
+
+                conversations.forEach(conversation => {
+                    const conversationItem = document.createElement('div');
+                    conversationItem.className = `sidebar-item ${conversation.id === currentConversation?.id ? 'active-history' : ''}`;
+                    conversationItem.textContent = conversation.title;
+                    conversationItem.dataset.id = conversation.id;
+
+                    conversationItem.addEventListener('click', function() {
+                        loadConversation(conversation.id);
+                        mobileSidebar.classList.remove('active');
+                    });
+
+                    mobileConversationList.appendChild(conversationItem);
+                });
+            }
+
+            function loadConversation(conversationId) {
+                const conversation = conversations.find(c => c.id === conversationId);
+                if (conversation) {
+                    currentConversation = conversation;
+
+                    // Update UI
+                    updateConversationList();
+                    updateMobileConversationList();
+
+                    // Display messages
+                    displayMessages(conversation.messages);
+
+                    // Update form fields if there are system/user messages
+                    if (conversation.messages.length > 0) {
+                        const lastSystemMessage = conversation.messages.findLast(m => m.role === 'system');
+                        const lastUserMessage = conversation.messages.findLast(m => m.role === 'user');
+
+                        if (lastSystemMessage) {
+                            systemMessage.value = lastSystemMessage.content;
+                        }
+
+                        if (lastUserMessage) {
+                            userMessage.value = lastUserMessage.content;
+                        }
+                    }
+                }
+            }
+
+            function loadConversations() {
+                if (conversations.length > 0) {
+                    currentConversation = conversations[0];
+                    updateConversationList();
+                    updateMobileConversationList();
+                    displayMessages(currentConversation.messages);
+                } else {
+                    createNewConversation();
+                }
+            }
+
+            function displayMessages(messages) {
+                messageContainer.innerHTML = '';
+
+                messages.forEach(message => {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = `message ${message.role}-message`;
+
+                    const messageContent = document.createElement('div');
+                    messageContent.className = 'message-content';
+                    messageContent.textContent = message.content;
+
+                    messageElement.appendChild(messageContent);
+
+                    if (message.role === 'assistant' && message.streaming) {
+                        const typingIndicator = document.createElement('div');
+                        typingIndicator.className = 'typing-indicator';
+                        typingIndicator.innerHTML = `
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                        `;
+                        messageElement.appendChild(typingIndicator);
+                    }
+
+                    messageContainer.appendChild(messageElement);
+                });
+
+                // Scroll to bottom
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+
+            async function sendMessage() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const systemMsg = systemMessage.value.trim();
+                const userMsg = userMessage.value.trim();
+
+                if (!systemMsg && !userMsg) {
+                    alert('Please enter a system message or user message.');
+                    return;
+                }
+
+                const messages = [];
+
+                if (systemMsg) {
+                    messages.push({
+                        role: 'system',
+                        content: systemMsg
+                    });
+                }
+
+                if (userMsg) {
+                    messages.push({
+                        role: 'user',
+                        content: userMsg
+                    });
+                }
+
+                // Add to current conversation
+                if (currentConversation) {
+                    currentConversation.messages.push(...messages);
+                    localStorage.setItem('conversations', JSON.stringify(conversations));
+                }
+
+                // Display messages
+                displayMessages(currentConversation.messages);
+
+                // Simulate API call
+                try {
+                    sendMessageBtn.disabled = true;
+                    sendMessageBtn.innerHTML = 'Sending... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Simulate response
+                    const response = {
+                        role: 'assistant',
+                        content: 'This is a simulated response from the Claude API. In a real implementation, this would be the actual response from the API.'
+                    };
+
+                    // Add response to conversation
+                    if (currentConversation) {
+                        currentConversation.messages.push(response);
+                        localStorage.setItem('conversations', JSON.stringify(conversations));
+                    }
+
+                    // Display response
+                    displayMessages(currentConversation.messages);
+
+                    // Update token count
+                    updateTokenCount();
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    alert('Error sending message. Please try again.');
+                } finally {
+                    sendMessageBtn.disabled = false;
+                    sendMessageBtn.textContent = 'Send Message';
+                }
+            }
+
+            async function toggleStreaming() {
+                if (isStreaming) {
+                    // Stop streaming
+                    if (streamController) {
+                        streamController.abort();
+                    }
+                    isStreaming = false;
+                    streamMessageBtn.textContent = 'Stream Response';
+
+                    // Remove typing indicator
+                    const lastMessage = currentConversation.messages[currentConversation.messages.length - 1];
+                    if (lastMessage && lastMessage.role === 'assistant' && lastMessage.streaming) {
+                        lastMessage.streaming = false;
+                        displayMessages(currentConversation.messages);
+                    }
+                } else {
+                    // Start streaming
+                    if (!apiKey) {
+                        alert('Please enter and validate your API key first.');
+                        return;
+                    }
+
+                    const systemMsg = systemMessage.value.trim();
+                    const userMsg = userMessage.value.trim();
+
+                    if (!systemMsg && !userMsg) {
+                        alert('Please enter a system message or user message.');
+                        return;
+                    }
+
+                    const messages = [];
+
+                    if (systemMsg) {
+                        messages.push({
+                            role: 'system',
+                            content: systemMsg
+                        });
+                    }
+
+                    if (userMsg) {
+                        messages.push({
+                            role: 'user',
+                            content: userMsg
+                        });
+                    }
+
+                    // Add to current conversation
+                    if (currentConversation) {
+                        currentConversation.messages.push(...messages);
+                        localStorage.setItem('conversations', JSON.stringify(conversations));
+                    }
+
+                    // Display messages
+                    displayMessages(currentConversation.messages);
+
+                    // Add assistant message with typing indicator
+                    const assistantMessage = {
+                        role: 'assistant',
+                        content: '',
+                        streaming: true
+                    };
+
+                    if (currentConversation) {
+                        currentConversation.messages.push(assistantMessage);
+                        localStorage.setItem('conversations', JSON.stringify(conversations));
+                    }
+
+                    displayMessages(currentConversation.messages);
+
+                    isStreaming = true;
+                    streamMessageBtn.textContent = 'Stop Streaming';
+
+                    // Simulate streaming response
+                    try {
+                        // Simulate API call with delay
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                        // Simulate streaming response
+                        const simulatedResponse = 'This is a simulated streaming response from the Claude API. In a real implementation, this would be a stream of tokens from the API. The response is being delivered in real-time to demonstrate the streaming capability of the interface.';
+
+                        const words = simulatedResponse.split(' ');
+                        let currentIndex = 0;
+
+                        const streamInterval = setInterval(() => {
+                            if (currentIndex < words.length && isStreaming) {
+                                assistantMessage.content += (currentIndex > 0 ? ' ' : '') + words[currentIndex];
+                                currentIndex++;
+
+                                // Update display
+                                displayMessages(currentConversation.messages);
+
+                                // Update token count
+                                updateTokenCount();
+                            } else {
+                                clearInterval(streamInterval);
+                                assistantMessage.streaming = false;
+                                isStreaming = false;
+                                streamMessageBtn.textContent = 'Stream Response';
+
+                                // Save final message
+                                if (currentConversation) {
+                                    localStorage.setItem('conversations', JSON.stringify(conversations));
+                                }
+                            }
+                        }, 200);
+
+                        // Store the interval ID to clear it if needed
+                        streamController = {
+                            abort: () => {
+                                clearInterval(streamInterval);
+                                assistantMessage.streaming = false;
+                                isStreaming = false;
+                                streamMessageBtn.textContent = 'Stream Response';
+
+                                // Save final message
+                                if (currentConversation) {
+                                    localStorage.setItem('conversations', JSON.stringify(conversations));
+                                }
+                            }
+                        };
+                    } catch (error) {
+                        console.error('Error streaming message:', error);
+                        alert('Error streaming message. Please try again.');
+                        isStreaming = false;
+                        streamMessageBtn.textContent = 'Stream Response';
+                    }
+                }
+            }
+
+            function updateTokenCount() {
+                // Simulate token count calculation
+                const totalTokens = Math.floor(Math.random() * 1000) + 100;
+                const input = Math.floor(totalTokens * 0.3);
+                const output = totalTokens - input;
+                const cost = (totalTokens * 0.000001).toFixed(4);
+
+                tokenCount.textContent = totalTokens;
+                costEstimate.textContent = cost;
+                tokenFill.style.width = `${(totalTokens / 4096) * 100}%`;
+                inputTokens.textContent = input;
+                outputTokens.textContent = output;
+            }
+
+            function previewImage() {
+                const file = imageUpload.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            async function analyzeImage() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const file = imageUpload.files[0];
+                const prompt = visionPrompt.value.trim();
+
+                if (!file) {
+                    alert('Please upload an image first.');
+                    return;
+                }
+
+                if (!prompt) {
+                    alert('Please enter a prompt for the vision analysis.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    analyzeImageBtn.disabled = true;
+                    analyzeImageBtn.innerHTML = 'Analyzing... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Simulate response
+                    const response = {
+                        role: 'assistant',
+                        content: `This is a simulated vision analysis response for the image you uploaded with the prompt: "${prompt}". In a real implementation, this would be the actual analysis from the Claude API, including descriptions, object recognition, and other visual insights.`
+                    };
+
+                    // Display response
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message assistant-message';
+
+                    const messageContent = document.createElement('div');
+                    messageContent.className = 'message-content';
+                    messageContent.textContent = response.content;
+
+                    messageElement.appendChild(messageContent);
+                    visionMessageContainer.appendChild(messageElement);
+
+                    // Scroll to bottom
+                    visionMessageContainer.scrollTop = visionMessageContainer.scrollHeight;
+                } catch (error) {
+                    console.error('Error analyzing image:', error);
+                    alert('Error analyzing image. Please try again.');
+                } finally {
+                    analyzeImageBtn.disabled = false;
+                    analyzeImageBtn.textContent = 'Analyze Image';
+                }
+            }
+
+            async function extractText() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const file = imageUpload.files[0];
+
+                if (!file) {
+                    alert('Please upload an image first.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    extractTextBtn.disabled = true;
+                    extractTextBtn.innerHTML = 'Extracting... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Simulate response
+                    const response = {
+                        role: 'assistant',
+                        content: 'This is a simulated text extraction from the uploaded image. In a real implementation, this would be the actual OCR text extracted from the image using the Claude API.'
+                    };
+
+                    // Display response
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message assistant-message';
+
+                    const messageContent = document.createElement('div');
+                    messageContent.className = 'message-content';
+                    messageContent.textContent = response.content;
+
+                    messageElement.appendChild(messageContent);
+                    visionMessageContainer.appendChild(messageElement);
+
+                    // Scroll to bottom
+                    visionMessageContainer.scrollTop = visionMessageContainer.scrollHeight;
+                } catch (error) {
+                    console.error('Error extracting text:', error);
+                    alert('Error extracting text. Please try again.');
+                } finally {
+                    extractTextBtn.disabled = false;
+                    extractTextBtn.textContent = 'Extract Text';
+                }
+            }
+
+            async function analyzeDiagram() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const file = imageUpload.files[0];
+
+                if (!file) {
+                    alert('Please upload an image first.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    analyzeDiagramBtn.disabled = true;
+                    analyzeDiagramBtn.innerHTML = 'Analyzing... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Simulate response
+                    const response = {
+                        role: 'assistant',
+                        content: 'This is a simulated diagram analysis of the uploaded image. In a real implementation, this would be the actual analysis of the diagram, including understanding the relationships between elements and providing insights based on the diagram structure.'
+                    };
+
+                    // Display response
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message assistant-message';
+
+                    const messageContent = document.createElement('div');
+                    messageContent.className = 'message-content';
+                    messageContent.textContent = response.content;
+
+                    messageElement.appendChild(messageContent);
+                    visionMessageContainer.appendChild(messageElement);
+
+                    // Scroll to bottom
+                    visionMessageContainer.scrollTop = visionMessageContainer.scrollHeight;
+                } catch (error) {
+                    console.error('Error analyzing diagram:', error);
+                    alert('Error analyzing diagram. Please try again.');
+                } finally {
+                    analyzeDiagramBtn.disabled = false;
+                    analyzeDiagramBtn.textContent = 'Analyze Diagram';
+                }
+            }
+
+            async function countTokens() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const text = tokenText.value.trim();
+
+                if (!text) {
+                    alert('Please enter text to count tokens.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    countTokensBtn.disabled = true;
+                    countTokensBtn.innerHTML = 'Counting... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Simulate response
+                    const tokenCount = text.split(/\s+/).length;
+                    const charCount = text.length;
+                    const wordCountValue = text.split(/\s+/).filter(word => word.length > 0).length;
+                    const cost = (tokenCount * 0.000001).toFixed(4);
+
+                    // Update UI
+                    tokenCounterCount.textContent = tokenCount;
+                    tokenCounterCost.textContent = cost;
+                    tokenCounterFill.style.width = `${(tokenCount / 1000) * 100}%`;
+                    characterCount.textContent = charCount;
+                    wordCount.textContent = wordCountValue;
+
+                    // Show optimization suggestions if needed
+                    if (tokenCount > 800) {
+                        optimizationSuggestions.classList.remove('hidden-section');
+                        suggestionsContent.innerHTML = `
+                            <p>Your text contains ${tokenCount} tokens, which is above the recommended limit of 800 tokens.</p>
+                            <p>Consider breaking your content into smaller chunks or summarizing parts to reduce token usage.</p>
+                            <p>You could also consider using a more concise language or removing unnecessary details.</p>
+                        `;
+                    } else {
+                        optimizationSuggestions.classList.add('hidden-section');
+                    }
+                } catch (error) {
+                    console.error('Error counting tokens:', error);
+                    alert('Error counting tokens. Please try again.');
+                } finally {
+                    countTokensBtn.disabled = false;
+                    countTokensBtn.textContent = 'Count Tokens';
+                }
+            }
+
+            function optimizeContent() {
+                alert('Content optimization functionality would be implemented here. This would analyze the current content and provide suggestions for optimization based on the token count and budget allocation.');
+            }
+
+            function validateJson() {
+                const jsonText = toolJson.value.trim();
+
+                if (!jsonText) {
+                    alert('Please enter JSON to validate.');
+                    return;
+                }
+
+                try {
+                    JSON.parse(jsonText);
+                    jsonError.classList.add('hidden-section');
+                    jsonError.textContent = '';
+                    alert('JSON is valid!');
+                } catch (error) {
+                    jsonError.classList.remove('hidden-section');
+                    jsonError.textContent = `Invalid JSON: ${error.message}`;
+                }
+            }
+
+            function formatJson() {
+                const jsonText = toolJson.value.trim();
+
+                if (!jsonText) {
+                    alert('Please enter JSON to format.');
+                    return;
+                }
+
+                try {
+                    const parsedJson = JSON.parse(jsonText);
+                    toolJson.value = JSON.stringify(parsedJson, null, 2);
+                    jsonError.classList.add('hidden-section');
+                    jsonError.textContent = '';
+                } catch (error) {
+                    jsonError.classList.remove('hidden-section');
+                    jsonError.textContent = `Invalid JSON: ${error.message}`;
+                }
+            }
+
+            async function callTool() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const jsonText = toolJson.value.trim();
+                const docs = functionDocs.value.trim();
+
+                if (!jsonText) {
+                    alert('Please enter tool JSON.');
+                    return;
+                }
+
+                if (!docs) {
+                    alert('Please enter function documentation.');
+                    return;
+                }
+
+                // Validate JSON
+                try {
+                    JSON.parse(jsonText);
+                } catch (error) {
+                    alert('Invalid JSON. Please fix the errors before calling the tool.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    callToolBtn.disabled = true;
+                    callToolBtn.innerHTML = 'Calling Tool... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Simulate response
+                    const response = {
+                        role: 'assistant',
+                        content: `This is a simulated tool calling response based on the provided JSON: ${jsonText} and documentation: ${docs}. In a real implementation, this would be the actual result of calling the specified tool with the provided parameters.`
+                    };
+
+                    // Display response
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message assistant-message';
+
+                    const messageContent = document.createElement('div');
+                    messageContent.className = 'message-content';
+                    messageContent.textContent = response.content;
+
+                    messageElement.appendChild(messageContent);
+                    toolMessageContainer.appendChild(messageElement);
+
+                    // Scroll to bottom
+                    toolMessageContainer.scrollTop = toolMessageContainer.scrollHeight;
+
+                    // Show result visualization
+                    resultVisualization.classList.remove('hidden-section');
+                    visualizationContent.innerHTML = `
+                        <p>This is a simulated visualization of the tool calling results. In a real implementation, this would be a graphical representation or interactive display of the tool's output.</p>
+                        <div style="background-color: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                            <h4>Tool Results</h4>
+                            <pre style="white-space: pre-wrap;">${response.content}</pre>
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error('Error calling tool:', error);
+                    alert('Error calling tool. Please try again.');
+                } finally {
+                    callToolBtn.disabled = false;
+                    callToolBtn.textContent = 'Call Tool';
+                }
+            }
+
+            async function startBatch() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const configText = batchConfig.value.trim();
+                const inputFile = batchInput.files[0];
+
+                if (!configText) {
+                    alert('Please enter batch job configuration.');
+                    return;
+                }
+
+                if (!inputFile) {
+                    alert('Please upload input data.');
+                    return;
+                }
+
+                // Validate JSON
+                try {
+                    JSON.parse(configText);
+                } catch (error) {
+                    alert('Invalid JSON configuration. Please fix the errors before starting the batch.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    startBatchBtn.disabled = true;
+                    startBatchBtn.innerHTML = 'Starting Batch... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // Simulate response
+                    const batchId = `batch_${Date.now()}`;
+                    currentBatchId = batchId;
+
+                    // Show batch status
+                    batchStatusContainer.classList.remove('hidden-section');
+                    batchStatusList.innerHTML = `
+                        <div class="batch-status status-pending">
+                            <div>
+                                <strong>Batch ${batchId}</strong>
+                                <div>Status: Processing</div>
+                            </div>
+                            <div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 20%;"></div>
+                                </div>
+                                <div>20% complete</div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Simulate batch processing completion after a delay
+                    setTimeout(() => {
+                        batchStatusList.innerHTML = `
+                            <div class="batch-status status-completed">
+                                <div>
+                                    <strong>Batch ${batchId}</strong>
+                                    <div>Status: Completed</div>
+                                </div>
+                                <div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 100%;"></div>
+                                    </div>
+                                    <div>100% complete</div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Show results
+                        batchResults.classList.remove('hidden-section');
+                        batchResultContent.innerHTML = `
+                            <p>This is a simulated batch processing result. In a real implementation, this would contain the actual results of the batch job.</p>
+                            <div style="background-color: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                                <h4>Batch Results</h4>
+                                <pre style="white-space: pre-wrap;">{
+    "status": "completed",
+    "results": [
+        {
+            "input": "Sample input 1",
+            "output": "Sample output 1"
+        },
+        {
+            "input": "Sample input 2",
+            "output": "Sample output 2"
+        },
+        {
+            "input": "Sample input 3",
+            "output": "Sample output 3"
+        }
+    ],
+    "summary": {
+        "total_processed": 3,
+        "success": 3,
+        "failures": 0
+    }
+}</pre>
+                            </div>
+                        `;
+                    }, 5000);
+                } catch (error) {
+                    console.error('Error starting batch:', error);
+                    alert('Error starting batch. Please try again.');
+                } finally {
+                    startBatchBtn.disabled = false;
+                    startBatchBtn.textContent = 'Start Batch Processing';
+                }
+            }
+
+            function validateBatch() {
+                const configText = batchConfig.value.trim();
+
+                if (!configText) {
+                    alert('Please enter batch job configuration.');
+                    return;
+                }
+
+                try {
+                    JSON.parse(configText);
+                    batchJsonError.classList.add('hidden-section');
+                    batchJsonError.textContent = '';
+                    alert('Batch configuration is valid!');
+                } catch (error) {
+                    batchJsonError.classList.remove('hidden-section');
+                    batchJsonError.textContent = `Invalid JSON: ${error.message}`;
+                }
+            }
+
+            function exportResults() {
+                if (!currentBatchId) {
+                    alert('No batch results to export.');
+                    return;
+                }
+
+                alert(`Exporting results for batch ${currentBatchId}. In a real implementation, this would download the batch results as a file.`);
+            }
+
+            async function refreshOrganization() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    refreshOrganizationBtn.disabled = true;
+                    refreshOrganizationBtn.innerHTML = 'Refreshing... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Simulate response
+                    organizationInfo.innerHTML = `
+                        <div style="background-color: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                            <h3>Organization Information</h3>
+                            <p><strong>Name:</strong> Example Organization</p>
+                            <p><strong>ID:</strong> org_123456789</p>
+                            <p><strong>Created:</strong> ${new Date().toLocaleDateString()}</p>
+                            <p><strong>Usage Limits:</strong></p>
+                            <ul>
+                                <li>API Requests: 10,000/month</li>
+                                <li>Tokens: 1,000,000/month</li>
+                                <li>Concurrent Requests: 5</li>
+                            </ul>
+                        </div>
+                    `;
+
+                    // Show team management
+                    teamManagement.classList.remove('hidden-section');
+                    teamList.innerHTML = `
+                        <div style="background-color: rgba(255, 255, 255, 0.05); padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem;">
+                            <strong>john@example.com</strong> - Admin
+                            <button class="btn-danger btn-small" style="float: right;">Remove</button>
+                        </div>
+                        <div style="background-color: rgba(255, 255, 255, 0.05); padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem;">
+                            <strong>jane@example.com</strong> - Member
+                            <button class="btn-danger btn-small" style="float: right;">Remove</button>
+                        </div>
+                    `;
+
+                    // Show API key management
+                    apiKeyManagement.classList.remove('hidden-section');
+                    apiKeyList.innerHTML = `
+                        <div style="background-color: rgba(255, 255, 255, 0.05); padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem;">
+                            <strong>Main API Key</strong> - Created: ${new Date().toLocaleDateString()}
+                            <button class="btn-danger btn-small" style="float: right;">Revoke</button>
+                        </div>
+                        <div style="background-color: rgba(255, 255, 255, 0.05); padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem;">
+                            <strong>Backup API Key</strong> - Created: ${new Date(new Date().setDate(new Date().getDate() - 7)).toLocaleDateString()}
+                            <button class="btn-danger btn-small" style="float: right;">Revoke</button>
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error('Error refreshing organization:', error);
+                    alert('Error refreshing organization. Please try again.');
+                } finally {
+                    refreshOrganizationBtn.disabled = false;
+                    refreshOrganizationBtn.textContent = 'Refresh Information';
+                }
+            }
+
+            async function addMember() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const email = newMemberEmail.value.trim();
+                const role = newMemberRole.value;
+
+                if (!email) {
+                    alert('Please enter an email address.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    addMemberBtn.disabled = true;
+                    addMemberBtn.innerHTML = 'Adding... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Add to team list
+                    const memberElement = document.createElement('div');
+                    memberElement.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    memberElement.style.padding = '0.5rem';
+                    memberElement.style.borderRadius = '4px';
+                    memberElement.style.marginBottom = '0.5rem';
+
+                    memberElement.innerHTML = `
+                        <strong>${email}</strong> - ${role.charAt(0).toUpperCase() + role.slice(1)}
+                        <button class="btn-danger btn-small" style="float: right;">Remove</button>
+                    `;
+
+                    teamList.appendChild(memberElement);
+
+                    // Clear input
+                    newMemberEmail.value = '';
+                } catch (error) {
+                    console.error('Error adding member:', error);
+                    alert('Error adding member. Please try again.');
+                } finally {
+                    addMemberBtn.disabled = false;
+                    addMemberBtn.textContent = 'Add Member';
+                }
+            }
+
+            async function createApiKey() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const name = newApiKeyName.value.trim();
+
+                if (!name) {
+                    alert('Please enter a name for the API key.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    createApiKeyBtn.disabled = true;
+                    createApiKeyBtn.innerHTML = 'Creating... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Add to API key list
+                    const keyElement = document.createElement('div');
+                    keyElement.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    keyElement.style.padding = '0.5rem';
+                    keyElement.style.borderRadius = '4px';
+                    keyElement.style.marginBottom = '0.5rem';
+
+                    keyElement.innerHTML = `
+                        <strong>${name}</strong> - Created: ${new Date().toLocaleDateString()}
+                        <button class="btn-danger btn-small" style="float: right;">Revoke</button>
+                    `;
+
+                    apiKeyList.appendChild(keyElement);
+
+                    // Clear input
+                    newApiKeyName.value = '';
+
+                    // Show the new key (in a real app, this would be the actual key)
+                    alert(`New API key created. Key: sk-${Math.random().toString(36).substring(2, 20)}`);
+                } catch (error) {
+                    console.error('Error creating API key:', error);
+                    alert('Error creating API key. Please try again.');
+                } finally {
+                    createApiKeyBtn.disabled = false;
+                    createApiKeyBtn.textContent = 'Create New Key';
+                }
+            }
+
+            async function fetchUsage() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const start = startDate.value;
+                const end = endDate.value;
+
+                if (!start || !end) {
+                    alert('Please select a date range.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    fetchUsageBtn.disabled = true;
+                    fetchUsageBtn.innerHTML = 'Fetching... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // Show charts
+                    usageCharts.classList.remove('hidden-section');
+
+                    // Simulate chart data
+                    const usageData = {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'API Requests',
+                            data: [1200, 1500, 1800, 1400, 2100, 2500],
+                            backgroundColor: 'rgba(255, 127, 80, 0.5)',
+                            borderColor: 'rgba(255, 127, 80, 1)',
+                            borderWidth: 1
+                        }]
+                    };
+
+                    const costData = {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Cost ($)',
+                            data: [12.50, 15.75, 18.20, 14.80, 21.50, 25.75],
+                            backgroundColor: 'rgba(245, 222, 179, 0.5)',
+                            borderColor: 'rgba(245, 222, 179, 1)',
+                            borderWidth: 1
+                        }]
+                    };
+
+                    // In a real implementation, you would use Chart.js to render these charts
+                    // For this example, we'll just show placeholder text
+                    document.getElementById('usage-chart').innerHTML = '<p>Usage chart would be rendered here with data from the API.</p>';
+                    document.getElementById('cost-chart').innerHTML = '<p>Cost chart would be rendered here with data from the API.</p>';
+
+                    // Show cost breakdown
+                    costBreakdown.classList.remove('hidden-section');
+                    costBreakdownContent.innerHTML = `
+                        <div style="background-color: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                            <h4>Cost Breakdown for ${start} to ${end}</h4>
+                            <p><strong>Total Cost:</strong> $25.75</p>
+                            <p><strong>API Requests:</strong> 2500</p>
+                            <p><strong>Tokens Processed:</strong> 1,250,000</p>
+                            <p><strong>Average Cost per Request:</strong> $0.01</p>
+                            <p><strong>Average Tokens per Request:</strong> 500</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error('Error fetching usage:', error);
+                    alert('Error fetching usage. Please try again.');
+                } finally {
+                    fetchUsageBtn.disabled = false;
+                    fetchUsageBtn.textContent = 'Fetch Usage Data';
+                }
+            }
+
+            function exportReport() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const start = startDate.value;
+                const end = endDate.value;
+
+                if (!start || !end) {
+                    alert('Please select a date range.');
+                    return;
+                }
+
+                alert(`Exporting usage report for ${start} to ${end}. In a real implementation, this would download the report as a PDF or CSV file.`);
+            }
+
+            function previewPdf() {
+                const file = pdfUpload.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // In a real implementation, you would use a PDF library to render the PDF
+                        // For this example, we'll just show a placeholder
+                        pdfPreview.classList.remove('hidden-section');
+                        pdfPreview.innerHTML = `
+                            <div class="pdf-page">
+                                <h4>Page 1</h4>
+                                <div class="pdf-text">
+                                    This is a simulated preview of the first page of the uploaded PDF.
+                                    In a real implementation, this would show the actual content of the PDF.
+                                </div>
+                            </div>
+                            <div class="pdf-page">
+                                <h4>Page 2</h4>
+                                <div class="pdf-text">
+                                    This is a simulated preview of the second page of the uploaded PDF.
+                                    In a real implementation, this would show the actual content of the PDF.
+                                </div>
+                            </div>
+                        `;
+
+                        // Store the text for later use
+                        currentPdfText = 'This is the simulated text extracted from the uploaded PDF. In a real implementation, this would be the actual text extracted from the PDF using a PDF processing library.';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            async function extractPdfText() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const file = pdfUpload.files[0];
+
+                if (!file) {
+                    alert('Please upload a PDF first.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    extractPdfTextBtn.disabled = true;
+                    extractPdfTextBtn.innerHTML = 'Extracting... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Show extracted text
+                    pdfTextContent.classList.remove('hidden-section');
+                    extractedText.textContent = currentPdfText;
+                } catch (error) {
+                    console.error('Error extracting PDF text:', error);
+                    alert('Error extracting PDF text. Please try again.');
+                } finally {
+                    extractPdfTextBtn.disabled = false;
+                    extractPdfTextBtn.textContent = 'Extract Text';
+                }
+            }
+
+            async function summarizePdf() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const file = pdfUpload.files[0];
+
+                if (!file) {
+                    alert('Please upload a PDF first.');
+                    return;
+                }
+
+                if (!currentPdfText) {
+                    alert('Please extract text from the PDF first.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    summarizePdfBtn.disabled = true;
+                    summarizePdfBtn.innerHTML = 'Summarizing... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // Show summary
+                    pdfSummary.classList.remove('hidden-section');
+                    summaryContent.textContent = 'This is a simulated summary of the PDF content. In a real implementation, this would be a concise summary generated by the Claude API based on the extracted text.';
+                } catch (error) {
+                    console.error('Error summarizing PDF:', error);
+                    alert('Error summarizing PDF. Please try again.');
+                } finally {
+                    summarizePdfBtn.disabled = false;
+                    summarizePdfBtn.textContent = 'Summarize';
+                }
+            }
+
+            async function countPdfTokens() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const file = pdfUpload.files[0];
+
+                if (!file) {
+                    alert('Please upload a PDF first.');
+                    return;
+                }
+
+                if (!currentPdfText) {
+                    alert('Please extract text from the PDF first.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    countPdfTokensBtn.disabled = true;
+                    countPdfTokensBtn.innerHTML = 'Counting... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Simulate token count
+                    const tokenCount = currentPdfText.split(/\s+/).length;
+                    const cost = (tokenCount * 0.000001).toFixed(4);
+
+                    // Update UI
+                    pdfTokenInfo.classList.remove('hidden-section');
+                    pdfTokenCount.textContent = tokenCount;
+                    pdfCostEstimate.textContent = cost;
+                    pdfTokenFill.style.width = `${(tokenCount / 4096) * 100}%`;
+                } catch (error) {
+                    console.error('Error counting PDF tokens:', error);
+                    alert('Error counting PDF tokens. Please try again.');
+                } finally {
+                    countPdfTokensBtn.disabled = false;
+                    countPdfTokensBtn.textContent = 'Count Tokens';
+                }
+            }
+
+            async function startBatchAnalysis() {
+                if (!apiKey) {
+                    alert('Please enter and validate your API key first.');
+                    return;
+                }
+
+                const configText = batchAnalysisConfig.value.trim();
+                const inputFile = batchAnalysisInput.files[0];
+
+                if (!configText) {
+                    alert('Please enter batch analysis configuration.');
+                    return;
+                }
+
+                if (!inputFile) {
+                    alert('Please upload input data.');
+                    return;
+                }
+
+                // Validate JSON
+                try {
+                    JSON.parse(configText);
+                } catch (error) {
+                    alert('Invalid JSON configuration. Please fix the errors before starting the batch analysis.');
+                    return;
+                }
+
+                // Simulate API call
+                try {
+                    startBatchAnalysisBtn.disabled = true;
+                    startBatchAnalysisBtn.innerHTML = 'Starting Analysis... <span class="loading"></span>';
+
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // Simulate response
+                    const batchAnalysisId = `batch_analysis_${Date.now()}`;
+                    currentBatchAnalysisId = batchAnalysisId;
+
+                    // Show progress
+                    batchProgress.classList.remove('hidden-section');
+                    batchProgressFill.style.width = '20%';
+                    batchProgressInfo.textContent = '20% complete';
+
+                    // Simulate progress updates
+                    let progress = 20;
+                    const progressInterval = setInterval(() => {
+                        progress += Math.floor(Math.random() * 10) + 5;
+                        if (progress >= 100) {
+                            progress = 100;
+                            clearInterval(progressInterval);
+
+                            // Show results
+                            batchAnalysisResults.classList.remove('hidden-section');
+                            batchAnalysisContent.innerHTML = `
+                                <p>This is a simulated batch analysis result. In a real implementation, this would contain the actual results of the batch analysis.</p>
+                                <div style="background-color: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                                    <h4>Batch Analysis Results</h4>
+                                    <pre style="white-space: pre-wrap;">{
+    "status": "completed",
+    "results": [
+        {
+            "input": "Sample input 1",
+            "output": "Sample output 1"
+        },
+        {
+            "input": "Sample input 2",
+            "output": "Sample output 2"
+        },
+        {
+            "input": "Sample input 3",
+            "output": "Sample output 3"
+        }
+    ],
+    "summary": {
+        "total_processed": 3,
+        "success": 3,
+        "failures": 0
+    }
+}</pre>
+                                </div>
+                            `;
+                        }
+
+                        batchProgressFill.style.width = `${progress}%`;
+                        batchProgressInfo.textContent = `${progress}% complete`;
+                    }, 1000);
+                } catch (error) {
+                    console.error('Error starting batch analysis:', error);
+                    alert('Error starting batch analysis. Please try again.');
+                } finally {
+                    startBatchAnalysisBtn.disabled = false;
+                    startBatchAnalysisBtn.textContent = 'Start Analysis';
+                }
+            }
+
+            function trackProgress() {
+                if (!currentBatchAnalysisId) {
+                    alert('No batch analysis in progress.');
+                    return;
+                }
+
+                alert(`Tracking progress for batch analysis ${currentBatchAnalysisId}. In a real implementation, this would show real-time progress updates.`);
+            }
+
+            function exportBatchResults() {
+                if (!currentBatchAnalysisId) {
+                    alert('No batch analysis results to export.');
+                    return;
+                }
+
+                alert(`Exporting results for batch analysis ${currentBatchAnalysisId}. In a real implementation, this would download the batch analysis results as a file.`);
+            }
+
+            function validateApiKey() {
+                const key = apiKeyInput.value.trim();
+                if (!key) {
+                    alert('Please enter an API key.');
+                    return;
+                }
+
+                // Simulate API key validation
+                apiKeyStatus.classList.remove('status-valid', 'status-invalid');
+                mobileApiKeyStatus.classList.remove('status-valid', 'status-invalid');
+                apiKeyMessage.textContent = 'Validating...';
+                mobileApiKeyMessage.textContent = 'Validating...';
+
+                setTimeout(() => {
+                    if (key.startsWith('sk-') && key.length > 10) {
+                        // Valid key
+                        apiKey = key;
+                        localStorage.setItem('apiKey', apiKey);
+                        apiKeyStatus.classList.add('status-valid');
+                        mobileApiKeyStatus.classList.add('status-valid');
+                        apiKeyMessage.textContent = 'API key is valid';
+                        mobileApiKeyMessage.textContent = 'API key is valid';
+                    } else {
+                        // Invalid key
+                        apiKey = '';
+                        localStorage.removeItem('apiKey');
+                        apiKeyStatus.classList.add('status-invalid');
+                        mobileApiKeyStatus.classList.add('status-invalid');
+                        apiKeyMessage.textContent = 'Invalid API key';
+                        mobileApiKeyMessage.textContent = 'Invalid API key';
+                    }
+                }, 1000);
+            }
+
+            // Initialize API key validation
+            validateApiKeyBtn.addEventListener('click', validateApiKey);
+            mobileValidateApiKeyBtn.addEventListener('click', validateApiKey);
+        });
+    </script>
+</body>
+</html>

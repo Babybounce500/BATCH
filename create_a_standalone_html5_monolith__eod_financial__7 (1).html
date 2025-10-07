@@ -1,0 +1,3406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EOD Financial Terminal</title>
+    <meta name="description" content="Professional financial dashboard with real-time data and analysis tools">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0a2e38;
+            --secondary-color: #1a5276;
+            --accent-green: #27ae60;
+            --accent-red: #e74c3c;
+            --text-color: #ecf0f1;
+            --background-color: #121212;
+            --card-background: #1e1e1e;
+            --border-color: #333;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --font-main: 'Orbitron', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-main);
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 60px 1fr;
+            height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .collapsed .sidebar {
+            width: 80px;
+        }
+
+        .collapsed .main-content {
+            grid-column: 2 / 3;
+            grid-row: 1 / 3;
+        }
+
+        .collapsed .nav-item span {
+            display: none;
+        }
+
+        .collapsed .nav-item {
+            justify-content: center;
+        }
+
+        .header {
+            grid-column: 1 / 3;
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background-color: var(--card-background);
+            color: var(--text-color);
+            font-family: var(--font-main);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--card-background);
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: var(--primary-color);
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            grid-row: 2 / 3;
+            background-color: var(--secondary-color);
+            padding: 20px 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background-color 0.2s;
+            gap: 10px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--primary-color);
+        }
+
+        .nav-item-icon {
+            font-size: 1.2rem;
+        }
+
+        .main-content {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .card-action {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.2s;
+        }
+
+        .card-action:hover {
+            color: var(--accent-green);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .chart {
+            width: 100%;
+            height: 100%;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th, .data-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: var(--primary-color);
+        }
+
+        .data-table tr:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .positive {
+            color: var(--accent-green);
+        }
+
+        .negative {
+            color: var(--accent-red);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-background);
+            color: var(--text-color);
+            font-family: var(--font-main);
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--accent-green);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #2ecc71;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #1f618d;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-red);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-green);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .alert {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background-color: var(--secondary-color);
+        }
+
+        .alert-success {
+            background-color: var(--accent-green);
+        }
+
+        .alert-danger {
+            background-color: var(--accent-red);
+        }
+
+        .alert-icon {
+            font-size: 1.2rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-green);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .range-slider {
+            width: 100%;
+        }
+
+        .range-slider input {
+            width: 100%;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-btn:hover {
+            background-color: #1f618d;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--card-background);
+            min-width: 160px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            z-index: 1;
+            border-radius: 4px;
+        }
+
+        .dropdown-content a {
+            color: var(--text-color);
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--primary-color);
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--card-background);
+            color: var(--text-color);
+            text-align: center;
+            border-radius: 4px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px auto 1fr;
+            }
+
+            .header {
+                grid-column: 1 / 2;
+            }
+
+            .sidebar {
+                grid-row: 2 / 3;
+                width: 100%;
+                height: auto;
+                overflow-y: visible;
+            }
+
+            .main-content {
+                grid-row: 3 / 4;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+        }
+
+        .portfolio-chart {
+            width: 100%;
+            height: 400px;
+            background-color: var(--card-background);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .asset-allocation {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .allocation-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .allocation-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .watchlist-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .watchlist-table th, .watchlist-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .watchlist-table th {
+            background-color: var(--primary-color);
+        }
+
+        .watchlist-table tr:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .alert-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .alert-form .form-group {
+            grid-column: span 2;
+        }
+
+        .alert-form .form-group:last-child {
+            grid-column: span 2;
+        }
+
+        .news-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .news-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .news-meta {
+            display: flex;
+            gap: 15px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        .news-source {
+            font-weight: 500;
+        }
+
+        .news-sentiment {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sentiment-positive {
+            color: var(--accent-green);
+        }
+
+        .sentiment-negative {
+            color: var(--accent-red);
+        }
+
+        .news-content {
+            margin-bottom: 10px;
+        }
+
+        .news-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .news-tag {
+            padding: 3px 8px;
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .dividend-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dividend-table th, .dividend-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dividend-table th {
+            background-color: var(--primary-color);
+        }
+
+        .dividend-table tr:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .dividend-calculator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .dividend-calculator .form-group {
+            grid-column: span 2;
+        }
+
+        .dividend-calculator .form-group:last-child {
+            grid-column: span 2;
+        }
+
+        .reinvestment-simulator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .reinvestment-simulator .form-group {
+            grid-column: span 2;
+        }
+
+        .reinvestment-simulator .form-group:last-child {
+            grid-column: span 2;
+        }
+
+        .ex-date-calendar {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ex-date-calendar th, .ex-date-calendar td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .ex-date-calendar th {
+            background-color: var(--primary-color);
+        }
+
+        .ex-date-calendar .ex-date {
+            background-color: var(--accent-red);
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .ex-date-calendar .record-date {
+            background-color: var(--accent-green);
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .ex-date-calendar .payment-date {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .api-key-manager {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .api-key-manager .form-group {
+            grid-column: span 2;
+        }
+
+        .api-key-manager .form-group:last-child {
+            grid-column: span 2;
+        }
+
+        .usage-tracker {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .usage-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .usage-label {
+            font-weight: 500;
+        }
+
+        .usage-value {
+            font-weight: 600;
+        }
+
+        .usage-chart {
+            width: 100%;
+            height: 200px;
+            background-color: var(--card-background);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="#" class="logo">
+                <span class="logo-icon">📈</span>
+                <span class="logo-text">EOD Financial Terminal</span>
+            </a>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search symbols..." id="symbol-search">
+                <div class="search-results" id="search-results"></div>
+            </div>
+            <div class="user-actions">
+                <button class="theme-toggle" id="theme-toggle">☀️</button>
+                <div class="dropdown">
+                    <button class="dropdown-btn">Account</button>
+                    <div class="dropdown-content">
+                        <a href="#" id="api-key-manager-link">API Key Manager</a>
+                        <a href="#" id="usage-tracker-link">Usage Tracker</a>
+                        <a href="#">Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <nav class="sidebar" id="sidebar">
+            <a href="#" class="nav-item active" data-target="dashboard">
+                <span class="nav-item-icon">🏠</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-target="historical-data">
+                <span class="nav-item-icon">📊</span>
+                <span>Historical Data</span>
+            </a>
+            <a href="#" class="nav-item" data-target="real-time-quotes">
+                <span class="nav-item-icon">⏱️</span>
+                <span>Real-Time Quotes</span>
+            </a>
+            <a href="#" class="nav-item" data-target="intraday-data">
+                <span class="nav-item-icon">📈</span>
+                <span>Intraday Data</span>
+            </a>
+            <a href="#" class="nav-item" data-target="fundamentals">
+                <span class="nav-item-icon">📋</span>
+                <span>Fundamentals</span>
+            </a>
+            <a href="#" class="nav-item" data-target="symbol-search">
+                <span class="nav-item-icon">🔍</span>
+                <span>Symbol Search</span>
+            </a>
+            <a href="#" class="nav-item" data-target="exchange-browser">
+                <span class="nav-item-icon">🌍</span>
+                <span>Exchange Browser</span>
+            </a>
+            <a href="#" class="nav-item" data-target="news-feed">
+                <span class="nav-item-icon">📰</span>
+                <span>News Feed</span>
+            </a>
+            <a href="#" class="nav-item" data-target="dividend-history">
+                <span class="nav-item-icon">💰</span>
+                <span>Dividend History</span>
+            </a>
+            <a href="#" class="nav-item" data-target="portfolio-analyzer">
+                <span class="nav-item-icon">📊</span>
+                <span>Portfolio Analyzer</span>
+            </a>
+            <a href="#" class="nav-item" data-target="watchlist">
+                <span class="nav-item-icon">👀</span>
+                <span>Watchlist</span>
+            </a>
+            <button class="nav-item" id="collapse-sidebar">
+                <span class="nav-item-icon">↔️</span>
+                <span>Collapse</span>
+            </button>
+        </nav>
+        <main class="main-content" id="main-content">
+            <section id="dashboard" class="content-section active">
+                <h2>Dashboard</h2>
+                <div class="dashboard">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Market Overview</h3>
+                            <div class="card-actions">
+                                <button class="card-action">🔄</button>
+                                <button class="card-action">⚙️</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas class="chart" id="market-overview-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Top Gainers</h3>
+                            <div class="card-actions">
+                                <button class="card-action">🔄</button>
+                                <button class="card-action">⚙️</button>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Price</th>
+                                    <th>Change</th>
+                                    <th>% Change</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-gainers-table"></tbody>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Top Losers</h3>
+                            <div class="card-actions">
+                                <button class="card-action">🔄</button>
+                                <button class="card-action">⚙️</button>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Price</th>
+                                    <th>Change</th>
+                                    <th>% Change</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-losers-table"></tbody>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Recent Activity</h3>
+                            <div class="card-actions">
+                                <button class="card-action">🔄</button>
+                                <button class="card-action">⚙️</button>
+                            </div>
+                        </div>
+                        <div class="activity-feed" id="activity-feed"></div>
+                    </div>
+                </div>
+            </section>
+            <section id="historical-data" class="content-section">
+                <h2>Historical OHLCV Data</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Data Request</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="historical-symbol">Symbol</label>
+                        <input type="text" class="form-control" id="historical-symbol" placeholder="Enter symbol">
+                    </div>
+                    <div class="form-group">
+                        <label for="historical-date-range">Date Range</label>
+                        <div class="date-range-picker">
+                            <input type="date" class="form-control" id="historical-start-date">
+                            <span>to</span>
+                            <input type="date" class="form-control" id="historical-end-date">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="historical-comparison">Comparison Symbols (comma separated)</label>
+                        <input type="text" class="form-control" id="historical-comparison" placeholder="e.g., AAPL, MSFT">
+                    </div>
+                    <div class="form-group">
+                        <label for="historical-indicators">Technical Indicators</label>
+                        <select class="form-control" id="historical-indicators" multiple>
+                            <option value="SMA">Simple Moving Average (SMA)</option>
+                            <option value="EMA">Exponential Moving Average (EMA)</option>
+                            <option value="RSI">Relative Strength Index (RSI)</option>
+                            <option value="MACD">Moving Average Convergence Divergence (MACD)</option>
+                            <option value="Bollinger">Bollinger Bands</option>
+                        </select>
+                    </div>
+                    <button class="btn" id="fetch-historical-data">Fetch Data</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Results</h3>
+                        <div class="card-actions">
+                            <button class="card-action" id="export-historical-data">📤</button>
+                            <button class="card-action" id="historical-chart-toggle">📊</button>
+                        </div>
+                    </div>
+                    <div class="chart-container" id="historical-chart-container">
+                        <canvas class="chart" id="historical-chart"></canvas>
+                    </div>
+                    <table class="data-table" id="historical-data-table"></table>
+                </div>
+            </section>
+            <section id="real-time-quotes" class="content-section">
+                <h2>Real-Time Quotes</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quote Request</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="quote-symbol">Symbol</label>
+                        <input type="text" class="form-control" id="quote-symbol" placeholder="Enter symbol">
+                    </div>
+                    <div class="form-group">
+                        <label for="auto-refresh-toggle">Auto-Refresh</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="auto-refresh-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="refresh-interval">Refresh Interval (seconds)</label>
+                        <input type="number" class="form-control" id="refresh-interval" value="5" min="1" max="60">
+                    </div>
+                    <button class="btn" id="fetch-real-time-quote">Get Quote</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quote Details</h3>
+                        <div class="card-actions">
+                            <button class="card-action" id="add-to-watchlist">➕</button>
+                            <button class="card-action" id="set-price-alert">🔔</button>
+                        </div>
+                    </div>
+                    <div class="quote-details" id="quote-details"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Market Hours</h3>
+                    </div>
+                    <div class="market-hours" id="market-hours"></div>
+                </div>
+            </section>
+            <section id="intraday-data" class="content-section">
+                <h2>Intraday Data</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Data Request</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="intraday-symbol">Symbol</label>
+                        <input type="text" class="form-control" id="intraday-symbol" placeholder="Enter symbol">
+                    </div>
+                    <div class="form-group">
+                        <label for="intraday-interval">Interval</label>
+                        <select class="form-control" id="intraday-interval">
+                            <option value="1m">1 Minute</option>
+                            <option value="5m">5 Minutes</option>
+                            <option value="1h">1 Hour</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="intraday-date">Date</label>
+                        <input type="date" class="form-control" id="intraday-date">
+                    </div>
+                    <button class="btn" id="fetch-intraday-data">Fetch Data</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Chart</h3>
+                        <div class="card-actions">
+                            <button class="card-action" id="intraday-chart-toggle">📊</button>
+                            <button class="card-action" id="volume-toggle">📊</button>
+                            <button class="card-action" id="drawing-tools">✏️</button>
+                        </div>
+                    </div>
+                    <div class="chart-container" id="intraday-chart-container">
+                        <canvas class="chart" id="intraday-chart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Volume Analysis</h3>
+                    </div>
+                    <div class="chart-container" id="volume-chart-container">
+                        <canvas class="chart" id="volume-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section id="fundamentals" class="content-section">
+                <h2>Company Fundamentals</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Fundamentals Request</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="fundamentals-symbol">Symbol</label>
+                        <input type="text" class="form-control" id="fundamentals-symbol" placeholder="Enter symbol">
+                    </div>
+                    <button class="btn" id="fetch-fundamentals">Get Fundamentals</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Key Metrics</h3>
+                    </div>
+                    <div class="fundamentals-metrics" id="fundamentals-metrics"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Financial Ratios</h3>
+                    </div>
+                    <div class="fundamentals-ratios" id="fundamentals-ratios"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Sector Comparison</h3>
+                    </div>
+                    <div class="chart-container" id="sector-comparison-container">
+                        <canvas class="chart" id="sector-comparison-chart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Growth Metrics</h3>
+                    </div>
+                    <div class="chart-container" id="growth-metrics-container">
+                        <canvas class="chart" id="growth-metrics-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section id="symbol-search" class="content-section">
+                <h2>Symbol Search</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Search</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="symbol-search-input">Search Query</label>
+                        <input type="text" class="form-control" id="symbol-search-input" placeholder="Enter search query">
+                    </div>
+                    <button class="btn" id="perform-symbol-search">Search</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Results</h3>
+                    </div>
+                    <table class="data-table" id="symbol-search-results"></table>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Searches</h3>
+                    </div>
+                    <div class="recent-searches" id="recent-searches"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Favorites</h3>
+                    </div>
+                    <div class="favorites" id="favorites"></div>
+                </div>
+            </section>
+            <section id="exchange-browser" class="content-section">
+                <h2>Exchange Browser</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Exchange Selection</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="exchange-select">Exchange</label>
+                        <select class="form-control" id="exchange-select">
+                            <option value="US">US Stocks</option>
+                            <option value="LSE">London Stock Exchange</option>
+                            <option value="NYSE">New York Stock Exchange</option>
+                            <option value="NASDAQ">NASDAQ</option>
+                            <option value="HKEX">Hong Kong Stock Exchange</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sector-filter">Sector Filter</label>
+                        <select class="form-control" id="sector-filter" multiple>
+                            <option value="Technology">Technology</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Financials">Financials</option>
+                            <option value="Consumer Discretionary">Consumer Discretionary</option>
+                            <option value="Industrials">Industrials</option>
+                            <option value="Energy">Energy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="market-cap-sort">Market Cap Sort</label>
+                        <select class="form-control" id="market-cap-sort">
+                            <option value="asc">Smallest to Largest</option>
+                            <option value="desc">Largest to Smallest</option>
+                        </select>
+                    </div>
+                    <button class="btn" id="fetch-exchange-data">Fetch Data</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Results</h3>
+                    </div>
+                    <table class="data-table" id="exchange-data-table"></table>
+                </div>
+            </section>
+            <section id="news-feed" class="content-section">
+                <h2>Financial News Feed</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Filters</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="news-date-range">Date Range</label>
+                        <div class="date-range-picker">
+                            <input type="date" class="form-control" id="news-start-date">
+                            <span>to</span>
+                            <input type="date" class="form-control" id="news-end-date">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="news-keywords">Keywords</label>
+                        <input type="text" class="form-control" id="news-keywords" placeholder="Enter keywords">
+                    </div>
+                    <button class="btn" id="fetch-news">Fetch News</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">News Articles</h3>
+                    </div>
+                    <div class="news-feed" id="news-feed-content"></div>
+                </div>
+            </section>
+            <section id="dividend-history" class="content-section">
+                <h2>Dividend History</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Dividend Request</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="dividend-symbol">Symbol</label>
+                        <input type="text" class="form-control" id="dividend-symbol" placeholder="Enter symbol">
+                    </div>
+                    <button class="btn" id="fetch-dividend-history">Fetch History</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Dividend Table</h3>
+                    </div>
+                    <table class="data-table" id="dividend-table"></table>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Yield Calculator</h3>
+                    </div>
+                    <div class="dividend-calculator">
+                        <div class="form-group">
+                            <label for="dividend-amount">Dividend Amount</label>
+                            <input type="number" class="form-control" id="dividend-amount" placeholder="Enter dividend amount">
+                        </div>
+                        <div class="form-group">
+                            <label for="share-price">Share Price</label>
+                            <input type="number" class="form-control" id="share-price" placeholder="Enter share price">
+                        </div>
+                        <div class="form-group">
+                            <label for="dividend-yield">Dividend Yield</label>
+                            <input type="text" class="form-control" id="dividend-yield" readonly>
+                        </div>
+                        <button class="btn" id="calculate-yield">Calculate</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Reinvestment Simulator</h3>
+                    </div>
+                    <div class="reinvestment-simulator">
+                        <div class="form-group">
+                            <label for="initial-investment">Initial Investment</label>
+                            <input type="number" class="form-control" id="initial-investment" placeholder="Enter initial investment">
+                        </div>
+                        <div class="form-group">
+                            <label for="annual-dividend">Annual Dividend</label>
+                            <input type="number" class="form-control" id="annual-dividend" placeholder="Enter annual dividend">
+                        </div>
+                        <div class="form-group">
+                            <label for="reinvestment-period">Reinvestment Period (years)</label>
+                            <input type="number" class="form-control" id="reinvestment-period" placeholder="Enter reinvestment period">
+                        </div>
+                        <div class="form-group">
+                            <label for="reinvestment-result">Result</label>
+                            <input type="text" class="form-control" id="reinvestment-result" readonly>
+                        </div>
+                        <button class="btn" id="simulate-reinvestment">Simulate</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Ex-Date Calendar</h3>
+                    </div>
+                    <table class="data-table" id="ex-date-calendar"></table>
+                </div>
+            </section>
+            <section id="portfolio-analyzer" class="content-section">
+                <h2>Portfolio Analyzer</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Portfolio Input</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="portfolio-symbols">Symbols (comma separated)</label>
+                        <input type="text" class="form-control" id="portfolio-symbols" placeholder="e.g., AAPL, MSFT, GOOGL">
+                    </div>
+                    <div class="form-group">
+                        <label for="portfolio-weights">Weights (comma separated)</label>
+                        <input type="text" class="form-control" id="portfolio-weights" placeholder="e.g., 0.5, 0.3, 0.2">
+                    </div>
+                    <button class="btn" id="analyze-portfolio">Analyze</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Performance Chart</h3>
+                    </div>
+                    <div class="portfolio-chart" id="portfolio-chart"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Asset Allocation</h3>
+                    </div>
+                    <div class="asset-allocation" id="asset-allocation"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Performance Metrics</h3>
+                    </div>
+                    <div class="performance-metrics" id="performance-metrics"></div>
+                </div>
+            </section>
+            <section id="watchlist" class="content-section">
+                <h2>Watchlist</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Watchlist Management</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="watchlist-symbol">Add Symbol</label>
+                        <input type="text" class="form-control" id="watchlist-symbol" placeholder="Enter symbol">
+                    </div>
+                    <button class="btn" id="add-to-watchlist-main">Add to Watchlist</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Watchlist Table</h3>
+                    </div>
+                    <table class="data-table" id="watchlist-table"></table>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Price Alerts</h3>
+                    </div>
+                    <div class="alert-form">
+                        <div class="form-group">
+                            <label for="alert-symbol">Symbol</label>
+                            <input type="text" class="form-control" id="alert-symbol" placeholder="Enter symbol">
+                        </div>
+                        <div class="form-group">
+                            <label for="alert-type">Alert Type</label>
+                            <select class="form-control" id="alert-type">
+                                <option value="above">Price Above</option>
+                                <option value="below">Price Below</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="alert-price">Price</label>
+                            <input type="number" class="form-control" id="alert-price" placeholder="Enter price">
+                        </div>
+                        <button class="btn" id="set-alert">Set Alert</button>
+                    </div>
+                    <div class="alert-list" id="alert-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal" id="api-key-manager-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">API Key Manager</h3>
+                <button class="close-btn" id="close-api-key-manager">&times;</button>
+            </div>
+            <div class="api-key-manager">
+                <div class="form-group">
+                    <label for="current-api-key">Current API Key</label>
+                    <input type="text" class="form-control" id="current-api-key" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="new-api-key">New API Key</label>
+                    <input type="text" class="form-control" id="new-api-key" placeholder="Enter new API key">
+                </div>
+                <button class="btn" id="update-api-key">Update API Key</button>
+                <button class="btn btn-danger" id="revoke-api-key">Revoke API Key</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="usage-tracker-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Usage Tracker</h3>
+                <button class="close-btn" id="close-usage-tracker">&times;</button>
+            </div>
+            <div class="usage-tracker">
+                <div class="usage-item">
+                    <span class="usage-label">Total Requests:</span>
+                    <span class="usage-value" id="total-requests">0</span>
+                </div>
+                <div class="usage-item">
+                    <span class="usage-label">Requests Today:</span>
+                    <span class="usage-value" id="requests-today">0</span>
+                </div>
+                <div class="usage-item">
+                    <span class="usage-label">Historical Data Requests:</span>
+                    <span class="usage-value" id="historical-requests">0</span>
+                </div>
+                <div class="usage-item">
+                    <span class="usage-label">Real-Time Quote Requests:</span>
+                    <span class="usage-value" id="real-time-requests">0</span>
+                </div>
+                <div class="usage-item">
+                    <span class="usage-label">Intraday Data Requests:</span>
+                    <span class="usage-value" id="intraday-requests">0</span>
+                </div>
+                <div class="usage-item">
+                    <span class="usage-label">Fundamentals Requests:</span>
+                    <span class="usage-value" id="fundamentals-requests">0</span>
+                </div>
+                <div class="usage-item">
+                    <span class="usage-label">Symbol Search Requests:</span>
+                    <span class="usage-value" id="symbol-search-requests">0</span>
+                </div>
+                <div class="usage-item">
+                    <span class="usage-label">Exchange Browser Requests:</span>
+                    <span class="usage-value" id="exchange-browser-requests">0</span>
+                </div>
+                <div class="usage-item">
+                    <span class="usage-label">News Feed Requests:</span>
+                    <span class="usage-value" id="news-feed-requests">0</span>
+                </div>
+                <div class="usage-item">
+                    <span class="usage-label">Dividend History Requests:</span>
+                    <span class="usage-value" id="dividend-history-requests">0</span>
+                </div>
+            </div>
+            <div class="usage-chart" id="usage-chart"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            const root = document.documentElement;
+
+            themeToggle.addEventListener('click', function() {
+                if (root.classList.contains('dark-theme')) {
+                    root.classList.remove('dark-theme');
+                    themeToggle.textContent = '🌙';
+                } else {
+                    root.classList.add('dark-theme');
+                    themeToggle.textContent = '☀️';
+                }
+            });
+
+            // Sidebar navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // Remove active class from all nav items and content sections
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    contentSections.forEach(section => section.classList.remove('active'));
+
+                    // Add active class to clicked nav item and corresponding content section
+                    this.classList.add('active');
+                    const targetId = this.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+
+            // Collapse sidebar
+            const collapseSidebar = document.getElementById('collapse-sidebar');
+            const container = document.querySelector('.container');
+
+            collapseSidebar.addEventListener('click', function() {
+                container.classList.toggle('collapsed');
+            });
+
+            // API key manager modal
+            const apiKeyManagerLink = document.getElementById('api-key-manager-link');
+            const apiKeyManagerModal = document.getElementById('api-key-manager-modal');
+            const closeApiKeyManager = document.getElementById('close-api-key-manager');
+
+            apiKeyManagerLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                apiKeyManagerModal.classList.add('active');
+            });
+
+            closeApiKeyManager.addEventListener('click', function() {
+                apiKeyManagerModal.classList.remove('active');
+            });
+
+            // Usage tracker modal
+            const usageTrackerLink = document.getElementById('usage-tracker-link');
+            const usageTrackerModal = document.getElementById('usage-tracker-modal');
+            const closeUsageTracker = document.getElementById('close-usage-tracker');
+
+            usageTrackerLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                usageTrackerModal.classList.add('active');
+                fetchUsageData();
+            });
+
+            closeUsageTracker.addEventListener('click', function() {
+                usageTrackerModal.classList.remove('active');
+            });
+
+            // Symbol search functionality
+            const symbolSearchInput = document.getElementById('symbol-search');
+            const searchResults = document.getElementById('search-results');
+
+            symbolSearchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                if (query.length > 0) {
+                    fetchSymbolSuggestions(query);
+                } else {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            // Fetch symbol suggestions
+            function fetchSymbolSuggestions(query) {
+                // Simulate API call to fetch symbol suggestions
+                setTimeout(() => {
+                    const suggestions = [
+                        { symbol: 'AAPL', name: 'Apple Inc.' },
+                        { symbol: 'MSFT', name: 'Microsoft Corporation' },
+                        { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+                        { symbol: 'AMZN', name: 'Amazon.com Inc.' },
+                        { symbol: 'FB', name: 'Meta Platforms Inc.' }
+                    ].filter(item =>
+                        item.symbol.toLowerCase().includes(query.toLowerCase()) ||
+                        item.name.toLowerCase().includes(query.toLowerCase())
+                    );
+
+                    displaySymbolSuggestions(suggestions);
+                }, 300);
+            }
+
+            // Display symbol suggestions
+            function displaySymbolSuggestions(suggestions) {
+                searchResults.innerHTML = '';
+
+                if (suggestions.length === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'search-result-item';
+                    noResults.textContent = 'No results found';
+                    searchResults.appendChild(noResults);
+                } else {
+                    suggestions.forEach(suggestion => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'search-result-item';
+                        resultItem.textContent = `${suggestion.symbol} - ${suggestion.name}`;
+                        resultItem.addEventListener('click', function() {
+                            symbolSearchInput.value = suggestion.symbol;
+                            searchResults.style.display = 'none';
+                            // Here you would typically fetch data for the selected symbol
+                            console.log(`Selected symbol: ${suggestion.symbol}`);
+                        });
+                        searchResults.appendChild(resultItem);
+                    });
+                }
+
+                searchResults.style.display = 'block';
+            }
+
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!symbolSearchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            // Initialize charts
+            function initCharts() {
+                // Market Overview Chart
+                const marketOverviewCtx = document.getElementById('market-overview-chart').getContext('2d');
+                new Chart(marketOverviewCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Market Performance',
+                            data: [120, 115, 125, 130, 128, 135],
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+
+                // Top Gainers Table
+                const topGainersTable = document.getElementById('top-gainers-table');
+                const topGainersData = [
+                    { symbol: 'TSLA', price: 720.50, change: 25.30, percentChange: 3.65 },
+                    { symbol: 'AMD', price: 110.80, change: 8.70, percentChange: 8.50 },
+                    { symbol: 'NVDA', price: 250.40, change: 15.20, percentChange: 6.45 },
+                    { symbol: 'AMC', price: 12.50, change: 2.30, percentChange: 21.00 },
+                    { symbol: 'GME', price: 35.20, change: 3.10, percentChange: 9.60 }
+                ];
+
+                topGainersData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.symbol}</td>
+                        <td>$${item.price.toFixed(2)}</td>
+                        <td class="positive">+$${item.change.toFixed(2)}</td>
+                        <td class="positive">+${item.percentChange.toFixed(2)}%</td>
+                    `;
+                    topGainersTable.appendChild(row);
+                });
+
+                // Top Losers Table
+                const topLosersTable = document.getElementById('top-losers-table');
+                const topLosersData = [
+                    { symbol: 'BB', price: 18.20, change: -1.20, percentChange: -6.10 },
+                    { symbol: 'RCL', price: 125.30, change: -8.50, percentChange: -6.30 },
+                    { symbol: 'NIO', price: 15.60, change: -2.10, percentChange: -11.80 },
+                    { symbol: 'PLTR', price: 22.40, change: -3.20, percentChange: -12.40 },
+                    { symbol: 'BBBY', price: 28.50, change: -2.80, percentChange: -8.90 }
+                ];
+
+                topLosersData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.symbol}</td>
+                        <td>$${item.price.toFixed(2)}</td>
+                        <td class="negative">-$${Math.abs(item.change).toFixed(2)}</td>
+                        <td class="negative">-${Math.abs(item.percentChange).toFixed(2)}%</td>
+                    `;
+                    topLosersTable.appendChild(row);
+                });
+
+                // Activity Feed
+                const activityFeed = document.getElementById('activity-feed');
+                const activities = [
+                    { time: '10:30 AM', action: 'Viewed', symbol: 'AAPL', details: 'Historical Data' },
+                    { time: '11:15 AM', action: 'Set', symbol: 'MSFT', details: 'Price Alert' },
+                    { time: '12:45 PM', action: 'Added', symbol: 'GOOGL', details: 'to Watchlist' },
+                    { time: '2:20 PM', action: 'Viewed', symbol: 'AMZN', details: 'Fundamentals' },
+                    { time: '3:55 PM', action: 'Searched', symbol: 'TSLA', details: 'Symbol Information' }
+                ];
+
+                activities.forEach(activity => {
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+                    activityItem.innerHTML = `
+                        <span class="activity-time">${activity.time}</span>
+                        <span class="activity-action">${activity.action}</span>
+                        <span class="activity-symbol">${activity.symbol}</span>
+                        <span class="activity-details">${activity.details}</span>
+                    `;
+                    activityFeed.appendChild(activityItem);
+                });
+            }
+
+            // Fetch usage data
+            function fetchUsageData() {
+                // Simulate API call to fetch usage data
+                setTimeout(() => {
+                    const usageData = {
+                        totalRequests: 452,
+                        requestsToday: 28,
+                        historicalRequests: 87,
+                        realTimeRequests: 124,
+                        intradayRequests: 65,
+                        fundamentalsRequests: 42,
+                        symbolSearchRequests: 54,
+                        exchangeBrowserRequests: 22,
+                        newsFeedRequests: 36,
+                        dividendHistoryRequests: 15
+                    };
+
+                    // Update usage values
+                    document.getElementById('total-requests').textContent = usageData.totalRequests;
+                    document.getElementById('requests-today').textContent = usageData.requestsToday;
+                    document.getElementById('historical-requests').textContent = usageData.historicalRequests;
+                    document.getElementById('real-time-requests').textContent = usageData.realTimeRequests;
+                    document.getElementById('intraday-requests').textContent = usageData.intradayRequests;
+                    document.getElementById('fundamentals-requests').textContent = usageData.fundamentalsRequests;
+                    document.getElementById('symbol-search-requests').textContent = usageData.symbolSearchRequests;
+                    document.getElementById('exchange-browser-requests').textContent = usageData.exchangeBrowserRequests;
+                    document.getElementById('news-feed-requests').textContent = usageData.newsFeedRequests;
+                    document.getElementById('dividend-history-requests').textContent = usageData.dividendHistoryRequests;
+
+                    // Create usage chart
+                    const usageChartCtx = document.getElementById('usage-chart').getContext('2d');
+                    new Chart(usageChartCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Historical', 'Real-Time', 'Intraday', 'Fundamentals', 'Symbol Search', 'Exchange Browser', 'News Feed', 'Dividend History'],
+                            datasets: [{
+                                label: 'Requests',
+                                data: [
+                                    usageData.historicalRequests,
+                                    usageData.realTimeRequests,
+                                    usageData.intradayRequests,
+                                    usageData.fundamentalsRequests,
+                                    usageData.symbolSearchRequests,
+                                    usageData.exchangeBrowserRequests,
+                                    usageData.newsFeedRequests,
+                                    usageData.dividendHistoryRequests
+                                ],
+                                backgroundColor: [
+                                    '#27ae60',
+                                    '#1a5276',
+                                    '#e74c3c',
+                                    '#f39c12',
+                                    '#8e44ad',
+                                    '#2980b9',
+                                    '#2ecc71',
+                                    '#d35400'
+                                ],
+                                borderColor: [
+                                    '#219653',
+                                    '#154360',
+                                    '#c0392b',
+                                    '#d35400',
+                                    '#732d91',
+                                    '#2471a3',
+                                    '#27ae60',
+                                    '#a04000'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }, 500);
+            }
+
+            // Initialize the application
+            function initApp() {
+                initCharts();
+
+                // Set current date for date pickers
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('historical-start-date').value = today;
+                document.getElementById('historical-end-date').value = today;
+                document.getElementById('intraday-date').value = today;
+                document.getElementById('news-start-date').value = today;
+                document.getElementById('news-end-date').value = today;
+            }
+
+            // Call initApp when the DOM is fully loaded
+            initApp();
+
+            // Historical Data functionality
+            const fetchHistoricalDataBtn = document.getElementById('fetch-historical-data');
+            const historicalChartContainer = document.getElementById('historical-chart-container');
+            const historicalDataTable = document.getElementById('historical-data-table');
+            const exportHistoricalDataBtn = document.getElementById('export-historical-data');
+            const historicalChartToggle = document.getElementById('historical-chart-toggle');
+
+            fetchHistoricalDataBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('historical-symbol').value;
+                const startDate = document.getElementById('historical-start-date').value;
+                const endDate = document.getElementById('historical-end-date').value;
+                const comparisonSymbols = document.getElementById('historical-comparison').value;
+                const indicators = Array.from(document.getElementById('historical-indicators').selectedOptions).map(option => option.value);
+
+                if (symbol) {
+                    fetchHistoricalData(symbol, startDate, endDate, comparisonSymbols, indicators);
+                }
+            });
+
+            function fetchHistoricalData(symbol, startDate, endDate, comparisonSymbols, indicators) {
+                // Simulate API call to fetch historical data
+                setTimeout(() => {
+                    // Generate mock data
+                    const dates = [];
+                    const currentDate = new Date(startDate);
+                    const end = new Date(endDate);
+
+                    while (currentDate <= end) {
+                        dates.push(new Date(currentDate));
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+
+                    const data = {
+                        symbol: symbol,
+                        dates: dates,
+                        open: dates.map(() => Math.random() * 100 + 50),
+                        high: dates.map(() => Math.random() * 100 + 60),
+                        low: dates.map(() => Math.random() * 100 + 40),
+                        close: dates.map(() => Math.random() * 100 + 50),
+                        volume: dates.map(() => Math.floor(Math.random() * 1000000))
+                    };
+
+                    // Add comparison symbols if provided
+                    if (comparisonSymbols) {
+                        const symbols = comparisonSymbols.split(',').map(s => s.trim());
+                        data.comparisons = symbols.map(s => ({
+                            symbol: s,
+                            close: dates.map(() => Math.random() * 100 + 50)
+                        }));
+                    }
+
+                    // Add indicators if selected
+                    if (indicators.length > 0) {
+                        data.indicators = {};
+                        indicators.forEach(indicator => {
+                            switch (indicator) {
+                                case 'SMA':
+                                    data.indicators.SMA = dates.map(() => Math.random() * 100 + 50);
+                                    break;
+                                case 'EMA':
+                                    data.indicators.EMA = dates.map(() => Math.random() * 100 + 50);
+                                    break;
+                                case 'RSI':
+                                    data.indicators.RSI = dates.map(() => Math.random() * 100);
+                                    break;
+                                case 'MACD':
+                                    data.indicators.MACD = {
+                                        line: dates.map(() => Math.random() * 2 - 1),
+                                        signal: dates.map(() => Math.random() * 2 - 1),
+                                        histogram: dates.map(() => Math.random() * 4 - 2)
+                                    };
+                                    break;
+                                case 'Bollinger':
+                                    data.indicators.Bollinger = {
+                                        upper: dates.map(() => Math.random() * 100 + 60),
+                                        middle: dates.map(() => Math.random() * 100 + 50),
+                                        lower: dates.map(() => Math.random() * 100 + 40)
+                                    };
+                                    break;
+                            }
+                        });
+                    }
+
+                    displayHistoricalData(data);
+                }, 1000);
+            }
+
+            function displayHistoricalData(data) {
+                // Show loading state
+                historicalChartContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+                historicalDataTable.innerHTML = '';
+
+                // Create chart after a short delay to simulate loading
+                setTimeout(() => {
+                    // Create chart
+                    const historicalChartCtx = document.getElementById('historical-chart').getContext('2d');
+
+                    // Prepare datasets
+                    const datasets = [{
+                        label: `${data.symbol} Close`,
+                        data: data.close,
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        yAxisID: 'y'
+                    }];
+
+                    // Add comparison symbols if available
+                    if (data.comparisons) {
+                        const colors = ['#1a5276', '#e74c3c', '#f39c12', '#8e44ad', '#2980b9'];
+                        data.comparisons.forEach((comparison, index) => {
+                            datasets.push({
+                                label: `${comparison.symbol} Close`,
+                                data: comparison.close,
+                                borderColor: colors[index % colors.length],
+                                backgroundColor: `rgba(${parseInt(colors[index % colors.length].substring(1, 3), 16)}, ${parseInt(colors[index % colors.length].substring(3, 5), 16)}, ${parseInt(colors[index % colors.length].substring(5, 7), 16)}, 0.1)`,
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y'
+                            });
+                        });
+                    }
+
+                    // Add indicators if available
+                    if (data.indicators) {
+                        if (data.indicators.SMA) {
+                            datasets.push({
+                                label: 'SMA',
+                                data: data.indicators.SMA,
+                                borderColor: '#3498db',
+                                borderDash: [5, 5],
+                                yAxisID: 'y'
+                            });
+                        }
+
+                        if (data.indicators.EMA) {
+                            datasets.push({
+                                label: 'EMA',
+                                data: data.indicators.EMA,
+                                borderColor: '#9b59b6',
+                                borderDash: [5, 5],
+                                yAxisID: 'y'
+                            });
+                        }
+
+                        if (data.indicators.RSI) {
+                            datasets.push({
+                                label: 'RSI',
+                                data: data.indicators.RSI,
+                                borderColor: '#e67e22',
+                                yAxisID: 'y2'
+                            });
+                        }
+
+                        if (data.indicators.MACD) {
+                            datasets.push({
+                                label: 'MACD Line',
+                                data: data.indicators.MACD.line,
+                                borderColor: '#16a085',
+                                yAxisID: 'y2'
+                            });
+
+                            datasets.push({
+                                label: 'MACD Signal',
+                                data: data.indicators.MACD.signal,
+                                borderColor: '#d35400',
+                                yAxisID: 'y2'
+                            });
+
+                            datasets.push({
+                                label: 'MACD Histogram',
+                                data: data.indicators.MACD.histogram,
+                                borderColor: '#2c3e50',
+                                backgroundColor: data.indicators.MACD.histogram.map(val => val >= 0 ? 'rgba(39, 174, 96, 0.5)' : 'rgba(231, 76, 60, 0.5)'),
+                                yAxisID: 'y2'
+                            });
+                        }
+
+                        if (data.indicators.Bollinger) {
+                            datasets.push({
+                                label: 'Bollinger Upper',
+                                data: data.indicators.Bollinger.upper,
+                                borderColor: '#7f8c8d',
+                                borderDash: [5, 5],
+                                yAxisID: 'y'
+                            });
+
+                            datasets.push({
+                                label: 'Bollinger Middle',
+                                data: data.indicators.Bollinger.middle,
+                                borderColor: '#95a5a6',
+                                borderDash: [5, 5],
+                                yAxisID: 'y'
+                            });
+
+                            datasets.push({
+                                label: 'Bollinger Lower',
+                                data: data.indicators.Bollinger.lower,
+                                borderColor: '#7f8c8d',
+                                borderDash: [5, 5],
+                                yAxisID: 'y'
+                            });
+                        }
+                    }
+
+                    new Chart(historicalChartCtx, {
+                        type: 'line',
+                        data: {
+                            labels: data.dates.map(date => date.toLocaleDateString()),
+                            datasets: datasets
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    title: {
+                                        display: true,
+                                        text: 'Price'
+                                    }
+                                },
+                                y2: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    title: {
+                                        display: true,
+                                        text: 'Indicators'
+                                    },
+                                    grid: {
+                                        drawOnChartArea: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // Create table
+                    const tableHeader = document.createElement('thead');
+                    tableHeader.innerHTML = `
+                        <tr>
+                            <th>Date</th>
+                            <th>Open</th>
+                            <th>High</th>
+                            <th>Low</th>
+                            <th>Close</th>
+                            <th>Volume</th>
+                        </tr>
+                    `;
+                    historicalDataTable.appendChild(tableHeader);
+
+                    const tableBody = document.createElement('tbody');
+                    data.dates.forEach((date, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${date.toLocaleDateString()}</td>
+                            <td>$${data.open[index].toFixed(2)}</td>
+                            <td>$${data.high[index].toFixed(2)}</td>
+                            <td>$${data.low[index].toFixed(2)}</td>
+                            <td>$${data.close[index].toFixed(2)}</td>
+                            <td>${data.volume[index].toLocaleString()}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                    historicalDataTable.appendChild(tableBody);
+                }, 1000);
+            }
+
+            historicalChartToggle.addEventListener('click', function() {
+                historicalChartContainer.style.display = historicalChartContainer.style.display === 'none' ? 'block' : 'none';
+                historicalDataTable.style.display = historicalDataTable.style.display === 'none' ? 'table' : 'none';
+            });
+
+            exportHistoricalDataBtn.addEventListener('click', function() {
+                // Simulate data export
+                alert('Data exported successfully!');
+            });
+
+            // Real-Time Quotes functionality
+            const fetchRealTimeQuoteBtn = document.getElementById('fetch-real-time-quote');
+            const quoteDetails = document.getElementById('quote-details');
+            const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
+            const refreshIntervalInput = document.getElementById('refresh-interval');
+            const addToWatchlistBtn = document.getElementById('add-to-watchlist');
+            const setPriceAlertBtn = document.getElementById('set-price-alert');
+            const marketHours = document.getElementById('market-hours');
+
+            let autoRefreshInterval;
+
+            fetchRealTimeQuoteBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('quote-symbol').value;
+
+                if (symbol) {
+                    fetchRealTimeQuote(symbol);
+                }
+            });
+
+            function fetchRealTimeQuote(symbol) {
+                // Show loading state
+                quoteDetails.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call to fetch real-time quote
+                setTimeout(() => {
+                    // Generate mock data
+                    const quote = {
+                        symbol: symbol,
+                        price: (Math.random() * 100 + 50).toFixed(2),
+                        change: (Math.random() * 10 - 5).toFixed(2),
+                        percentChange: (Math.random() * 20 - 10).toFixed(2),
+                        open: (Math.random() * 100 + 50).toFixed(2),
+                        high: (Math.random() * 100 + 60).toFixed(2),
+                        low: (Math.random() * 100 + 40).toFixed(2),
+                        volume: Math.floor(Math.random() * 1000000),
+                        previousClose: (Math.random() * 100 + 50).toFixed(2),
+                        timestamp: new Date().toLocaleString()
+                    };
+
+                    displayRealTimeQuote(quote);
+                }, 1000);
+            }
+
+            function displayRealTimeQuote(quote) {
+                quoteDetails.innerHTML = `
+                    <div class="quote-symbol">${quote.symbol}</div>
+                    <div class="quote-price">$${quote.price}</div>
+                    <div class="quote-change ${quote.change >= 0 ? 'positive' : 'negative'}">
+                        ${quote.change >= 0 ? '+' : ''}${quote.change} (${quote.percentChange}%)
+                    </div>
+                    <div class="quote-details-grid">
+                        <div class="quote-detail">
+                            <span class="detail-label">Open:</span>
+                            <span class="detail-value">$${quote.open}</span>
+                        </div>
+                        <div class="quote-detail">
+                            <span class="detail-label">High:</span>
+                            <span class="detail-value">$${quote.high}</span>
+                        </div>
+                        <div class="quote-detail">
+                            <span class="detail-label">Low:</span>
+                            <span class="detail-value">$${quote.low}</span>
+                        </div>
+                        <div class="quote-detail">
+                            <span class="detail-label">Volume:</span>
+                            <span class="detail-value">${quote.volume.toLocaleString()}</span>
+                        </div>
+                        <div class="quote-detail">
+                            <span class="detail-label">Prev Close:</span>
+                            <span class="detail-value">$${quote.previousClose}</span>
+                        </div>
+                        <div class="quote-detail">
+                            <span class="detail-label">Timestamp:</span>
+                            <span class="detail-value">${quote.timestamp}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Update market hours
+                const now = new Date();
+                const hours = now.getHours();
+                const isMarketOpen = hours >= 9 && hours < 16; // Simplified market hours
+
+                marketHours.innerHTML = `
+                    <div class="market-status ${isMarketOpen ? 'positive' : 'negative'}">
+                        Market is currently ${isMarketOpen ? 'open' : 'closed'}
+                    </div>
+                    <div class="market-hours-info">
+                        <div>Regular Market Hours: 9:30 AM - 4:00 PM ET</div>
+                        <div>Extended Hours: 4:00 PM - 8:00 PM ET</div>
+                    </div>
+                `;
+            }
+
+            autoRefreshToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    const interval = parseInt(refreshIntervalInput.value) * 1000;
+                    const symbol = document.getElementById('quote-symbol').value;
+
+                    if (symbol) {
+                        autoRefreshInterval = setInterval(() => {
+                            fetchRealTimeQuote(symbol);
+                        }, interval);
+                    }
+                } else {
+                    clearInterval(autoRefreshInterval);
+                }
+            });
+
+            addToWatchlistBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('quote-symbol').value;
+                if (symbol) {
+                    // Simulate adding to watchlist
+                    alert(`${symbol} added to watchlist!`);
+                }
+            });
+
+            setPriceAlertBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('quote-symbol').value;
+                if (symbol) {
+                    // Simulate setting price alert
+                    alert(`Price alert set for ${symbol}!`);
+                }
+            });
+
+            // Intraday Data functionality
+            const fetchIntradayDataBtn = document.getElementById('fetch-intraday-data');
+            const intradayChartContainer = document.getElementById('intraday-chart-container');
+            const volumeChartContainer = document.getElementById('volume-chart-container');
+            const intradayChartToggle = document.getElementById('intraday-chart-toggle');
+            const volumeToggle = document.getElementById('volume-toggle');
+            const drawingToolsBtn = document.getElementById('drawing-tools');
+
+            fetchIntradayDataBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('intraday-symbol').value;
+                const interval = document.getElementById('intraday-interval').value;
+                const date = document.getElementById('intraday-date').value;
+
+                if (symbol && date) {
+                    fetchIntradayData(symbol, interval, date);
+                }
+            });
+
+            function fetchIntradayData(symbol, interval, date) {
+                // Show loading state
+                intradayChartContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+                volumeChartContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call to fetch intraday data
+                setTimeout(() => {
+                    // Generate mock data based on interval
+                    const startTime = new Date(date);
+                    startTime.setHours(9, 30, 0, 0); // Market open at 9:30 AM
+                    const endTime = new Date(date);
+                    endTime.setHours(16, 0, 0, 0); // Market close at 4:00 PM
+
+                    const times = [];
+                    const currentTime = new Date(startTime);
+
+                    // Set interval based on selected option
+                    let intervalMinutes;
+                    switch (interval) {
+                        case '1m':
+                            intervalMinutes = 1;
+                            break;
+                        case '5m':
+                            intervalMinutes = 5;
+                            break;
+                        case '1h':
+                            intervalMinutes = 60;
+                            break;
+                        default:
+                            intervalMinutes = 5;
+                    }
+
+                    while (currentTime <= endTime) {
+                        times.push(new Date(currentTime));
+                        currentTime.setMinutes(currentTime.getMinutes() + intervalMinutes);
+                    }
+
+                    const data = {
+                        symbol: symbol,
+                        times: times,
+                        open: times.map(() => Math.random() * 100 + 50),
+                        high: times.map(() => Math.random() * 100 + 60),
+                        low: times.map(() => Math.random() * 100 + 40),
+                        close: times.map(() => Math.random() * 100 + 50),
+                        volume: times.map(() => Math.floor(Math.random() * 100000))
+                    };
+
+                    displayIntradayData(data);
+                }, 1000);
+            }
+
+            function displayIntradayData(data) {
+                // Create intraday chart
+                const intradayChartCtx = document.getElementById('intraday-chart').getContext('2d');
+                new Chart(intradayChartCtx, {
+                    type: 'candlestick',
+                    data: {
+                        datasets: [{
+                            label: `${data.symbol} Intraday`,
+                            data: data.times.map((time, index) => ({
+                                x: time,
+                                o: data.open[index],
+                                h: data.high[index],
+                                l: data.low[index],
+                                c: data.close[index]
+                            })),
+                            borderColor: data.times.map((time, index) => data.close[index] >= data.open[index] ? '#27ae60' : '#e74c3c'),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'hour',
+                                    displayFormats: {
+                                        hour: 'h:mm a'
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Price'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Create volume chart
+                const volumeChartCtx = document.getElementById('volume-chart').getContext('2d');
+                new Chart(volumeChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.times.map(time => time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
+                        datasets: [{
+                            label: 'Volume',
+                            data: data.volume,
+                            backgroundColor: data.times.map((time, index) => data.close[index] >= data.open[index] ? '#27ae60' : '#e74c3c'),
+                            borderColor: data.times.map((time, index) => data.close[index] >= data.open[index] ? '#219653' : '#c0392b'),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Volume'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            intradayChartToggle.addEventListener('click', function() {
+                intradayChartContainer.style.display = intradayChartContainer.style.display === 'none' ? 'block' : 'none';
+            });
+
+            volumeToggle.addEventListener('click', function() {
+                volumeChartContainer.style.display = volumeChartContainer.style.display === 'none' ? 'block' : 'none';
+            });
+
+            drawingToolsBtn.addEventListener('click', function() {
+                // Simulate enabling drawing tools
+                alert('Drawing tools enabled!');
+            });
+
+            // Fundamentals functionality
+            const fetchFundamentalsBtn = document.getElementById('fetch-fundamentals');
+            const fundamentalsMetrics = document.getElementById('fundamentals-metrics');
+            const fundamentalsRatios = document.getElementById('fundamentals-ratios');
+            const sectorComparisonContainer = document.getElementById('sector-comparison-container');
+            const growthMetricsContainer = document.getElementById('growth-metrics-container');
+
+            fetchFundamentalsBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('fundamentals-symbol').value;
+
+                if (symbol) {
+                    fetchFundamentals(symbol);
+                }
+            });
+
+            function fetchFundamentals(symbol) {
+                // Show loading state
+                fundamentalsMetrics.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+                fundamentalsRatios.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+                sectorComparisonContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+                growthMetricsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call to fetch fundamentals
+                setTimeout(() => {
+                    // Generate mock data
+                    const fundamentals = {
+                        symbol: symbol,
+                        metrics: {
+                            marketCap: (Math.random() * 1000000000000).toFixed(2),
+                            peRatio: (Math.random() * 50).toFixed(2),
+                            eps: (Math.random() * 10).toFixed(2),
+                            dividendYield: (Math.random() * 10).toFixed(2),
+                            beta: (Math.random() * 2).toFixed(2),
+                            sharesOutstanding: (Math.random() * 1000000000).toFixed(2),
+                            fiftyTwoWeekHigh: (Math.random() * 100 + 50).toFixed(2),
+                            fiftyTwoWeekLow: (Math.random() * 100 + 50).toFixed(2),
+                            averageVolume: (Math.random() * 10000000).toFixed(2)
+                        },
+                        ratios: {
+                            currentRatio: (Math.random() * 5).toFixed(2),
+                            quickRatio: (Math.random() * 3).toFixed(2),
+                            debtToEquity: (Math.random() * 2).toFixed(2),
+                            priceToBook: (Math.random() * 5).toFixed(2),
+                            priceToSales: (Math.random() * 10).toFixed(2),
+                            pegRatio: (Math.random() * 3).toFixed(2),
+                            enterpriseValueToRevenue: (Math.random() * 2).toFixed(2),
+                            enterpriseValueToEbitda: (Math.random() * 10).toFixed(2)
+                        },
+                        sectorComparison: {
+                            labels: ['Technology', 'Healthcare', 'Financials', 'Consumer Discretionary', 'Industrials', 'Energy'],
+                            peRatios: [Math.random() * 50, Math.random() * 50, Math.random() * 50, Math.random() * 50, Math.random() * 50, Math.random() * 50],
+                            dividendYields: [Math.random() * 10, Math.random() * 10, Math.random() * 10, Math.random() * 10, Math.random() * 10, Math.random() * 10]
+                        },
+                        growthMetrics: {
+                            years: ['2019', '2020', '2021', '2022', '2023'],
+                            revenue: [Math.random() * 100000000000, Math.random() * 100000000000, Math.random() * 100000000000, Math.random() * 100000000000, Math.random() * 100000000000],
+                            netIncome: [Math.random() * 10000000000, Math.random() * 10000000000, Math.random() * 10000000000, Math.random() * 10000000000, Math.random() * 10000000000],
+                            earningsPerShare: [Math.random() * 10, Math.random() * 10, Math.random() * 10, Math.random() * 10, Math.random() * 10]
+                        }
+                    };
+
+                    displayFundamentals(fundamentals);
+                }, 1000);
+            }
+
+            function displayFundamentals(fundamentals) {
+                // Display key metrics
+                fundamentalsMetrics.innerHTML = `
+                    <div class="metric-card">
+                        <div class="metric-value">$${parseFloat(fundamentals.metrics.marketCap).toLocaleString()}</div>
+                        <div class="metric-label">Market Cap</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.metrics.peRatio}</div>
+                        <div class="metric-label">P/E Ratio</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$${fundamentals.metrics.eps}</div>
+                        <div class="metric-label">EPS</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.metrics.dividendYield}%</div>
+                        <div class="metric-label">Dividend Yield</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.metrics.beta}</div>
+                        <div class="metric-label">Beta</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${parseFloat(fundamentals.metrics.sharesOutstanding).toLocaleString()}</div>
+                        <div class="metric-label">Shares Outstanding</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$${fundamentals.metrics.fiftyTwoWeekHigh}</div>
+                        <div class="metric-label">52 Week High</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$${fundamentals.metrics.fiftyTwoWeekLow}</div>
+                        <div class="metric-label">52 Week Low</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${parseFloat(fundamentals.metrics.averageVolume).toLocaleString()}</div>
+                        <div class="metric-label">Avg Volume</div>
+                    </div>
+                `;
+
+                // Display financial ratios
+                fundamentalsRatios.innerHTML = `
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.ratios.currentRatio}</div>
+                        <div class="metric-label">Current Ratio</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.ratios.quickRatio}</div>
+                        <div class="metric-label">Quick Ratio</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.ratios.debtToEquity}</div>
+                        <div class="metric-label">Debt to Equity</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.ratios.priceToBook}</div>
+                        <div class="metric-label">Price to Book</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.ratios.priceToSales}</div>
+                        <div class="metric-label">Price to Sales</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.ratios.pegRatio}</div>
+                        <div class="metric-label">PEG Ratio</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.ratios.enterpriseValueToRevenue}</div>
+                        <div class="metric-label">EV to Revenue</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${fundamentals.ratios.enterpriseValueToEbitda}</div>
+                        <div class="metric-label">EV to EBITDA</div>
+                    </div>
+                `;
+
+                // Create sector comparison chart
+                const sectorComparisonCtx = document.getElementById('sector-comparison-chart').getContext('2d');
+                new Chart(sectorComparisonCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: fundamentals.sectorComparison.labels,
+                        datasets: [
+                            {
+                                label: 'P/E Ratio',
+                                data: fundamentals.sectorComparison.peRatios,
+                                backgroundColor: '#27ae60',
+                                borderColor: '#219653',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Dividend Yield',
+                                data: fundamentals.sectorComparison.dividendYields,
+                                backgroundColor: '#1a5276',
+                                borderColor: '#154360',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Value'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Create growth metrics chart
+                const growthMetricsCtx = document.getElementById('growth-metrics-chart').getContext('2d');
+                new Chart(growthMetricsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: fundamentals.growthMetrics.years,
+                        datasets: [
+                            {
+                                label: 'Revenue',
+                                data: fundamentals.growthMetrics.revenue,
+                                borderColor: '#27ae60',
+                                backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Net Income',
+                                data: fundamentals.growthMetrics.netIncome,
+                                borderColor: '#1a5276',
+                                backgroundColor: 'rgba(26, 82, 118, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Earnings per Share',
+                                data: fundamentals.growthMetrics.earningsPerShare,
+                                borderColor: '#e74c3c',
+                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y2'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Dollars'
+                                }
+                            },
+                            y2: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'EPS'
+                                },
+                                grid: {
+                                    drawOnChartArea: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Symbol Search functionality
+            const performSymbolSearchBtn = document.getElementById('perform-symbol-search');
+            const symbolSearchResults = document.getElementById('symbol-search-results');
+            const recentSearches = document.getElementById('recent-searches');
+            const favorites = document.getElementById('favorites');
+
+            performSymbolSearchBtn.addEventListener('click', function() {
+                const query = document.getElementById('symbol-search-input').value;
+
+                if (query) {
+                    fetchSymbolSearchResults(query);
+                }
+            });
+
+            function fetchSymbolSearchResults(query) {
+                // Show loading state
+                symbolSearchResults.innerHTML = '<tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>';
+
+                // Simulate API call to fetch symbol search results
+                setTimeout(() => {
+                    // Generate mock data
+                    const results = Array.from({ length: 10 }, (_, i) => ({
+                        symbol: `SYM${i + 1}`,
+                        name: `Company ${String.fromCharCode(65 + i)}`,
+                        exchange: ['NYSE', 'NASDAQ', 'LSE', 'HKEX'][Math.floor(Math.random() * 4)],
+                        sector: ['Technology', 'Healthcare', 'Financials', 'Consumer Discretionary', 'Industrials', 'Energy'][Math.floor(Math.random() * 6)],
+                        marketCap: (Math.random() * 1000000000000).toFixed(2)
+                    }));
+
+                    displaySymbolSearchResults(results);
+                }, 1000);
+            }
+
+            function displaySymbolSearchResults(results) {
+                // Create table header
+                symbolSearchResults.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Name</th>
+                            <th>Exchange</th>
+                            <th>Sector</th>
+                            <th>Market Cap</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+
+                const tbody = symbolSearchResults.querySelector('tbody');
+
+                // Add results to table
+                results.forEach(result => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${result.symbol}</td>
+                        <td>${result.name}</td>
+                        <td>${result.exchange}</td>
+                        <td>${result.sector}</td>
+                        <td>$${parseFloat(result.marketCap).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-secondary favorite-btn" data-symbol="${result.symbol}">⭐</button>
+                            <button class="btn btn-secondary view-btn" data-symbol="${result.symbol}">👁️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Add event listeners to favorite and view buttons
+                document.querySelectorAll('.favorite-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const symbol = this.getAttribute('data-symbol');
+                        addToFavorites(symbol);
+                    });
+                });
+
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const symbol = this.getAttribute('data-symbol');
+                        viewSymbolDetails(symbol);
+                    });
+                });
+            }
+
+            function addToFavorites(symbol) {
+                // Simulate adding to favorites
+                alert(`${symbol} added to favorites!`);
+
+                // Update favorites display
+                const favoriteItem = document.createElement('div');
+                favoriteItem.className = 'favorite-item';
+                favoriteItem.textContent = symbol;
+                favorites.appendChild(favoriteItem);
+            }
+
+            function viewSymbolDetails(symbol) {
+                // Simulate viewing symbol details
+                alert(`Viewing details for ${symbol}`);
+            }
+
+            // Exchange Browser functionality
+            const fetchExchangeDataBtn = document.getElementById('fetch-exchange-data');
+            const exchangeDataTable = document.getElementById('exchange-data-table');
+
+            fetchExchangeDataBtn.addEventListener('click', function() {
+                const exchange = document.getElementById('exchange-select').value;
+                const sectors = Array.from(document.getElementById('sector-filter').selectedOptions).map(option => option.value);
+                const sort = document.getElementById('market-cap-sort').value;
+
+                fetchExchangeData(exchange, sectors, sort);
+            });
+
+            function fetchExchangeData(exchange, sectors, sort) {
+                // Show loading state
+                exchangeDataTable.innerHTML = '<tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr>';
+
+                // Simulate API call to fetch exchange data
+                setTimeout(() => {
+                    // Generate mock data
+                    const data = Array.from({ length: 20 }, (_, i) => ({
+                        symbol: `SYM${i + 1}`,
+                        name: `Company ${String.fromCharCode(65 + i)}`,
+                        sector: ['Technology', 'Healthcare', 'Financials', 'Consumer Discretionary', 'Industrials', 'Energy'][Math.floor(Math.random() * 6)],
+                        marketCap: (Math.random() * 1000000000000).toFixed(2),
+                        price: (Math.random() * 100 + 50).toFixed(2),
+                        change: (Math.random() * 20 - 10).toFixed(2),
+                        percentChange: (Math.random() * 40 - 20).toFixed(2),
+                        volume: (Math.random() * 10000000).toFixed(2)
+                    }));
+
+                    // Filter by sectors if selected
+                    if (sectors.length > 0) {
+                        data = data.filter(item => sectors.includes(item.sector));
+                    }
+
+                    // Sort by market cap
+                    if (sort === 'asc') {
+                        data.sort((a, b) => parseFloat(a.marketCap) - parseFloat(b.marketCap));
+                    } else {
+                        data.sort((a, b) => parseFloat(b.marketCap) - parseFloat(a.marketCap));
+                    }
+
+                    displayExchangeData(data);
+                }, 1000);
+            }
+
+            function displayExchangeData(data) {
+                // Create table header
+                exchangeDataTable.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Name</th>
+                            <th>Sector</th>
+                            <th>Market Cap</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>% Change</th>
+                            <th>Volume</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+
+                const tbody = exchangeDataTable.querySelector('tbody');
+
+                // Add data to table
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.symbol}</td>
+                        <td>${item.name}</td>
+                        <td>${item.sector}</td>
+                        <td>$${parseFloat(item.marketCap).toLocaleString()}</td>
+                        <td>$${item.price}</td>
+                        <td class="${item.change >= 0 ? 'positive' : 'negative'}">
+                            ${item.change >= 0 ? '+' : ''}${item.change}
+                        </td>
+                        <td class="${item.percentChange >= 0 ? 'positive' : 'negative'}">
+                            ${item.percentChange >= 0 ? '+' : ''}${item.percentChange}%
+                        </td>
+                        <td>${parseFloat(item.volume).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-secondary view-btn" data-symbol="${item.symbol}">👁️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Add event listeners to view buttons
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const symbol = this.getAttribute('data-symbol');
+                        viewSymbolDetails(symbol);
+                    });
+                });
+            }
+
+            // News Feed functionality
+            const fetchNewsBtn = document.getElementById('fetch-news');
+            const newsFeedContent = document.getElementById('news-feed-content');
+
+            fetchNewsBtn.addEventListener('click', function() {
+                const startDate = document.getElementById('news-start-date').value;
+                const endDate = document.getElementById('news-end-date').value;
+                const keywords = document.getElementById('news-keywords').value;
+
+                fetchNews(startDate, endDate, keywords);
+            });
+
+            function fetchNews(startDate, endDate, keywords) {
+                // Show loading state
+                newsFeedContent.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call to fetch news
+                setTimeout(() => {
+                    // Generate mock data
+                    const newsItems = Array.from({ length: 10 }, (_, i) => ({
+                        title: `News Article ${i + 1} about ${keywords || 'financial markets'}`,
+                        source: ['Bloomberg', 'Reuters', 'CNBC', 'The Wall Street Journal', 'Financial Times'][Math.floor(Math.random() * 5)],
+                        date: new Date(startDate).toLocaleDateString(),
+                        content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. ${keywords ? `This article is about ${keywords}.` : ''}`,
+                        sentiment: ['positive', 'neutral', 'negative'][Math.floor(Math.random() * 3)],
+                        relatedSymbols: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'FB'].slice(0, Math.floor(Math.random() * 5) + 1)
+                    }));
+
+                    displayNews(newsItems);
+                }, 1000);
+            }
+
+            function displayNews(newsItems) {
+                newsFeedContent.innerHTML = '';
+
+                newsItems.forEach(item => {
+                    const newsItem = document.createElement('div');
+                    newsItem.className = 'news-item';
+                    newsItem.innerHTML = `
+                        <h3 class="news-title">${item.title}</h3>
+                        <div class="news-meta">
+                            <span class="news-source">${item.source}</span>
+                            <span class="news-date">${item.date}</span>
+                            <span class="news-sentiment ${item.sentiment === 'positive' ? 'sentiment-positive' : item.sentiment === 'negative' ? 'sentiment-negative' : ''}">
+                                ${item.sentiment === 'positive' ? '😊' : item.sentiment === 'negative' ? '😠' : '😐'} ${item.sentiment}
+                            </span>
+                        </div>
+                        <p class="news-content">${item.content}</p>
+                        <div class="news-tags">
+                            ${item.relatedSymbols.map(symbol => `<span class="news-tag">${symbol}</span>`).join('')}
+                        </div>
+                    `;
+                    newsFeedContent.appendChild(newsItem);
+                });
+            }
+
+            // Dividend History functionality
+            const fetchDividendHistoryBtn = document.getElementById('fetch-dividend-history');
+            const dividendTable = document.getElementById('dividend-table');
+            const calculateYieldBtn = document.getElementById('calculate-yield');
+            const simulateReinvestmentBtn = document.getElementById('simulate-reinvestment');
+            const exDateCalendar = document.getElementById('ex-date-calendar');
+
+            fetchDividendHistoryBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('dividend-symbol').value;
+
+                if (symbol) {
+                    fetchDividendHistory(symbol);
+                }
+            });
+
+            function fetchDividendHistory(symbol) {
+                // Show loading state
+                dividendTable.innerHTML = '<tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>';
+                exDateCalendar.innerHTML = '<tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr>';
+
+                // Simulate API call to fetch dividend history
+                setTimeout(() => {
+                    // Generate mock data
+                    const dividendData = Array.from({ length: 12 }, (_, i) => {
+                        const date = new Date();
+                        date.setMonth(date.getMonth() - i);
+                        return {
+                            date: date.toLocaleDateString(),
+                            dividend: (Math.random() * 2 + 0.1).toFixed(2),
+                            exDate: new Date(date.setDate(date.getDate() - 3)).toLocaleDateString(),
+                            recordDate: new Date(date.setDate(date.getDate() - 1)).toLocaleDateString(),
+                            paymentDate: new Date(date.setDate(date.getDate() + 1)).toLocaleDateString()
+                        };
+                    });
+
+                    displayDividendHistory(dividendData);
+                }, 1000);
+            }
+
+            function displayDividendHistory(dividendData) {
+                // Create dividend table
+                dividendTable.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Dividend</th>
+                            <th>Ex-Date</th>
+                            <th>Record Date</th>
+                            <th>Payment Date</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+
+                const tbody = dividendTable.querySelector('tbody');
+
+                dividendData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.date}</td>
+                        <td>$${item.dividend}</td>
+                        <td>${item.exDate}</td>
+                        <td>${item.recordDate}</td>
+                        <td>${item.paymentDate}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Create ex-date calendar
+                const today = new Date();
+                const currentMonth = today.getMonth();
+                const currentYear = today.getFullYear();
+
+                // Get the first day of the month
+                const firstDay = new Date(currentYear, currentMonth, 1);
+                const startingDay = firstDay.getDay();
+
+                // Get the last day of the month
+                const lastDay = new Date(currentYear, currentMonth + 1, 0);
+                const monthLength = lastDay.getDate();
+
+                // Create calendar header
+                exDateCalendar.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Sun</th>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th>Sat</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+
+                const calendarBody = exDateCalendar.querySelector('tbody');
+                let date = 1;
+
+                // Create calendar rows
+                for (let i = 0; i < 6; i++) {
+                    const row = document.createElement('tr');
+
+                    for (let j = 0; j < 7; j++) {
+                        const cell = document.createElement('td');
+
+                        if (i === 0 && j < startingDay) {
+                            // Empty cell before the first day of the month
+                            cell.textContent = '';
+                        } else if (date > monthLength) {
+                            // Empty cell after the last day of the month
+                            cell.textContent = '';
+                        } else {
+                            // Cell with a date
+                            cell.textContent = date;
+
+                            // Check if this date is an ex-date, record date, or payment date
+                            const currentDate = new Date(currentYear, currentMonth, date);
+                            const isExDate = dividendData.some(item => new Date(item.exDate).toDateString() === currentDate.toDateString());
+                            const isRecordDate = dividendData.some(item => new Date(item.recordDate).toDateString() === currentDate.toDateString());
+                            const isPaymentDate = dividendData.some(item => new Date(item.paymentDate).toDateString() === currentDate.toDateString());
+
+                            if (isExDate) {
+                                cell.classList.add('ex-date');
+                                cell.title = 'Ex-Date';
+                            } else if (isRecordDate) {
+                                cell.classList.add('record-date');
+                                cell.title = 'Record Date';
+                            } else if (isPaymentDate) {
+                                cell.classList.add('payment-date');
+                                cell.title = 'Payment Date';
+                            }
+
+                            date++;
+                        }
+
+                        row.appendChild(cell);
+                    }
+
+                    calendarBody.appendChild(row);
+
+                    // Stop creating rows if we've passed the last day of the month
+                    if (date > monthLength) {
+                        break;
+                    }
+                }
+            }
+
+            calculateYieldBtn.addEventListener('click', function() {
+                const dividendAmount = parseFloat(document.getElementById('dividend-amount').value);
+                const sharePrice = parseFloat(document.getElementById('share-price').value);
+
+                if (!isNaN(dividendAmount) && !isNaN(sharePrice) && sharePrice !== 0) {
+                    const yield = (dividendAmount / sharePrice) * 100;
+                    document.getElementById('dividend-yield').value = `${yield.toFixed(2)}%`;
+                } else {
+                    alert('Please enter valid dividend amount and share price.');
+                }
+            });
+
+            simulateReinvestmentBtn.addEventListener('click', function() {
+                const initialInvestment = parseFloat(document.getElementById('initial-investment').value);
+                const annualDividend = parseFloat(document.getElementById('annual-dividend').value);
+                const period = parseFloat(document.getElementById('reinvestment-period').value);
+
+                if (!isNaN(initialInvestment) && !isNaN(annualDividend) && !isNaN(period)) {
+                    // Simple compound interest calculation
+                    const result = initialInvestment * Math.pow(1 + annualDividend / initialInvestment, period);
+                    document.getElementById('reinvestment-result').value = `$${result.toFixed(2)}`;
+                } else {
+                    alert('Please enter valid values for initial investment, annual dividend, and period.');
+                }
+            });
+
+            // Portfolio Analyzer functionality
+            const analyzePortfolioBtn = document.getElementById('analyze-portfolio');
+            const portfolioChart = document.getElementById('portfolio-chart');
+            const assetAllocation = document.getElementById('asset-allocation');
+            const performanceMetrics = document.getElementById('performance-metrics');
+
+            analyzePortfolioBtn.addEventListener('click', function() {
+                const symbols = document.getElementById('portfolio-symbols').value.split(',').map(s => s.trim());
+                const weights = document.getElementById('portfolio-weights').value.split(',').map(w => parseFloat(w.trim()));
+
+                if (symbols.length > 0 && weights.length === symbols.length && weights.every(w => !isNaN(w))) {
+                    analyzePortfolio(symbols, weights);
+                } else {
+                    alert('Please enter valid symbols and weights (comma separated, same number of items).');
+                }
+            });
+
+            function analyzePortfolio(symbols, weights) {
+                // Show loading state
+                portfolioChart.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+                assetAllocation.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+                performanceMetrics.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call to analyze portfolio
+                setTimeout(() => {
+                    // Generate mock data
+                    const portfolioData = {
+                        symbols: symbols,
+                        weights: weights,
+                        performance: Array.from({ length: 12 }, (_, i) => ({
+                            date: new Date(2023, i, 1).toLocaleDateString(),
+                            value: (Math.random() * 100000 + 50000).toFixed(2)
+                        })),
+                        allocation: symbols.map((symbol, index) => ({
+                            symbol: symbol,
+                            weight: weights[index],
+                            color: `#${Math.floor(Math.random() * 16777215).toString(16)}`
+                        })),
+                        metrics: {
+                            totalValue: (Math.random() * 1000000 + 500000).toFixed(2),
+                            dailyReturn: (Math.random() * 5 - 2.5).toFixed(2),
+                            monthlyReturn: (Math.random() * 15 - 7.5).toFixed(2),
+                            annualReturn: (Math.random() * 30 - 15).toFixed(2),
+                            volatility: (Math.random() * 20).toFixed(2),
+                            sharpeRatio: (Math.random() * 3).toFixed(2),
+                            beta: (Math.random() * 2).toFixed(2)
+                        }
+                    };
+
+                    displayPortfolioAnalysis(portfolioData);
+                }, 1000);
+            }
+
+            function displayPortfolioAnalysis(portfolioData) {
+                // Create portfolio chart
+                const portfolioChartCtx = document.createElement('canvas');
+                portfolioChart.innerHTML = '';
+                portfolioChart.appendChild(portfolioChartCtx);
+
+                new Chart(portfolioChartCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: portfolioData.performance.map(item => item.date),
+                        datasets: [{
+                            label: 'Portfolio Value',
+                            data: portfolioData.performance.map(item => item.value),
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Value ($)'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Display asset allocation
+                assetAllocation.innerHTML = '';
+                portfolioData.allocation.forEach(item => {
+                    const allocationItem = document.createElement('div');
+                    allocationItem.className = 'allocation-item';
+                    allocationItem.innerHTML = `
+                        <div class="allocation-color" style="background-color: ${item.color};"></div>
+                        <div class="allocation-symbol">${item.symbol}</div>
+                        <div class="allocation-weight">${(item.weight * 100).toFixed(2)}%</div>
+                    `;
+                    assetAllocation.appendChild(allocationItem);
+                });
+
+                // Display performance metrics
+                performanceMetrics.innerHTML = `
+                    <div class="metric-card">
+                        <div class="metric-value">$${parseFloat(portfolioData.metrics.totalValue).toLocaleString()}</div>
+                        <div class="metric-label">Total Value</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value ${portfolioData.metrics.dailyReturn >= 0 ? 'positive' : 'negative'}">
+                            ${portfolioData.metrics.dailyReturn >= 0 ? '+' : ''}${portfolioData.metrics.dailyReturn}%
+                        </div>
+                        <div class="metric-label">Daily Return</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value ${portfolioData.metrics.monthlyReturn >= 0 ? 'positive' : 'negative'}">
+                            ${portfolioData.metrics.monthlyReturn >= 0 ? '+' : ''}${portfolioData.metrics.monthlyReturn}%
+                        </div>
+                        <div class="metric-label">Monthly Return</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value ${portfolioData.metrics.annualReturn >= 0 ? 'positive' : 'negative'}">
+                            ${portfolioData.metrics.annualReturn >= 0 ? '+' : ''}${portfolioData.metrics.annualReturn}%
+                        </div>
+                        <div class="metric-label">Annual Return</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${portfolioData.metrics.volatility}%</div>
+                        <div class="metric-label">Volatility</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${portfolioData.metrics.sharpeRatio}</div>
+                        <div class="metric-label">Sharpe Ratio</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${portfolioData.metrics.beta}</div>
+                        <div class="metric-label">Beta</div>
+                    </div>
+                `;
+            }
+
+            // Watchlist functionality
+            const addToWatchlistMainBtn = document.getElementById('add-to-watchlist-main');
+            const watchlistTable = document.getElementById('watchlist-table');
+            const setAlertBtn = document.getElementById('set-alert');
+            const alertList = document.getElementById('alert-list');
+
+            addToWatchlistMainBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('watchlist-symbol').value;
+
+                if (symbol) {
+                    addToWatchlist(symbol);
+                }
+            });
+
+            function addToWatchlist(symbol) {
+                // Show loading state
+                watchlistTable.innerHTML = '<tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr>';
+
+                // Simulate API call to add to watchlist
+                setTimeout(() => {
+                    // Generate mock data
+                    const watchlistData = Array.from({ length: 5 }, (_, i) => ({
+                        symbol: i === 0 ? symbol : `SYM${i + 1}`,
+                        name: i === 0 ? `Company ${symbol}` : `Company ${String.fromCharCode(65 + i)}`,
+                        price: (Math.random() * 100 + 50).toFixed(2),
+                        change: (Math.random() * 20 - 10).toFixed(2),
+                        percentChange: (Math.random() * 40 - 20).toFixed(2),
+                        volume: (Math.random() * 10000000).toFixed(2),
+                        marketCap: (Math.random() * 1000000000000).toFixed(2)
+                    }));
+
+                    displayWatchlist(watchlistData);
+                }, 1000);
+            }
+
+            function displayWatchlist(watchlistData) {
+                // Create table header
+                watchlistTable.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>% Change</th>
+                            <th>Volume</th>
+                            <th>Market Cap</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+
+                const tbody = watchlistTable.querySelector('tbody');
+
+                // Add data to table
+                watchlistData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.symbol}</td>
+                        <td>${item.name}</td>
+                        <td>$${item.price}</td>
+                        <td class="${item.change >= 0 ? 'positive' : 'negative'}">
+                            ${item.change >= 0 ? '+' : ''}${item.change}
+                        </td>
+                        <td class="${item.percentChange >= 0 ? 'positive' : 'negative'}">
+                            ${item.percentChange >= 0 ? '+' : ''}${item.percentChange}%
+                        </td>
+                        <td>${parseFloat(item.volume).toLocaleString()}</td>
+                        <td>$${parseFloat(item.marketCap).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-secondary view-btn" data-symbol="${item.symbol}">👁️</button>
+                            <button class="btn btn-danger remove-btn" data-symbol="${item.symbol}">❌</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Add event listeners to view and remove buttons
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const symbol = this.getAttribute('data-symbol');
+                        viewSymbolDetails(symbol);
+                    });
+                });
+
+                document.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const symbol = this.getAttribute('data-symbol');
+                        removeFromWatchlist(symbol);
+                    });
+                });
+            }
+
+            function removeFromWatchlist(symbol) {
+                // Simulate removing from watchlist
+                alert(`${symbol} removed from watchlist!`);
+
+                // Refresh watchlist
+                const watchlistData = Array.from(watchlistTable.querySelectorAll('tbody tr'))
+                    .filter(row => row.querySelector('.remove-btn').getAttribute('data-symbol') !== symbol)
+                    .map(row => {
+                        const cells = row.querySelectorAll('td');
+                        return {
+                            symbol: cells[0].textContent,
+                            name: cells[1].textContent,
+                            price: cells[2].textContent.replace('$', ''),
+                            change: cells[3].textContent.replace(/[^0-9.-]/g, ''),
+                            percentChange: cells[4].textContent.replace(/[^0-9.-]/g, ''),
+                            volume: cells[5].textContent.replace(/,/g, ''),
+                            marketCap: cells[6].textContent.replace(/[^0-9.-]/g, '')
+                        };
+                    });
+
+                displayWatchlist(watchlistData);
+            }
+
+            setAlertBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('alert-symbol').value;
+                const type = document.getElementById('alert-type').value;
+                const price = parseFloat(document.getElementById('alert-price').value);
+
+                if (symbol && !isNaN(price)) {
+                    setPriceAlert(symbol, type, price);
+                } else {
+                    alert('Please enter valid symbol and price.');
+                }
+            });
+
+            function setPriceAlert(symbol, type, price) {
+                // Simulate setting price alert
+                alert(`Price alert set for ${symbol}: ${type} $${price}`);
+
+                // Add alert to list
+                const alertItem = document.createElement('div');
+                alertItem.className = 'alert-item';
+                alertItem.innerHTML = `
+                    <span class="alert-symbol">${symbol}</span>
+                    <span class="alert-type">${type === 'above' ? 'Price Above' : 'Price Below'}</span>
+                    <span class="alert-price">$${price}</span>
+                    <button class="btn btn-danger remove-alert-btn" data-symbol="${symbol}" data-type="${type}" data-price="${price}">❌</button>
+                `;
+                alertList.appendChild(alertItem);
+
+                // Add event listener to remove button
+                alertItem.querySelector('.remove-alert-btn').addEventListener('click', function() {
+                    const symbol = this.getAttribute('data-symbol');
+                    const type = this.getAttribute('data-type');
+                    const price = this.getAttribute('data-price');
+                    removePriceAlert(symbol, type, price);
+                });
+            }
+
+            function removePriceAlert(symbol, type, price) {
+                // Simulate removing price alert
+                alert(`Price alert removed for ${symbol}: ${type} $${price}`);
+
+                // Remove alert from list
+                const alertItems = alertList.querySelectorAll('.alert-item');
+                alertItems.forEach(item => {
+                    if (
+                        item.querySelector('.alert-symbol').textContent === symbol &&
+                        item.querySelector('.alert-type').textContent === (type === 'above' ? 'Price Above' : 'Price Below') &&
+                        item.querySelector('.alert-price').textContent === `$${price}`
+                    ) {
+                        item.remove();
+                    }
+                });
+            }
+
+            // API Key Manager functionality
+            const updateApiKeyBtn = document.getElementById('update-api-key');
+            const revokeApiKeyBtn = document.getElementById('revoke-api-key');
+
+            // Set initial API key
+            document.getElementById('current-api-key').value = '************************';
+
+            updateApiKeyBtn.addEventListener('click', function() {
+                const newApiKey = document.getElementById('new-api-key').value;
+
+                if (newApiKey) {
+                    // Simulate updating API key
+                    document.getElementById('current-api-key').value = newApiKey;
+                    document.getElementById('new-api-key').value = '';
+                    alert('API key updated successfully!');
+                } else {
+                    alert('Please enter a new API key.');
+                }
+            });
+
+            revokeApiKeyBtn.addEventListener('click', function() {
+                // Simulate revoking API key
+                document.getElementById('current-api-key').value = '************************';
+                alert('API key revoked successfully!');
+            });
+        });
+    </script>
+</body>
+</html>

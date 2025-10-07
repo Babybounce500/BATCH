@@ -1,0 +1,4016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Command Center</title>
+    <meta name="description" content="Comprehensive OpenAI API interface with dark theme and Orbitron font">
+    <style>
+        :root {
+            --primary: #10A37F;
+            --primary-dark: #0D8266;
+            --secondary: #2C3E50;
+            --background: #1E1E1E;
+            --surface: #2D2D2D;
+            --text: #E0E0E0;
+            --text-secondary: #A0A0A0;
+            --error: #E74C3C;
+            --success: #2ECC71;
+            --warning: #F39C12;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: auto 1fr;
+            transition: var(--transition);
+        }
+
+        .sidebar {
+            background-color: var(--surface);
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            width: 280px;
+            overflow-y: auto;
+            border-right: 1px solid var(--text-secondary);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .sidebar-header h1 {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            color: var(--primary);
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--primary);
+            color: var(--background);
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .content-header h2 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: var(--primary);
+        }
+
+        .api-key-section {
+            background-color: var(--surface);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .api-key-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--text-secondary);
+            border-radius: var(--border-radius);
+            background-color: var(--background);
+            color: var(--text);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .api-key-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--background);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #34495E;
+        }
+
+        .card {
+            background-color: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .card-content {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--text-secondary);
+            border-radius: var(--border-radius);
+            background-color: var(--background);
+            color: var(--text);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-value {
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid var(--text-secondary);
+            border-radius: var(--border-radius);
+            background-color: var(--background);
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: var(--border-radius);
+        }
+
+        .message.system {
+            background-color: rgba(16, 163, 127, 0.2);
+            border-left: 3px solid var(--primary);
+        }
+
+        .message.user {
+            background-color: rgba(44, 62, 80, 0.2);
+            border-left: 3px solid var(--secondary);
+        }
+
+        .message.assistant {
+            background-color: rgba(46, 204, 113, 0.2);
+            border-left: 3px solid var(--success);
+        }
+
+        .response-container {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid var(--text-secondary);
+            border-radius: var(--border-radius);
+            background-color: var(--background);
+            white-space: pre-wrap;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--text-secondary);
+            transition: var(--transition);
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--background);
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .code-export {
+            margin-top: 20px;
+        }
+
+        .code-tabs {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .code-tab {
+            padding: 8px 15px;
+            cursor: pointer;
+            background-color: var(--secondary);
+            color: var(--text);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            margin-right: 5px;
+        }
+
+        .code-tab.active {
+            background-color: var(--primary);
+            color: var(--background);
+        }
+
+        .code-content {
+            background-color: var(--background);
+            padding: 15px;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            border: 1px solid var(--text-secondary);
+            border-top: none;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .token-usage {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--text-secondary);
+        }
+
+        .token-item {
+            text-align: center;
+        }
+
+        .token-value {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .token-label {
+            color: var(--text-secondary);
+        }
+
+        .budget-alert {
+            background-color: var(--warning);
+            color: var(--background);
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin-top: 10px;
+            display: none;
+        }
+
+        .model-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .model-card {
+            background-color: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .model-name {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .model-id {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .model-capabilities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .capability {
+            background-color: rgba(16, 163, 127, 0.2);
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .model-created {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .file-uploader {
+            border: 2px dashed var(--text-secondary);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-uploader:hover {
+            border-color: var(--primary);
+            background-color: rgba(16, 163, 127, 0.1);
+        }
+
+        .file-uploader i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: var(--text-secondary);
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--text-secondary);
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-name {
+            font-weight: 500;
+        }
+
+        .file-details {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        #imageCanvas {
+            border: 1px solid var(--text-secondary);
+            border-radius: var(--border-radius);
+            cursor: crosshair;
+        }
+
+        .canvas-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tool-btn {
+            padding: 8px 12px;
+            background-color: var(--secondary);
+            color: var(--text);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tool-btn:hover {
+            background-color: #34495E;
+        }
+
+        .tool-btn.active {
+            background-color: var(--primary);
+            color: var(--background);
+        }
+
+        .color-picker {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .brush-size {
+            width: 50px;
+        }
+
+        .image-preview {
+            margin-top: 20px;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .voice-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .voice-card {
+            background-color: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+
+        .voice-name {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .play-btn {
+            background-color: var(--primary);
+            color: var(--background);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            transition: var(--transition);
+        }
+
+        .play-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .ssml-editor {
+            height: 200px;
+            margin-bottom: 15px;
+        }
+
+        .moderation-gauges {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .gauge-container {
+            text-align: center;
+        }
+
+        .gauge {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 10px;
+        }
+
+        .gauge-value {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .gauge-label {
+            color: var(--text-secondary);
+        }
+
+        .similarity-matrix {
+            margin-top: 20px;
+        }
+
+        .similarity-matrix table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .similarity-matrix th, .similarity-matrix td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid var(--text-secondary);
+        }
+
+        .similarity-matrix th {
+            background-color: var(--secondary);
+        }
+
+        .similarity-cell {
+            background-color: rgba(16, 163, 127, 0.2);
+        }
+
+        .dimension-plot {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .assistant-tools {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tool-card {
+            background-color: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--box-shadow);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tool-card.active {
+            border: 2px solid var(--primary);
+        }
+
+        .tool-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .tool-name {
+            font-weight: 500;
+        }
+
+        .tool-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .message-history {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid var(--text-secondary);
+            border-radius: var(--border-radius);
+            background-color: var(--background);
+        }
+
+        .run-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .progress-tracker {
+            margin-top: 20px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: var(--text-secondary);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .notification-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .notification {
+            background-color: var(--surface);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 10px;
+            max-width: 300px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--error);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .notification.success .notification-icon {
+            color: var(--success);
+        }
+
+        .notification.error .notification-icon {
+            color: var(--error);
+        }
+
+        .notification.warning .notification-icon {
+            color: var(--warning);
+        }
+
+        .notification-message {
+            flex: 1;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .workflow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--secondary);
+            color: var(--text);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .step-content {
+            flex: 1;
+            background-color: var(--surface);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .step-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .model-list {
+                grid-template-columns: 1fr;
+            }
+
+            .assistant-tools {
+                grid-template-columns: 1fr;
+            }
+
+            .workflow-step {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="https://openai.com/favicon.ico" alt="OpenAI Logo">
+            <h1>OpenAI Command Center</h1>
+        </div>
+        <nav class="nav">
+            <div class="nav-item active" data-target="chat-completions">
+                <i class="fas fa-comments"></i>
+                <span>Chat Completions</span>
+            </div>
+            <div class="nav-item" data-target="embeddings">
+                <i class="fas fa-vector-square"></i>
+                <span>Embeddings</span>
+            </div>
+            <div class="nav-item" data-target="dalle">
+                <i class="fas fa-image"></i>
+                <span>DALL-E</span>
+            </div>
+            <div class="nav-item" data-target="whisper">
+                <i class="fas fa-microphone"></i>
+                <span>Whisper</span>
+            </div>
+            <div class="nav-item" data-target="tts">
+                <i class="fas fa-volume-up"></i>
+                <span>Text-to-Speech</span>
+            </div>
+            <div class="nav-item" data-target="moderation">
+                <i class="fas fa-shield-alt"></i>
+                <span>Content Moderation</span>
+            </div>
+            <div class="nav-item" data-target="models">
+                <i class="fas fa-cube"></i>
+                <span>Models</span>
+            </div>
+            <div class="nav-item" data-target="files">
+                <i class="fas fa-file-alt"></i>
+                <span>Files</span>
+            </div>
+            <div class="nav-item" data-target="assistants">
+                <i class="fas fa-robot"></i>
+                <span>Assistants</span>
+            </div>
+            <div class="nav-item" data-target="threads">
+                <i class="fas fa-comment-dots"></i>
+                <span>Threads</span>
+            </div>
+            <div class="nav-item" data-target="vector-stores">
+                <i class="fas fa-database"></i>
+                <span>Vector Stores</span>
+            </div>
+            <div class="nav-item" data-target="batch-jobs">
+                <i class="fas fa-tasks"></i>
+                <span>Batch Jobs</span>
+            </div>
+            <div class="nav-item" data-target="workflow">
+                <i class="fas fa-project-diagram"></i>
+                <span>Workflow</span>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="content-header">
+            <h2 id="page-title">Chat Completions</h2>
+            <div class="api-key-section">
+                <input type="password" class="api-key-input" id="apiKey" placeholder="Enter your OpenAI API key">
+                <div class="api-key-actions">
+                    <button class="btn btn-primary" id="saveApiKey">Save API Key</button>
+                    <button class="btn btn-secondary" id="validateApiKey">Validate API Key</button>
+                </div>
+            </div>
+        </header>
+
+        <section id="chat-completions" class="content-section active">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Chat Completions</h3>
+                    <div class="toggle-container">
+                        <span>Streaming:</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="streamingToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="message-container" id="messageContainer">
+                        <!-- Messages will be added here dynamically -->
+                    </div>
+                    <div class="form-group">
+                        <label for="systemMessage">System Message</label>
+                        <textarea class="form-control" id="systemMessage" rows="3" placeholder="Enter system message"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="userMessage">User Message</label>
+                        <textarea class="form-control" id="userMessage" rows="3" placeholder="Enter your message"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="temperature">Temperature</label>
+                        <div class="slider-container">
+                            <input type="range" class="form-control" id="temperature" min="0" max="2" step="0.1" value="1">
+                            <span class="slider-value" id="temperatureValue">1.0</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="topP">Top P</label>
+                        <div class="slider-container">
+                            <input type="range" class="form-control" id="topP" min="0" max="1" step="0.1" value="1">
+                            <span class="slider-value" id="topPValue">1.0</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="maxTokens">Max Tokens</label>
+                        <input type="number" class="form-control" id="maxTokens" placeholder="Enter max tokens" value="100">
+                    </div>
+                    <button class="btn btn-primary" id="sendMessage">Send Message</button>
+                    <div class="response-container" id="responseContainer">
+                        <!-- Response will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="codeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                    <div class="token-usage">
+                        <div class="token-item">
+                            <div class="token-value" id="promptTokens">0</div>
+                            <div class="token-label">Prompt Tokens</div>
+                        </div>
+                        <div class="token-item">
+                            <div class="token-value" id="completionTokens">0</div>
+                            <div class="token-label">Completion Tokens</div>
+                        </div>
+                        <div class="token-item">
+                            <div class="token-value" id="totalTokens">0</div>
+                            <div class="token-label">Total Tokens</div>
+                        </div>
+                    </div>
+                    <div class="budget-alert" id="budgetAlert">
+                        You've exceeded your budget for this month!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="embeddings" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Embeddings</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="embeddingInput">Text Input</label>
+                        <textarea class="form-control" id="embeddingInput" rows="5" placeholder="Enter text to generate embeddings"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="embeddingModel">Model</label>
+                        <select class="form-control" id="embeddingModel">
+                            <option value="text-embedding-ada-002">text-embedding-ada-002</option>
+                            <option value="text-embedding-3-small">text-embedding-3-small</option>
+                            <option value="text-embedding-3-large">text-embedding-3-large</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="generateEmbeddings">Generate Embeddings</button>
+                    <div class="response-container" id="embeddingResponse">
+                        <!-- Embedding response will be displayed here -->
+                    </div>
+                    <div class="similarity-matrix" id="similarityMatrix">
+                        <!-- Similarity matrix will be displayed here -->
+                    </div>
+                    <div class="dimension-plot" id="dimensionPlot">
+                        <!-- Dimension reduction plot will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="embeddingCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dalle" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">DALL-E</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="dallePrompt">Prompt</label>
+                        <textarea class="form-control" id="dallePrompt" rows="3" placeholder="Enter your image prompt"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="dalleModel">Model</label>
+                        <select class="form-control" id="dalleModel">
+                            <option value="dall-e-2">DALL-E 2</option>
+                            <option value="dall-e-3">DALL-E 3</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="dalleSizeGroup">
+                        <label for="dalleSize">Size</label>
+                        <select class="form-control" id="dalleSize">
+                            <option value="256x256">256x256</option>
+                            <option value="512x512">512x512</option>
+                            <option value="1024x1024">1024x1024</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="dalleQualityGroup" style="display: none;">
+                        <label for="dalleQuality">Quality</label>
+                        <select class="form-control" id="dalleQuality">
+                            <option value="standard">Standard</option>
+                            <option value="hd">HD</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="dalleStyleGroup" style="display: none;">
+                        <label for="dalleStyle">Style</label>
+                        <select class="form-control" id="dalleStyle">
+                            <option value="vivid">Vivid</option>
+                            <option value="natural">Natural</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dalleN">Number of Images</label>
+                        <input type="number" class="form-control" id="dalleN" min="1" max="10" value="1">
+                    </div>
+                    <button class="btn btn-primary" id="generateImage">Generate Image</button>
+                    <div class="image-preview" id="dalleImagePreview">
+                        <!-- Generated images will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="dalleCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Edit Image</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="editImagePrompt">Prompt</label>
+                        <textarea class="form-control" id="editImagePrompt" rows="3" placeholder="Enter your edit prompt"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editImageFile">Original Image</label>
+                        <input type="file" class="form-control" id="editImageFile" accept="image/*">
+                    </div>
+                    <div class="canvas-container">
+                        <canvas id="imageCanvas"></canvas>
+                        <div class="canvas-toolbar">
+                            <button class="tool-btn active" data-tool="brush"><i class="fas fa-paint-brush"></i></button>
+                            <button class="tool-btn" data-tool="eraser"><i class="fas fa-eraser"></i></button>
+                            <input type="color" class="color-picker" id="brushColor" value="#000000">
+                            <input type="range" class="brush-size" id="brushSize" min="1" max="50" value="10">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="editImage">Edit Image</button>
+                    <div class="image-preview" id="editImagePreview">
+                        <!-- Edited image will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="editImageCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Generate Variations</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="variationImageFile">Original Image</label>
+                        <input type="file" class="form-control" id="variationImageFile" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="variationN">Number of Variations</label>
+                        <input type="number" class="form-control" id="variationN" min="1" max="10" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="variationSize">Size</label>
+                        <select class="form-control" id="variationSize">
+                            <option value="256x256">256x256</option>
+                            <option value="512x512">512x512</option>
+                            <option value="1024x1024">1024x1024</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="generateVariations">Generate Variations</button>
+                    <div class="image-preview" id="variationImagePreview">
+                        <!-- Generated variations will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="variationCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="whisper" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Transcriptions</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="audioFile">Audio File</label>
+                        <input type="file" class="form-control" id="audioFile" accept="audio/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="transcriptionPrompt">Prompt</label>
+                        <textarea class="form-control" id="transcriptionPrompt" rows="3" placeholder="Enter optional prompt"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="transcriptionLanguage">Language</label>
+                        <select class="form-control" id="transcriptionLanguage">
+                            <option value="">Detect language</option>
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="it">Italian</option>
+                            <option value="pt">Portuguese</option>
+                            <option value="ru">Russian</option>
+                            <option value="zh">Chinese</option>
+                            <option value="ja">Japanese</option>
+                            <option value="ko">Korean</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="transcriptionResponseFormat">Response Format</label>
+                        <select class="form-control" id="transcriptionResponseFormat">
+                            <option value="json">JSON</option>
+                            <option value="text">Text</option>
+                            <option value="srt">SRT</option>
+                            <option value="verbose_json">Verbose JSON</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="transcribeAudio">Transcribe Audio</button>
+                    <div class="response-container" id="transcriptionResponse">
+                        <!-- Transcription will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="transcriptionCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Translations</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="translationAudioFile">Audio File</label>
+                        <input type="file" class="form-control" id="translationAudioFile" accept="audio/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="translationPrompt">Prompt</label>
+                        <textarea class="form-control" id="translationPrompt" rows="3" placeholder="Enter optional prompt"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="translationResponseFormat">Response Format</label>
+                        <select class="form-control" id="translationResponseFormat">
+                            <option value="json">JSON</option>
+                            <option value="text">Text</option>
+                            <option value="srt">SRT</option>
+                            <option value="verbose_json">Verbose JSON</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="translateAudio">Translate Audio</button>
+                    <div class="response-container" id="translationResponse">
+                        <!-- Translation will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="translationCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tts" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Text-to-Speech</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="ttsInput">Text Input</label>
+                        <textarea class="form-control" id="ttsInput" rows="5" placeholder="Enter text to convert to speech"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="ttsModel">Model</label>
+                        <select class="form-control" id="ttsModel">
+                            <option value="tts-1">TTS 1</option>
+                            <option value="tts-1-hd">TTS 1 HD</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ttsVoice">Voice</label>
+                        <select class="form-control" id="ttsVoice">
+                            <option value="alloy">Alloy</option>
+                            <option value="echo">Echo</option>
+                            <option value="fable">Fable</option>
+                            <option value="onyx">Onyx</option>
+                            <option value="nova">Nova</option>
+                            <option value="shimmer">Shimmer</option>
+                        </select>
+                    </div>
+                    <div class="voice-preview">
+                        <div class="voice-card">
+                            <div class="voice-name">Alloy</div>
+                            <button class="play-btn" data-voice="alloy"><i class="fas fa-play"></i></button>
+                            <audio id="alloyAudio" src="https://cdn.openai.com/API/examples/ptts/output.mp3?model=tts-1&voice=alloy&input=Hello%2C+world%21"></audio>
+                        </div>
+                        <div class="voice-card">
+                            <div class="voice-name">Echo</div>
+                            <button class="play-btn" data-voice="echo"><i class="fas fa-play"></i></button>
+                            <audio id="echoAudio" src="https://cdn.openai.com/API/examples/ptts/output.mp3?model=tts-1&voice=echo&input=Hello%2C+world%21"></audio>
+                        </div>
+                        <div class="voice-card">
+                            <div class="voice-name">Fable</div>
+                            <button class="play-btn" data-voice="fable"><i class="fas fa-play"></i></button>
+                            <audio id="fableAudio" src="https://cdn.openai.com/API/examples/ptts/output.mp3?model=tts-1&voice=fable&input=Hello%2C+world%21"></audio>
+                        </div>
+                        <div class="voice-card">
+                            <div class="voice-name">Onyx</div>
+                            <button class="play-btn" data-voice="onyx"><i class="fas fa-play"></i></button>
+                            <audio id="onyxAudio" src="https://cdn.openai.com/API/examples/ptts/output.mp3?model=tts-1&voice=onyx&input=Hello%2C+world%21"></audio>
+                        </div>
+                        <div class="voice-card">
+                            <div class="voice-name">Nova</div>
+                            <button class="play-btn" data-voice="nova"><i class="fas fa-play"></i></button>
+                            <audio id="novaAudio" src="https://cdn.openai.com/API/examples/ptts/output.mp3?model=tts-1&voice=nova&input=Hello%2C+world%21"></audio>
+                        </div>
+                        <div class="voice-card">
+                            <div class="voice-name">Shimmer</div>
+                            <button class="play-btn" data-voice="shimmer"><i class="fas fa-play"></i></button>
+                            <audio id="shimmerAudio" src="https://cdn.openai.com/API/examples/ptts/output.mp3?model=tts-1&voice=shimmer&input=Hello%2C+world%21"></audio>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ttsSpeed">Speed</label>
+                        <div class="slider-container">
+                            <input type="range" class="form-control" id="ttsSpeed" min="0.25" max="4" step="0.25" value="1">
+                            <span class="slider-value" id="ttsSpeedValue">1.0</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ttsResponseFormat">Response Format</label>
+                        <select class="form-control" id="ttsResponseFormat">
+                            <option value="mp3">MP3</option>
+                            <option value="opus">Opus</option>
+                            <option value="aac">AAC</option>
+                            <option value="flac">FLAC</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="generateSpeech">Generate Speech</button>
+                    <div class="response-container" id="ttsResponse">
+                        <!-- Audio player will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="ttsCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="moderation" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Content Moderation</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="moderationInput">Text Input</label>
+                        <textarea class="form-control" id="moderationInput" rows="5" placeholder="Enter text to moderate"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="moderationModel">Model</label>
+                        <select class="form-control" id="moderationModel">
+                            <option value="text-moderation-latest">Latest</option>
+                            <option value="text-moderation-stable">Stable</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="checkModeration">Check Moderation</button>
+                    <div class="moderation-gauges" id="moderationGauges">
+                        <!-- Moderation gauges will be displayed here -->
+                    </div>
+                    <div class="response-container" id="moderationResponse">
+                        <!-- Moderation response will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="moderationCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="models" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Models</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="modelSearch">Search Models</label>
+                        <input type="text" class="form-control" id="modelSearch" placeholder="Search models...">
+                    </div>
+                    <div class="form-group">
+                        <label>Capabilities</label>
+                        <div class="capability-filters">
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="completion">
+                                <span>Completion</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="chat">
+                                <span>Chat</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="fine-tuning">
+                                <span>Fine-tuning</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="function-calling">
+                                <span>Function Calling</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="vision">
+                                <span>Vision</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="code-interpreter">
+                                <span>Code Interpreter</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="tools">
+                                <span>Tools</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="embeddings">
+                                <span>Embeddings</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="json">
+                                <span>JSON</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="multimodal">
+                                <span>Multimodal</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="capability-filter" value="assistants">
+                                <span>Assistants</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="listModels">List Models</button>
+                    <div class="model-list" id="modelList">
+                        <!-- Models will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="files" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Upload Files</h3>
+                </div>
+                <div class="card-content">
+                    <div class="file-uploader" id="fileUploader">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & drop files here or click to select</p>
+                        <input type="file" id="fileInput" multiple style="display: none;">
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="uploadProgress"></div>
+                    </div>
+                    <div class="file-list" id="fileList">
+                        <!-- Uploaded files will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">File List</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="fileSearch">Search Files</label>
+                        <input type="text" class="form-control" id="fileSearch" placeholder="Search files...">
+                    </div>
+                    <div class="form-group">
+                        <label for="fileSort">Sort By</label>
+                        <select class="form-control" id="fileSort">
+                            <option value="created_at">Date Created</option>
+                            <option value="filename">Filename</option>
+                            <option value="bytes">Size</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="listFiles">List Files</button>
+                    <div class="file-list" id="fileListDisplay">
+                        <!-- Files will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="assistants" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Create Assistant</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="assistantName">Name</label>
+                        <input type="text" class="form-control" id="assistantName" placeholder="Enter assistant name">
+                    </div>
+                    <div class="form-group">
+                        <label for="assistantModel">Model</label>
+                        <select class="form-control" id="assistantModel">
+                            <option value="gpt-4o">GPT-4o</option>
+                            <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                            <option value="gpt-4">GPT-4</option>
+                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="assistantDescription">Description</label>
+                        <textarea class="form-control" id="assistantDescription" rows="3" placeholder="Enter assistant description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="assistantInstructions">Instructions</label>
+                        <textarea class="form-control" id="assistantInstructions" rows="5" placeholder="Enter assistant instructions"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="assistantTools">Tools</label>
+                        <div class="assistant-tools">
+                            <div class="tool-card" data-tool="code_interpreter">
+                                <div class="tool-icon"><i class="fas fa-code"></i></div>
+                                <div class="tool-name">Code Interpreter</div>
+                                <div class="tool-description">Enables the assistant to write and run code.</div>
+                            </div>
+                            <div class="tool-card" data-tool="retrieval">
+                                <div class="tool-icon"><i class="fas fa-file-alt"></i></div>
+                                <div class="tool-name">Retrieval</div>
+                                <div class="tool-description">Enables the assistant to retrieve files.</div>
+                            </div>
+                            <div class="tool-card" data-tool="function">
+                                <div class="tool-icon"><i class="fas fa-cog"></i></div>
+                                <div class="tool-name">Function</div>
+                                <div class="tool-description">Enables the assistant to use functions.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="createAssistant">Create Assistant</button>
+                    <div class="response-container" id="assistantResponse">
+                        <!-- Assistant creation response will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="assistantCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="threads" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Create Thread</h3>
+                </div>
+                <div class="card-content">
+                    <button class="btn btn-primary" id="createThread">Create Thread</button>
+                    <div class="response-container" id="threadResponse">
+                        <!-- Thread creation response will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="threadCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Thread Messages</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="threadId">Thread ID</label>
+                        <input type="text" class="form-control" id="threadId" placeholder="Enter thread ID">
+                    </div>
+                    <button class="btn btn-primary" id="listMessages">List Messages</button>
+                    <div class="message-history" id="messageHistory">
+                        <!-- Thread messages will be displayed here -->
+                    </div>
+                    <div class="form-group">
+                        <label for="messageContent">New Message</label>
+                        <textarea class="form-control" id="messageContent" rows="3" placeholder="Enter message content"></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="addMessage">Add Message</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Run Thread</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="runThreadId">Thread ID</label>
+                        <input type="text" class="form-control" id="runThreadId" placeholder="Enter thread ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="runAssistantId">Assistant ID</label>
+                        <input type="text" class="form-control" id="runAssistantId" placeholder="Enter assistant ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="runInstructions">Instructions</label>
+                        <textarea class="form-control" id="runInstructions" rows="3" placeholder="Enter optional instructions"></textarea>
+                    </div>
+                    <div class="run-controls">
+                        <button class="btn btn-primary" id="createRun">Create Run</button>
+                        <button class="btn btn-secondary" id="cancelRun">Cancel Run</button>
+                        <button class="btn btn-secondary" id="submitToolOutputs">Submit Tool Outputs</button>
+                    </div>
+                    <div class="response-container" id="runResponse">
+                        <!-- Run response will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="vector-stores" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Create Vector Store</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="vectorStoreName">Name</label>
+                        <input type="text" class="form-control" id="vectorStoreName" placeholder="Enter vector store name">
+                    </div>
+                    <div class="form-group">
+                        <label for="vectorStoreExpiresAfter">Expires After</label>
+                        <input type="number" class="form-control" id="vectorStoreExpiresAfter" placeholder="Enter expiration time in seconds">
+                    </div>
+                    <div class="form-group">
+                        <label for="vectorStoreChunkingStrategy">Chunking Strategy</label>
+                        <select class="form-control" id="vectorStoreChunkingStrategy">
+                            <option value="auto">Auto</option>
+                            <option value="static">Static</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="staticChunkingOptions" style="display: none;">
+                        <label for="staticChunkSize">Chunk Size</label>
+                        <input type="number" class="form-control" id="staticChunkSize" placeholder="Enter chunk size">
+                    </div>
+                    <button class="btn btn-primary" id="createVectorStore">Create Vector Store</button>
+                    <div class="response-container" id="vectorStoreResponse">
+                        <!-- Vector store creation response will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="vectorStoreCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Vector Store Files</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="vectorStoreId">Vector Store ID</label>
+                        <input type="text" class="form-control" id="vectorStoreId" placeholder="Enter vector store ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="vectorStoreFile">File</label>
+                        <input type="file" class="form-control" id="vectorStoreFile">
+                    </div>
+                    <div class="form-group">
+                        <label for="vectorStoreChunkIndices">Chunk Indices</label>
+                        <input type="text" class="form-control" id="vectorStoreChunkIndices" placeholder="Enter comma-separated chunk indices">
+                    </div>
+                    <button class="btn btn-primary" id="addVectorStoreFile">Add File</button>
+                    <button class="btn btn-secondary" id="listVectorStoreFiles">List Files</button>
+                    <div class="file-list" id="vectorStoreFileList">
+                        <!-- Vector store files will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="batch-jobs" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Create Batch Job</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="batchFile">Input File</label>
+                        <input type="file" class="form-control" id="batchFile" accept=".jsonl">
+                    </div>
+                    <div class="form-group">
+                        <label for="batchEndpoint">Endpoint</label>
+                        <select class="form-control" id="batchEndpoint">
+                            <option value="/v1/chat/completions">Chat Completions</option>
+                            <option value="/v1/embeddings">Embeddings</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="batchCompletionWindow">Completion Window</label>
+                        <select class="form-control" id="batchCompletionWindow">
+                            <option value="24h">24 hours</option>
+                            <option value="turnaround">Turnaround time</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="createBatch">Create Batch</button>
+                    <div class="progress-tracker" id="batchProgressTracker">
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" id="batchProgressFill"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span id="batchProgressText">0%</span>
+                            <span id="batchStatus">Pending</span>
+                        </div>
+                    </div>
+                    <div class="response-container" id="batchResponse">
+                        <!-- Batch creation response will be displayed here -->
+                    </div>
+                    <div class="code-export">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-lang="curl">cURL</div>
+                            <div class="code-tab" data-lang="fetch">Fetch</div>
+                            <div class="code-tab" data-lang="python">Python</div>
+                        </div>
+                        <div class="code-content" id="batchCodeContent">
+                            <!-- Code will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Batch Job Details</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="batchId">Batch ID</label>
+                        <input type="text" class="form-control" id="batchId" placeholder="Enter batch ID">
+                    </div>
+                    <button class="btn btn-primary" id="retrieveBatch">Retrieve Batch</button>
+                    <button class="btn btn-secondary" id="cancelBatch">Cancel Batch</button>
+                    <div class="response-container" id="batchDetailsResponse">
+                        <!-- Batch details will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Image to Vision to Copy to Moderation to TTS Workflow</h3>
+                </div>
+                <div class="card-content">
+                    <div class="workflow-container">
+                        <div class="workflow-step">
+                            <div class="step-icon"><i class="fas fa-image"></i></div>
+                            <div class="step-content">
+                                <h4>Step 1: Generate Image</h4>
+                                <div class="form-group">
+                                    <label for="workflowPrompt">Prompt</label>
+                                    <textarea class="form-control" id="workflowPrompt" rows="3" placeholder="Enter your image prompt"></textarea>
+                                </div>
+                                <div class="step-actions">
+                                    <button class="btn btn-primary" id="workflowGenerateImage">Generate Image</button>
+                                </div>
+                                <div class="image-preview" id="workflowImagePreview">
+                                    <!-- Generated image will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step">
+                            <div class="step-icon"><i class="fas fa-eye"></i></div>
+                            <div class="step-content">
+                                <h4>Step 2: Analyze Image</h4>
+                                <div class="form-group">
+                                    <label for="workflowVisionPrompt">Vision Prompt</label>
+                                    <textarea class="form-control" id="workflowVisionPrompt" rows="3" placeholder="Enter your vision prompt"></textarea>
+                                </div>
+                                <div class="step-actions">
+                                    <button class="btn btn-primary" id="workflowAnalyzeImage">Analyze Image</button>
+                                </div>
+                                <div class="response-container" id="workflowVisionResponse">
+                                    <!-- Vision analysis will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step">
+                            <div class="step-icon"><i class="fas fa-copy"></i></div>
+                            <div class="step-content">
+                                <h4>Step 3: Generate Copy</h4>
+                                <div class="form-group">
+                                    <label for="workflowCopyPrompt">Copy Prompt</label>
+                                    <textarea class="form-control" id="workflowCopyPrompt" rows="3" placeholder="Enter your copy prompt"></textarea>
+                                </div>
+                                <div class="step-actions">
+                                    <button class="btn btn-primary" id="workflowGenerateCopy">Generate Copy</button>
+                                </div>
+                                <div class="response-container" id="workflowCopyResponse">
+                                    <!-- Generated copy will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step">
+                            <div class="step-icon"><i class="fas fa-shield-alt"></i></div>
+                            <div class="step-content">
+                                <h4>Step 4: Moderate Content</h4>
+                                <div class="step-actions">
+                                    <button class="btn btn-primary" id="workflowModerateContent">Moderate Content</button>
+                                </div>
+                                <div class="moderation-gauges" id="workflowModerationGauges">
+                                    <!-- Moderation gauges will be displayed here -->
+                                </div>
+                                <div class="response-container" id="workflowModerationResponse">
+                                    <!-- Moderation response will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="workflow-step">
+                            <div class="step-icon"><i class="fas fa-volume-up"></i></div>
+                            <div class="step-content">
+                                <h4>Step 5: Generate Speech</h4>
+                                <div class="form-group">
+                                    <label for="workflowTtsVoice">Voice</label>
+                                    <select class="form-control" id="workflowTtsVoice">
+                                        <option value="alloy">Alloy</option>
+                                        <option value="echo">Echo</option>
+                                        <option value="fable">Fable</option>
+                                        <option value="onyx">Onyx</option>
+                                        <option value="nova">Nova</option>
+                                        <option value="shimmer">Shimmer</option>
+                                    </select>
+                                </div>
+                                <div class="step-actions">
+                                    <button class="btn btn-primary" id="workflowGenerateSpeech">Generate Speech</button>
+                                </div>
+                                <div class="response-container" id="workflowTtsResponse">
+                                    <!-- Audio player will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="notification-container" id="notificationContainer">
+        <!-- Notifications will be added here dynamically -->
+    </div>
+
+    <script>
+        // DOM Elements
+        const navItems = document.querySelectorAll('.nav-item');
+        const contentSections = document.querySelectorAll('.content-section');
+        const pageTitle = document.getElementById('page-title');
+        const apiKeyInput = document.getElementById('apiKey');
+        const saveApiKeyBtn = document.getElementById('saveApiKey');
+        const validateApiKeyBtn = document.getElementById('validateApiKey');
+
+        // Chat Completions Elements
+        const messageContainer = document.getElementById('messageContainer');
+        const systemMessageInput = document.getElementById('systemMessage');
+        const userMessageInput = document.getElementById('userMessage');
+        const temperatureSlider = document.getElementById('temperature');
+        const temperatureValue = document.getElementById('temperatureValue');
+        const topPSlider = document.getElementById('topP');
+        const topPValue = document.getElementById('topPValue');
+        const maxTokensInput = document.getElementById('maxTokens');
+        const streamingToggle = document.getElementById('streamingToggle');
+        const sendMessageBtn = document.getElementById('sendMessage');
+        const responseContainer = document.getElementById('responseContainer');
+        const codeTabs = document.querySelectorAll('.code-tab');
+        const codeContent = document.getElementById('codeContent');
+        const promptTokens = document.getElementById('promptTokens');
+        const completionTokens = document.getElementById('completionTokens');
+        const totalTokens = document.getElementById('totalTokens');
+        const budgetAlert = document.getElementById('budgetAlert');
+
+        // Embeddings Elements
+        const embeddingInput = document.getElementById('embeddingInput');
+        const embeddingModel = document.getElementById('embeddingModel');
+        const generateEmbeddingsBtn = document.getElementById('generateEmbeddings');
+        const embeddingResponse = document.getElementById('embeddingResponse');
+        const similarityMatrix = document.getElementById('similarityMatrix');
+        const dimensionPlot = document.getElementById('dimensionPlot');
+        const embeddingCodeContent = document.getElementById('embeddingCodeContent');
+
+        // DALL-E Elements
+        const dallePrompt = document.getElementById('dallePrompt');
+        const dalleModel = document.getElementById('dalleModel');
+        const dalleSizeGroup = document.getElementById('dalleSizeGroup');
+        const dalleSize = document.getElementById('dalleSize');
+        const dalleQualityGroup = document.getElementById('dalleQualityGroup');
+        const dalleQuality = document.getElementById('dalleQuality');
+        const dalleStyleGroup = document.getElementById('dalleStyleGroup');
+        const dalleStyle = document.getElementById('dalleStyle');
+        const dalleN = document.getElementById('dalleN');
+        const generateImageBtn = document.getElementById('generateImage');
+        const dalleImagePreview = document.getElementById('dalleImagePreview');
+        const dalleCodeContent = document.getElementById('dalleCodeContent');
+
+        const editImagePrompt = document.getElementById('editImagePrompt');
+        const editImageFile = document.getElementById('editImageFile');
+        const imageCanvas = document.getElementById('imageCanvas');
+        const ctx = imageCanvas.getContext('2d');
+        const toolBtns = document.querySelectorAll('.tool-btn');
+        const brushColor = document.getElementById('brushColor');
+        const brushSize = document.getElementById('brushSize');
+        const editImageBtn = document.getElementById('editImage');
+        const editImagePreview = document.getElementById('editImagePreview');
+        const editImageCodeContent = document.getElementById('editImageCodeContent');
+
+        const variationImageFile = document.getElementById('variationImageFile');
+        const variationN = document.getElementById('variationN');
+        const variationSize = document.getElementById('variationSize');
+        const generateVariationsBtn = document.getElementById('generateVariations');
+        const variationImagePreview = document.getElementById('variationImagePreview');
+        const variationCodeContent = document.getElementById('variationCodeContent');
+
+        // Whisper Elements
+        const audioFile = document.getElementById('audioFile');
+        const transcriptionPrompt = document.getElementById('transcriptionPrompt');
+        const transcriptionLanguage = document.getElementById('transcriptionLanguage');
+        const transcriptionResponseFormat = document.getElementById('transcriptionResponseFormat');
+        const transcribeAudioBtn = document.getElementById('transcribeAudio');
+        const transcriptionResponse = document.getElementById('transcriptionResponse');
+        const transcriptionCodeContent = document.getElementById('transcriptionCodeContent');
+
+        const translationAudioFile = document.getElementById('translationAudioFile');
+        const translationPrompt = document.getElementById('translationPrompt');
+        const translationResponseFormat = document.getElementById('translationResponseFormat');
+        const translateAudioBtn = document.getElementById('translateAudio');
+        const translationResponse = document.getElementById('translationResponse');
+        const translationCodeContent = document.getElementById('translationCodeContent');
+
+        // TTS Elements
+        const ttsInput = document.getElementById('ttsInput');
+        const ttsModel = document.getElementById('ttsModel');
+        const ttsVoice = document.getElementById('ttsVoice');
+        const playBtns = document.querySelectorAll('.play-btn');
+        const ttsSpeed = document.getElementById('ttsSpeed');
+        const ttsSpeedValue = document.getElementById('ttsSpeedValue');
+        const ttsResponseFormat = document.getElementById('ttsResponseFormat');
+        const generateSpeechBtn = document.getElementById('generateSpeech');
+        const ttsResponse = document.getElementById('ttsResponse');
+        const ttsCodeContent = document.getElementById('ttsCodeContent');
+
+        // Moderation Elements
+        const moderationInput = document.getElementById('moderationInput');
+        const moderationModel = document.getElementById('moderationModel');
+        const checkModerationBtn = document.getElementById('checkModeration');
+        const moderationGauges = document.getElementById('moderationGauges');
+        const moderationResponse = document.getElementById('moderationResponse');
+        const moderationCodeContent = document.getElementById('moderationCodeContent');
+
+        // Models Elements
+        const modelSearch = document.getElementById('modelSearch');
+        const capabilityFilters = document.querySelectorAll('.capability-filter');
+        const listModelsBtn = document.getElementById('listModels');
+        const modelList = document.getElementById('modelList');
+
+        // Files Elements
+        const fileUploader = document.getElementById('fileUploader');
+        const fileInput = document.getElementById('fileInput');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const fileList = document.getElementById('fileList');
+        const fileSearch = document.getElementById('fileSearch');
+        const fileSort = document.getElementById('fileSort');
+        const listFilesBtn = document.getElementById('listFiles');
+        const fileListDisplay = document.getElementById('fileListDisplay');
+
+        // Assistants Elements
+        const assistantName = document.getElementById('assistantName');
+        const assistantModel = document.getElementById('assistantModel');
+        const assistantDescription = document.getElementById('assistantDescription');
+        const assistantInstructions = document.getElementById('assistantInstructions');
+        const toolCards = document.querySelectorAll('.tool-card');
+        const createAssistantBtn = document.getElementById('createAssistant');
+        const assistantResponse = document.getElementById('assistantResponse');
+        const assistantCodeContent = document.getElementById('assistantCodeContent');
+
+        // Threads Elements
+        const createThreadBtn = document.getElementById('createThread');
+        const threadResponse = document.getElementById('threadResponse');
+        const threadCodeContent = document.getElementById('threadCodeContent');
+
+        const threadId = document.getElementById('threadId');
+        const listMessagesBtn = document.getElementById('listMessages');
+        const messageHistory = document.getElementById('messageHistory');
+        const messageContent = document.getElementById('messageContent');
+        const addMessageBtn = document.getElementById('addMessage');
+
+        const runThreadId = document.getElementById('runThreadId');
+        const runAssistantId = document.getElementById('runAssistantId');
+        const runInstructions = document.getElementById('runInstructions');
+        const createRunBtn = document.getElementById('createRun');
+        const cancelRunBtn = document.getElementById('cancelRun');
+        const submitToolOutputsBtn = document.getElementById('submitToolOutputs');
+        const runResponse = document.getElementById('runResponse');
+
+        // Vector Stores Elements
+        const vectorStoreName = document.getElementById('vectorStoreName');
+        const vectorStoreExpiresAfter = document.getElementById('vectorStoreExpiresAfter');
+        const vectorStoreChunkingStrategy = document.getElementById('vectorStoreChunkingStrategy');
+        const staticChunkingOptions = document.getElementById('staticChunkingOptions');
+        const staticChunkSize = document.getElementById('staticChunkSize');
+        const createVectorStoreBtn = document.getElementById('createVectorStore');
+        const vectorStoreResponse = document.getElementById('vectorStoreResponse');
+        const vectorStoreCodeContent = document.getElementById('vectorStoreCodeContent');
+
+        const vectorStoreId = document.getElementById('vectorStoreId');
+        const vectorStoreFile = document.getElementById('vectorStoreFile');
+        const vectorStoreChunkIndices = document.getElementById('vectorStoreChunkIndices');
+        const addVectorStoreFileBtn = document.getElementById('addVectorStoreFile');
+        const listVectorStoreFilesBtn = document.getElementById('listVectorStoreFiles');
+        const vectorStoreFileList = document.getElementById('vectorStoreFileList');
+
+        // Batch Jobs Elements
+        const batchFile = document.getElementById('batchFile');
+        const batchEndpoint = document.getElementById('batchEndpoint');
+        const batchCompletionWindow = document.getElementById('batchCompletionWindow');
+        const createBatchBtn = document.getElementById('createBatch');
+        const batchProgressFill = document.getElementById('batchProgressFill');
+        const batchProgressText = document.getElementById('batchProgressText');
+        const batchStatus = document.getElementById('batchStatus');
+        const batchResponse = document.getElementById('batchResponse');
+        const batchCodeContent = document.getElementById('batchCodeContent');
+
+        const batchId = document.getElementById('batchId');
+        const retrieveBatchBtn = document.getElementById('retrieveBatch');
+        const cancelBatchBtn = document.getElementById('cancelBatch');
+        const batchDetailsResponse = document.getElementById('batchDetailsResponse');
+
+        // Workflow Elements
+        const workflowPrompt = document.getElementById('workflowPrompt');
+        const workflowGenerateImageBtn = document.getElementById('workflowGenerateImage');
+        const workflowImagePreview = document.getElementById('workflowImagePreview');
+
+        const workflowVisionPrompt = document.getElementById('workflowVisionPrompt');
+        const workflowAnalyzeImageBtn = document.getElementById('workflowAnalyzeImage');
+        const workflowVisionResponse = document.getElementById('workflowVisionResponse');
+
+        const workflowCopyPrompt = document.getElementById('workflowCopyPrompt');
+        const workflowGenerateCopyBtn = document.getElementById('workflowGenerateCopy');
+        const workflowCopyResponse = document.getElementById('workflowCopyResponse');
+
+        const workflowModerateContentBtn = document.getElementById('workflowModerateContent');
+        const workflowModerationGauges = document.getElementById('workflowModerationGauges');
+        const workflowModerationResponse = document.getElementById('workflowModerationResponse');
+
+        const workflowTtsVoice = document.getElementById('workflowTtsVoice');
+        const workflowGenerateSpeechBtn = document.getElementById('workflowGenerateSpeech');
+        const workflowTtsResponse = document.getElementById('workflowTtsResponse');
+
+        // Notification Elements
+        const notificationContainer = document.getElementById('notificationContainer');
+
+        // Canvas drawing variables
+        let isDrawing = false;
+        let currentTool = 'brush';
+        let currentColor = '#000000';
+        let currentSize = 10;
+        let lastX = 0;
+        let lastY = 0;
+
+        // Workflow variables
+        let workflowImageUrl = '';
+        let workflowVisionText = '';
+        let workflowCopyText = '';
+
+        // API Key management
+        let apiKey = localStorage.getItem('openaiApiKey') || '';
+
+        // Initialize the app
+        function init() {
+            // Load saved API key
+            if (apiKey) {
+                apiKeyInput.value = apiKey;
+            }
+
+            // Set up event listeners
+            setupEventListeners();
+
+            // Initialize canvas
+            initCanvas();
+
+            // Initialize code content
+            updateCodeContent('curl');
+
+            // Load saved settings and history
+            loadSettings();
+
+            // Check budget
+            checkBudget();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Navigation
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const target = item.getAttribute('data-target');
+                    switchContent(target);
+                });
+            });
+
+            // API Key management
+            saveApiKeyBtn.addEventListener('click', saveApiKey);
+            validateApiKeyBtn.addEventListener('click', validateApiKey);
+
+            // Chat Completions
+            temperatureSlider.addEventListener('input', () => {
+                temperatureValue.textContent = temperatureSlider.value;
+            });
+            topPSlider.addEventListener('input', () => {
+                topPValue.textContent = topPSlider.value;
+            });
+            sendMessageBtn.addEventListener('click', sendMessage);
+            codeTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const lang = tab.getAttribute('data-lang');
+                    updateCodeContent(lang);
+                });
+            });
+
+            // Embeddings
+            generateEmbeddingsBtn.addEventListener('click', generateEmbeddings);
+
+            // DALL-E
+            dalleModel.addEventListener('change', toggleDalleOptions);
+            generateImageBtn.addEventListener('click', generateImage);
+            editImageFile.addEventListener('change', loadImage);
+            toolBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentTool = btn.getAttribute('data-tool');
+                    toolBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+            brushColor.addEventListener('input', () => {
+                currentColor = brushColor.value;
+            });
+            brushSize.addEventListener('input', () => {
+                currentSize = brushSize.value;
+            });
+            imageCanvas.addEventListener('mousedown', startDrawing);
+            imageCanvas.addEventListener('mousemove', draw);
+            imageCanvas.addEventListener('mouseup', stopDrawing);
+            imageCanvas.addEventListener('mouseout', stopDrawing);
+            editImageBtn.addEventListener('click', editImage);
+            generateVariationsBtn.addEventListener('click', generateVariations);
+
+            // Whisper
+            transcribeAudioBtn.addEventListener('click', transcribeAudio);
+            translateAudioBtn.addEventListener('click', translateAudio);
+
+            // TTS
+            ttsSpeed.addEventListener('input', () => {
+                ttsSpeedValue.textContent = ttsSpeed.value;
+            });
+            playBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const voice = btn.getAttribute('data-voice');
+                    const audio = document.getElementById(`${voice}Audio`);
+                    audio.play();
+                });
+            });
+            generateSpeechBtn.addEventListener('click', generateSpeech);
+
+            // Moderation
+            checkModerationBtn.addEventListener('click', checkModeration);
+
+            // Models
+            modelSearch.addEventListener('input', filterModels);
+            capabilityFilters.forEach(filter => {
+                filter.addEventListener('change', filterModels);
+            });
+            listModelsBtn.addEventListener('click', listModels);
+
+            // Files
+            fileUploader.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', uploadFiles);
+            fileSearch.addEventListener('input', filterFiles);
+            fileSort.addEventListener('change', sortFiles);
+            listFilesBtn.addEventListener('click', listFiles);
+
+            // Assistants
+            toolCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    card.classList.toggle('active');
+                });
+            });
+            createAssistantBtn.addEventListener('click', createAssistant);
+
+            // Threads
+            createThreadBtn.addEventListener('click', createThread);
+            listMessagesBtn.addEventListener('click', listMessages);
+            addMessageBtn.addEventListener('click', addMessage);
+            createRunBtn.addEventListener('click', createRun);
+            cancelRunBtn.addEventListener('click', cancelRun);
+            submitToolOutputsBtn.addEventListener('click', submitToolOutputs);
+
+            // Vector Stores
+            vectorStoreChunkingStrategy.addEventListener('change', toggleChunkingOptions);
+            createVectorStoreBtn.addEventListener('click', createVectorStore);
+            addVectorStoreFileBtn.addEventListener('click', addVectorStoreFile);
+            listVectorStoreFilesBtn.addEventListener('click', listVectorStoreFiles);
+
+            // Batch Jobs
+            createBatchBtn.addEventListener('click', createBatch);
+            retrieveBatchBtn.addEventListener('click', retrieveBatch);
+            cancelBatchBtn.addEventListener('click', cancelBatch);
+
+            // Workflow
+            workflowGenerateImageBtn.addEventListener('click', workflowGenerateImage);
+            workflowAnalyzeImageBtn.addEventListener('click', workflowAnalyzeImage);
+            workflowGenerateCopyBtn.addEventListener('click', workflowGenerateCopy);
+            workflowModerateContentBtn.addEventListener('click', workflowModerateContent);
+            workflowGenerateSpeechBtn.addEventListener('click', workflowGenerateSpeech);
+        }
+
+        // Switch content sections
+        function switchContent(target) {
+            // Update active nav item
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-target') === target) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Update active content section
+            contentSections.forEach(section => {
+                section.classList.remove('active');
+                if (section.id === target) {
+                    section.classList.add('active');
+                }
+            });
+
+            // Update page title
+            const navItem = document.querySelector(`.nav-item[data-target="${target}"]`);
+            pageTitle.textContent = navItem.querySelector('span').textContent;
+
+            // Save current section to localStorage
+            localStorage.setItem('currentSection', target);
+        }
+
+        // Save API key
+        function saveApiKey() {
+            apiKey = apiKeyInput.value.trim();
+            if (apiKey) {
+                localStorage.setItem('openaiApiKey', apiKey);
+                showNotification('API key saved successfully', 'success');
+            } else {
+                showNotification('Please enter a valid API key', 'error');
+            }
+        }
+
+        // Validate API key
+        async function validateApiKey() {
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    showNotification('API key is valid', 'success');
+                } else {
+                    showNotification('Invalid API key', 'error');
+                }
+            } catch (error) {
+                showNotification('Error validating API key', 'error');
+                console.error('Error validating API key:', error);
+            }
+        }
+
+        // Send chat message
+        async function sendMessage() {
+            const systemMessage = systemMessageInput.value.trim();
+            const userMessage = userMessageInput.value.trim();
+            const temperature = parseFloat(temperatureSlider.value);
+            const topP = parseFloat(topPSlider.value);
+            const maxTokens = parseInt(maxTokensInput.value);
+            const streaming = streamingToggle.checked;
+
+            if (!userMessage) {
+                showNotification('Please enter a message', 'error');
+                return;
+            }
+
+            // Add messages to container
+            if (systemMessage) {
+                addMessageToContainer('system', systemMessage);
+            }
+            addMessageToContainer('user', userMessage);
+
+            // Clear input
+            systemMessageInput.value = '';
+            userMessageInput.value = '';
+
+            // Prepare request data
+            const requestData = {
+                model: 'gpt-4o',
+                messages: [],
+                temperature,
+                top_p: topP,
+                max_tokens: maxTokens,
+                stream: streaming
+            };
+
+            if (systemMessage) {
+                requestData.messages.push({ role: 'system', content: systemMessage });
+            }
+            requestData.messages.push({ role: 'user', content: userMessage });
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                if (streaming) {
+                    // Handle streaming response
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let result = '';
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+
+                        const chunk = decoder.decode(value);
+                        const lines = chunk.split('\n');
+
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                const data = line.substring(6);
+                                if (data === '[DONE]') continue;
+
+                                try {
+                                    const parsed = JSON.parse(data);
+                                    const content = parsed.choices[0].delta.content;
+                                    if (content) {
+                                        result += content;
+                                        updateResponseContainer(result);
+                                    }
+                                } catch (e) {
+                                    console.error('Error parsing JSON:', e);
+                                }
+                            }
+                        }
+                    }
+
+                    // Add assistant message to container
+                    addMessageToContainer('assistant', result);
+                } else {
+                    // Handle non-streaming response
+                    const data = await response.json();
+                    const assistantMessage = data.choices[0].message.content;
+
+                    // Update response container
+                    updateResponseContainer(assistantMessage);
+
+                    // Add assistant message to container
+                    addMessageToContainer('assistant', assistantMessage);
+
+                    // Update token usage
+                    updateTokenUsage(data.usage);
+                }
+
+                // Update code content
+                updateCodeContent('curl', requestData);
+
+                // Save to history
+                saveToHistory('chat', requestData, response);
+
+                // Check budget
+                checkBudget();
+            } catch (error) {
+                showNotification('Error sending message', 'error');
+                console.error('Error sending message:', error);
+                updateResponseContainer(`Error: ${error.message}`);
+            }
+        }
+
+        // Add message to container
+        function addMessageToContainer(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            messageDiv.textContent = content;
+            messageContainer.appendChild(messageDiv);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        // Update response container
+        function updateResponseContainer(content) {
+            responseContainer.textContent = content;
+            responseContainer.scrollTop = responseContainer.scrollHeight;
+        }
+
+        // Update code content
+        function updateCodeContent(lang, requestData = null) {
+            // Update active tab
+            codeTabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-lang') === lang) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Get the current section
+            const currentSection = document.querySelector('.content-section.active').id;
+
+            // Set code content based on language and current section
+            let code = '';
+
+            switch (currentSection) {
+                case 'chat-completions':
+                    if (requestData) {
+                        switch (lang) {
+                            case 'curl':
+                                code = `curl https://theserver-open-ai.replit.app/v1/chat/completions \\
+  -H "Authorization: Bearer ${apiKey}" \\
+  -H "Content-Type: application/json" \\
+  -d '${JSON.stringify(requestData, null, 2)}'`;
+                                break;
+                            case 'fetch':
+                                code = `fetch('https://theserver-open-ai.replit.app/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer ${apiKey}',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(${JSON.stringify(requestData, null, 2)})
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+                                break;
+                            case 'python':
+                                code = `import requests
+import json
+
+url = "https://theserver-open-ai.replit.app/v1/chat/completions"
+
+headers = {
+    "Authorization": f"Bearer {apiKey}",
+    "Content-Type": "application/json"
+}
+
+data = ${JSON.stringify(requestData, null, 2)}
+
+response = requests.post(url, headers=headers, data=json.dumps(data))
+print(response.json())`;
+                                break;
+                        }
+                    } else {
+                        switch (lang) {
+                            case 'curl':
+                                code = `curl https://theserver-open-ai.replit.app/v1/chat/completions \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "gpt-4o",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant."
+      },
+      {
+        "role": "user",
+        "content": "Hello!"
+      }
+    ],
+    "temperature": 1,
+    "top_p": 1,
+    "max_tokens": 100
+  }'`;
+                                break;
+                            case 'fetch':
+                                code = `fetch('https://theserver-open-ai.replit.app/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a helpful assistant.'
+      },
+      {
+        role: 'user',
+        content: 'Hello!'
+      }
+    ],
+    temperature: 1,
+    top_p: 1,
+    max_tokens: 100
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+                                break;
+                            case 'python':
+                                code = `import requests
+import json
+
+url = "https://theserver-open-ai.replit.app/v1/chat/completions"
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "model": "gpt-4o",
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant."
+        },
+        {
+            "role": "user",
+            "content": "Hello!"
+        }
+    ],
+    "temperature": 1,
+    "top_p": 1,
+    "max_tokens": 100
+}
+
+response = requests.post(url, headers=headers, data=json.dumps(data))
+print(response.json())`;
+                                break;
+                        }
+                    }
+                    codeContent.textContent = code;
+                    break;
+
+                case 'embeddings':
+                    if (requestData) {
+                        switch (lang) {
+                            case 'curl':
+                                code = `curl https://theserver-open-ai.replit.app/v1/embeddings \\
+  -H "Authorization: Bearer ${apiKey}" \\
+  -H "Content-Type: application/json" \\
+  -d '${JSON.stringify(requestData, null, 2)}'`;
+                                break;
+                            case 'fetch':
+                                code = `fetch('https://theserver-open-ai.replit.app/v1/embeddings', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer ${apiKey}',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(${JSON.stringify(requestData, null, 2)})
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+                                break;
+                            case 'python':
+                                code = `import requests
+import json
+
+url = "https://theserver-open-ai.replit.app/v1/embeddings"
+
+headers = {
+    "Authorization": f"Bearer {apiKey}",
+    "Content-Type": "application/json"
+}
+
+data = ${JSON.stringify(requestData, null, 2)}
+
+response = requests.post(url, headers=headers, data=json.dumps(data))
+print(response.json())`;
+                                break;
+                        }
+                    } else {
+                        switch (lang) {
+                            case 'curl':
+                                code = `curl https://theserver-open-ai.replit.app/v1/embeddings \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "input": "Your text string goes here",
+    "model": "text-embedding-ada-002"
+  }'`;
+                                break;
+                            case 'fetch':
+                                code = `fetch('https://theserver-open-ai.replit.app/v1/embeddings', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    input: "Your text string goes here",
+    model: "text-embedding-ada-002"
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+                                break;
+                            case 'python':
+                                code = `import requests
+import json
+
+url = "https://theserver-open-ai.replit.app/v1/embeddings"
+
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "input": "Your text string goes here",
+    "model": "text-embedding-ada-002"
+}
+
+response = requests.post(url, headers=headers, data=json.dumps(data))
+print(response.json())`;
+                                break;
+                        }
+                    }
+                    embeddingCodeContent.textContent = code;
+                    break;
+
+                // Add similar cases for other sections
+                // ...
+            }
+        }
+
+        // Update token usage
+        function updateTokenUsage(usage) {
+            promptTokens.textContent = usage.prompt_tokens;
+            completionTokens.textContent = usage.completion_tokens;
+            totalTokens.textContent = usage.total_tokens;
+
+            // Save token usage to localStorage
+            const tokenUsage = JSON.parse(localStorage.getItem('tokenUsage')) || [];
+            tokenUsage.push({
+                date: new Date().toISOString(),
+                prompt_tokens: usage.prompt_tokens,
+                completion_tokens: usage.completion_tokens,
+                total_tokens: usage.total_tokens
+            });
+            localStorage.setItem('tokenUsage', JSON.stringify(tokenUsage));
+        }
+
+        // Check budget
+        function checkBudget() {
+            const tokenUsage = JSON.parse(localStorage.getItem('tokenUsage')) || [];
+            const totalTokensUsed = tokenUsage.reduce((sum, item) => sum + item.total_tokens, 0);
+
+            // Assuming a budget of 10,000 tokens per month
+            const budget = 10000;
+            const remaining = budget - totalTokensUsed;
+
+            if (remaining <= 0) {
+                budgetAlert.style.display = 'block';
+            } else {
+                budgetAlert.style.display = 'none';
+            }
+        }
+
+        // Generate embeddings
+        async function generateEmbeddings() {
+            const inputText = embeddingInput.value.trim();
+            const model = embeddingModel.value;
+
+            if (!inputText) {
+                showNotification('Please enter text to generate embeddings', 'error');
+                return;
+            }
+
+            // Prepare request data
+            const requestData = {
+                input: inputText,
+                model: model
+            };
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/embeddings', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display embeddings
+                embeddingResponse.textContent = JSON.stringify(data, null, 2);
+
+                // Generate similarity matrix and dimension reduction plot
+                generateSimilarityMatrix(data.data[0].embedding);
+                generateDimensionPlot(data.data[0].embedding);
+
+                // Update code content
+                updateCodeContent('curl', requestData);
+
+                // Save to history
+                saveToHistory('embeddings', requestData, data);
+
+                // Check budget
+                checkBudget();
+            } catch (error) {
+                showNotification('Error generating embeddings', 'error');
+                console.error('Error generating embeddings:', error);
+                embeddingResponse.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Generate similarity matrix
+        function generateSimilarityMatrix(embedding) {
+            // For simplicity, we'll create a matrix with the same embedding repeated
+            // In a real application, you would have multiple embeddings to compare
+            const embeddings = [embedding, embedding, embedding]; // Example with 3 embeddings
+
+            // Calculate cosine similarity between embeddings
+            const similarityMatrix = [];
+            for (let i = 0; i < embeddings.length; i++) {
+                similarityMatrix[i] = [];
+                for (let j = 0; j < embeddings.length; j++) {
+                    if (i === j) {
+                        similarityMatrix[i][j] = 1; // Similarity with itself is 1
+                    } else {
+                        similarityMatrix[i][j] = cosineSimilarity(embeddings[i], embeddings[j]);
+                    }
+                }
+            }
+
+            // Create HTML for similarity matrix
+            let html = '<table><tr><th></th>';
+            for (let i = 0; i < embeddings.length; i++) {
+                html += `<th>Embedding ${i + 1}</th>`;
+            }
+            html += '</tr>';
+
+            for (let i = 0; i < similarityMatrix.length; i++) {
+                html += `<tr><th>Embedding ${i + 1}</th>`;
+                for (let j = 0; j < similarityMatrix[i].length; j++) {
+                    html += `<td class="similarity-cell">${similarityMatrix[i][j].toFixed(4)}</td>`;
+                }
+                html += '</tr>';
+            }
+
+            html += '</table>';
+
+            similarityMatrix.innerHTML = html;
+        }
+
+        // Calculate cosine similarity
+        function cosineSimilarity(a, b) {
+            let dotProduct = 0;
+            let normA = 0;
+            let normB = 0;
+
+            for (let i = 0; i < a.length; i++) {
+                dotProduct += a[i] * b[i];
+                normA += a[i] * a[i];
+                normB += b[i] * b[i];
+            }
+
+            if (normA === 0 || normB === 0) {
+                return 0;
+            }
+
+            return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+        }
+
+        // Generate dimension reduction plot
+        function generateDimensionPlot(embedding) {
+            // For simplicity, we'll use the first 2 dimensions of the embedding
+            // In a real application, you would use PCA or t-SNE for dimension reduction
+            const x = embedding[0];
+            const y = embedding[1];
+
+            // Create a simple scatter plot
+            const canvas = document.createElement('canvas');
+            canvas.width = 400;
+            canvas.height = 400;
+            const ctx = canvas.getContext('2d');
+
+            // Draw axes
+            ctx.beginPath();
+            ctx.moveTo(20, 200);
+            ctx.lineTo(380, 200);
+            ctx.strokeStyle = '#A0A0A0';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(200, 20);
+            ctx.lineTo(200, 380);
+            ctx.stroke();
+
+            // Draw point
+            ctx.beginPath();
+            ctx.arc(200 + x * 100, 200 - y * 100, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#10A37F';
+            ctx.fill();
+
+            // Add to dimension plot container
+            dimensionPlot.innerHTML = '';
+            dimensionPlot.appendChild(canvas);
+        }
+
+        // Toggle DALL-E options based on model
+        function toggleDalleOptions() {
+            const model = dalleModel.value;
+
+            if (model === 'dall-e-3') {
+                dalleSizeGroup.style.display = 'none';
+                dalleQualityGroup.style.display = 'block';
+                dalleStyleGroup.style.display = 'block';
+            } else {
+                dalleSizeGroup.style.display = 'block';
+                dalleQualityGroup.style.display = 'none';
+                dalleStyleGroup.style.display = 'none';
+            }
+        }
+
+        // Generate image with DALL-E
+        async function generateImage() {
+            const prompt = dallePrompt.value.trim();
+            const model = dalleModel.value;
+            const size = dalleSize.value;
+            const quality = dalleQuality.value;
+            const style = dalleStyle.value;
+            const n = parseInt(dalleN.value);
+
+            if (!prompt) {
+                showNotification('Please enter a prompt', 'error');
+                return;
+            }
+
+            // Prepare request data
+            const requestData = {
+                prompt: prompt,
+                n: n,
+                size: size
+            };
+
+            if (model === 'dall-e-3') {
+                requestData.quality = quality;
+                requestData.style = style;
+            }
+
+            try {
+                const response = await fetch(`https://theserver-open-ai.replit.app/v1/images/generations`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display generated images
+                dalleImagePreview.innerHTML = '';
+                data.data.forEach(image => {
+                    const img = document.createElement('img');
+                    img.src = image.url;
+                    img.alt = 'Generated Image';
+                    dalleImagePreview.appendChild(img);
+                });
+
+                // Update code content
+                updateCodeContent('curl', requestData);
+
+                // Save to history
+                saveToHistory('dalle', requestData, data);
+
+                // Check budget
+                checkBudget();
+            } catch (error) {
+                showNotification('Error generating image', 'error');
+                console.error('Error generating image:', error);
+                dalleImagePreview.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        // Initialize canvas
+        function initCanvas() {
+            // Set canvas size
+            imageCanvas.width = 500;
+            imageCanvas.height = 300;
+
+            // Fill canvas with white background
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, imageCanvas.width, imageCanvas.height);
+        }
+
+        // Load image onto canvas
+        function loadImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Clear canvas
+                    ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+
+                    // Calculate dimensions to fit canvas
+                    const ratio = Math.min(imageCanvas.width / img.width, imageCanvas.height / img.height);
+                    const newWidth = img.width * ratio;
+                    const newHeight = img.height * ratio;
+
+                    // Draw image centered on canvas
+                    ctx.drawImage(img, (imageCanvas.width - newWidth) / 2, (imageCanvas.height - newHeight) / 2, newWidth, newHeight);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Start drawing on canvas
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        // Draw on canvas
+        function draw(e) {
+            if (!isDrawing) return;
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.strokeStyle = currentTool === 'brush' ? currentColor : '#FFFFFF';
+            ctx.lineWidth = currentSize;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        // Stop drawing on canvas
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        // Edit image with DALL-E
+        async function editImage() {
+            const prompt = editImagePrompt.value.trim();
+            const file = editImageFile.files[0];
+
+            if (!prompt || !file) {
+                showNotification('Please enter a prompt and select an image', 'error');
+                return;
+            }
+
+            // Get the edited image from canvas
+            const editedImage = imageCanvas.toDataURL('image/png');
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('mask', dataURLToBlob(editedImage));
+            formData.append('prompt', prompt);
+            formData.append('n', 1);
+            formData.append('size', '1024x1024');
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/images/edits', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display edited image
+                editImagePreview.innerHTML = '';
+                data.data.forEach(image => {
+                    const img = document.createElement('img');
+                    img.src = image.url;
+                    img.alt = 'Edited Image';
+                    editImagePreview.appendChild(img);
+                });
+
+                // Update code content
+                updateCodeContent('curl', {
+                    prompt: prompt,
+                    n: 1,
+                    size: '1024x1024'
+                });
+
+                // Save to history
+                saveToHistory('dalle-edit', {
+                    prompt: prompt,
+                    n: 1,
+                    size: '1024x1024'
+                }, data);
+
+                // Check budget
+                checkBudget();
+            } catch (error) {
+                showNotification('Error editing image', 'error');
+                console.error('Error editing image:', error);
+                editImagePreview.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        // Convert data URL to blob
+        function dataURLToBlob(dataURL) {
+            const parts = dataURL.split(';base64,');
+            const contentType = parts[0].split(':')[1];
+            const raw = window.atob(parts[1]);
+            const rawLength = raw.length;
+            const uInt8Array = new Uint8Array(rawLength);
+
+            for (let i = 0; i < rawLength; ++i) {
+                uInt8Array[i] = raw.charCodeAt(i);
+            }
+
+            return new Blob([uInt8Array], { type: contentType });
+        }
+
+        // Generate image variations with DALL-E
+        async function generateVariations() {
+            const file = variationImageFile.files[0];
+            const n = parseInt(variationN.value);
+            const size = variationSize.value;
+
+            if (!file) {
+                showNotification('Please select an image', 'error');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('n', n);
+            formData.append('size', size);
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/images/variations', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display generated variations
+                variationImagePreview.innerHTML = '';
+                data.data.forEach(image => {
+                    const img = document.createElement('img');
+                    img.src = image.url;
+                    img.alt = 'Image Variation';
+                    variationImagePreview.appendChild(img);
+                });
+
+                // Update code content
+                updateCodeContent('curl', {
+                    n: n,
+                    size: size
+                });
+
+                // Save to history
+                saveToHistory('dalle-variations', {
+                    n: n,
+                    size: size
+                }, data);
+
+                // Check budget
+                checkBudget();
+            } catch (error) {
+                showNotification('Error generating variations', 'error');
+                console.error('Error generating variations:', error);
+                variationImagePreview.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        // Transcribe audio with Whisper
+        async function transcribeAudio() {
+            const file = audioFile.files[0];
+            const prompt = transcriptionPrompt.value.trim();
+            const language = transcriptionLanguage.value;
+            const responseFormat = transcriptionResponseFormat.value;
+
+            if (!file) {
+                showNotification('Please select an audio file', 'error');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('model', 'whisper-1');
+            if (prompt) formData.append('prompt', prompt);
+            if (language) formData.append('language', language);
+            formData.append('response_format', responseFormat);
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/audio/transcriptions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                if (responseFormat === 'json' || responseFormat === 'verbose_json') {
+                    const data = await response.json();
+                    transcriptionResponse.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    const text = await response.text();
+                    transcriptionResponse.textContent = text;
+                }
+
+                // Update code content
+                updateCodeContent('curl', {
+                    model: 'whisper-1',
+                    prompt: prompt,
+                    language: language,
+                    response_format: responseFormat
+                });
+
+                // Save to history
+                saveToHistory('whisper-transcription', {
+                    model: 'whisper-1',
+                    prompt: prompt,
+                    language: language,
+                    response_format: responseFormat
+                }, responseFormat === 'json' || responseFormat === 'verbose_json' ? await response.json() : await response.text());
+
+                // Check budget
+                checkBudget();
+            } catch (error) {
+                showNotification('Error transcribing audio', 'error');
+                console.error('Error transcribing audio:', error);
+                transcriptionResponse.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Translate audio with Whisper
+        async function translateAudio() {
+            const file = translationAudioFile.files[0];
+            const prompt = translationPrompt.value.trim();
+            const responseFormat = translationResponseFormat.value;
+
+            if (!file) {
+                showNotification('Please select an audio file', 'error');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('model', 'whisper-1');
+            if (prompt) formData.append('prompt', prompt);
+            formData.append('response_format', responseFormat);
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/audio/translations', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                if (responseFormat === 'json' || responseFormat === 'verbose_json') {
+                    const data = await response.json();
+                    translationResponse.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    const text = await response.text();
+                    translationResponse.textContent = text;
+                }
+
+                // Update code content
+                updateCodeContent('curl', {
+                    model: 'whisper-1',
+                    prompt: prompt,
+                    response_format: responseFormat
+                });
+
+                // Save to history
+                saveToHistory('whisper-translation', {
+                    model: 'whisper-1',
+                    prompt: prompt,
+                    response_format: responseFormat
+                }, responseFormat === 'json' || responseFormat === 'verbose_json' ? await response.json() : await response.text());
+
+                // Check budget
+                checkBudget();
+            } catch (error) {
+                showNotification('Error translating audio', 'error');
+                console.error('Error translating audio:', error);
+                translationResponse.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Generate speech with TTS
+        async function generateSpeech() {
+            const inputText = ttsInput.value.trim();
+            const model = ttsModel.value;
+            const voice = ttsVoice.value;
+            const speed = parseFloat(ttsSpeed.value);
+            const responseFormat = ttsResponseFormat.value;
+
+            if (!inputText) {
+                showNotification('Please enter text to convert to speech', 'error');
+                return;
+            }
+
+            // Prepare request data
+            const requestData = {
+                model: model,
+                input: inputText,
+                voice: voice,
+                speed: speed,
+                response_format: responseFormat
+            };
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/audio/speech', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+
+                // Display audio player
+                ttsResponse.innerHTML = `
+                    <audio controls>
+                        <source src="${audioUrl}" type="audio/${responseFormat}">
+                        Your browser does not support the audio element.
+                    </audio>
+                `;
+
+                // Update code content
+                updateCodeContent('curl', requestData);
+
+                // Save to history
+                saveToHistory('tts', requestData, audioUrl);
+
+                // Check budget
+                checkBudget();
+            } catch (error) {
+                showNotification('Error generating speech', 'error');
+                console.error('Error generating speech:', error);
+                ttsResponse.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        // Check content moderation
+        async function checkModeration() {
+            const inputText = moderationInput.value.trim();
+            const model = moderationModel.value;
+
+            if (!inputText) {
+                showNotification('Please enter text to moderate', 'error');
+                return;
+            }
+
+            // Prepare request data
+            const requestData = {
+                input: inputText,
+                model: model
+            };
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/moderations', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display moderation results
+                moderationResponse.textContent = JSON.stringify(data, null, 2);
+
+                // Create gauges for each category
+                createModerationGauges(data.results[0].category_scores);
+
+                // Update code content
+                updateCodeContent('curl', requestData);
+
+                // Save to history
+                saveToHistory('moderation', requestData, data);
+
+                // Check budget
+                checkBudget();
+            } catch (error) {
+                showNotification('Error checking moderation', 'error');
+                console.error('Error checking moderation:', error);
+                moderationResponse.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Create moderation gauges
+        function createModerationGauges(categoryScores) {
+            moderationGauges.innerHTML = '';
+
+            for (const [category, score] of Object.entries(categoryScores)) {
+                const gaugeContainer = document.createElement('div');
+                gaugeContainer.className = 'gauge-container';
+
+                const gauge = document.createElement('div');
+                gauge.className = 'gauge';
+
+                // Create gauge using SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 100 100');
+                svg.setAttribute('width', '100%');
+                svg.setAttribute('height', '100%');
+
+                // Background circle
+                const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                bgCircle.setAttribute('cx', '50');
+                bgCircle.setAttribute('cy', '50');
+                bgCircle.setAttribute('r', '45');
+                bgCircle.setAttribute('fill', 'none');
+                bgCircle.setAttribute('stroke', '#A0A0A0');
+                bgCircle.setAttribute('stroke-width', '5');
+                svg.appendChild(bgCircle);
+
+                // Foreground circle
+                const fgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                fgCircle.setAttribute('cx', '50');
+                fgCircle.setAttribute('cy', '50');
+                fgCircle.setAttribute('r', '45');
+                fgCircle.setAttribute('fill', 'none');
+                fgCircle.setAttribute('stroke', '#10A37F');
+                fgCircle.setAttribute('stroke-width', '5');
+                fgCircle.setAttribute('stroke-dasharray', `${score * 283} ${283 - score * 283}`);
+                fgCircle.setAttribute('transform', 'rotate(-90 50 50)');
+                svg.appendChild(fgCircle);
+
+                // Add SVG to gauge
+                gauge.appendChild(svg);
+
+                // Add gauge value and label
+                const gaugeValue = document.createElement('div');
+                gaugeValue.className = 'gauge-value';
+                gaugeValue.textContent = (score * 100).toFixed(1) + '%';
+
+                const gaugeLabel = document.createElement('div');
+                gaugeLabel.className = 'gauge-label';
+                gaugeLabel.textContent = category;
+
+                gaugeContainer.appendChild(gauge);
+                gaugeContainer.appendChild(gaugeValue);
+                gaugeContainer.appendChild(gaugeLabel);
+
+                moderationGauges.appendChild(gaugeContainer);
+            }
+        }
+
+        // List models
+        async function listModels() {
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display models
+                displayModels(data.data);
+
+                // Save to history
+                saveToHistory('models', null, data);
+            } catch (error) {
+                showNotification('Error listing models', 'error');
+                console.error('Error listing models:', error);
+                modelList.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        // Display models
+        function displayModels(models) {
+            modelList.innerHTML = '';
+
+            models.forEach(model => {
+                const modelCard = document.createElement('div');
+                modelCard.className = 'model-card';
+
+                const modelName = document.createElement('div');
+                modelName.className = 'model-name';
+                modelName.textContent = model.id;
+
+                const modelId = document.createElement('div');
+                modelId.className = 'model-id';
+                modelId.textContent = `ID: ${model.id}`;
+
+                const capabilities = document.createElement('div');
+                capabilities.className = 'model-capabilities';
+
+                if (model.capabilities) {
+                    for (const [capability, supported] of Object.entries(model.capabilities)) {
+                        if (supported) {
+                            const capabilitySpan = document.createElement('span');
+                            capabilitySpan.className = 'capability';
+                            capabilitySpan.textContent = capability;
+                            capabilities.appendChild(capabilitySpan);
+                        }
+                    }
+                }
+
+                const modelCreated = document.createElement('div');
+                modelCreated.className = 'model-created';
+                modelCreated.textContent = `Created: ${new Date(model.created * 1000).toLocaleString()}`;
+
+                modelCard.appendChild(modelName);
+                modelCard.appendChild(modelId);
+                modelCard.appendChild(capabilities);
+                modelCard.appendChild(modelCreated);
+
+                modelList.appendChild(modelCard);
+            });
+        }
+
+        // Filter models
+        function filterModels() {
+            const searchTerm = modelSearch.value.toLowerCase();
+            const selectedCapabilities = Array.from(capabilityFilters)
+                .filter(filter => filter.checked)
+                .map(filter => filter.value);
+
+            // Get all model cards
+            const modelCards = document.querySelectorAll('.model-card');
+
+            modelCards.forEach(card => {
+                const modelName = card.querySelector('.model-name').textContent.toLowerCase();
+                const capabilities = Array.from(card.querySelectorAll('.capability'))
+                    .map(cap => cap.textContent.toLowerCase());
+
+                // Check if model matches search term
+                const matchesSearch = modelName.includes(searchTerm);
+
+                // Check if model has all selected capabilities
+                const hasCapabilities = selectedCapabilities.every(cap =>
+                    capabilities.includes(cap)
+                );
+
+                // Show or hide card based on filters
+                if (matchesSearch && (selectedCapabilities.length === 0 || hasCapabilities)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Upload files
+        async function uploadFiles(event) {
+            const files = event.target.files;
+
+            if (files.length === 0) return;
+
+            // Reset progress bar
+            uploadProgress.style.width = '0%';
+
+            // Create form data for each file
+            const uploadPromises = Array.from(files).map(file => {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('purpose', 'assistants');
+
+                return fetch('https://theserver-open-ai.replit.app/v1/files', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update file list
+                    addFileToList(data);
+
+                    // Save to history
+                    saveToHistory('file-upload', { purpose: 'assistants' }, data);
+
+                    return data;
+                })
+                .catch(error => {
+                    showNotification(`Error uploading file ${file.name}`, 'error');
+                    console.error(`Error uploading file ${file.name}:`, error);
+                    return null;
+                });
+            });
+
+            // Track upload progress
+            Promise.all(uploadPromises)
+                .then(results => {
+                    const successfulUploads = results.filter(result => result !== null);
+                    showNotification(`${successfulUploads.length} files uploaded successfully`, 'success');
+
+                    // Check budget
+                    checkBudget();
+                })
+                .catch(error => {
+                    showNotification('Error uploading files', 'error');
+                    console.error('Error uploading files:', error);
+                });
+        }
+
+        // Add file to list
+        function addFileToList(fileData) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+
+            const fileInfo = document.createElement('div');
+            fileInfo.className = 'file-info';
+
+            const fileName = document.createElement('div');
+            fileName.className = 'file-name';
+            fileName.textContent = fileData.filename;
+
+            const fileDetails = document.createElement('div');
+            fileDetails.className = 'file-details';
+            fileDetails.textContent = `${formatFileSize(fileData.bytes)} • ${new Date(fileData.created_at * 1000).toLocaleString()}`;
+
+            const fileActions = document.createElement('div');
+            fileActions.className = 'file-actions';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-secondary';
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteBtn.addEventListener('click', () => deleteFile(fileData.id, fileItem));
+
+            fileInfo.appendChild(fileName);
+            fileInfo.appendChild(fileDetails);
+            fileActions.appendChild(deleteBtn);
+
+            fileItem.appendChild(fileInfo);
+            fileItem.appendChild(fileActions);
+
+            fileList.appendChild(fileItem);
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Delete file
+        async function deleteFile(fileId, fileItem) {
+            try {
+                const response = await fetch(`https://theserver-open-ai.replit.app/v1/files/${fileId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Remove file from list
+                fileItem.remove();
+
+                showNotification('File deleted successfully', 'success');
+
+                // Save to history
+                saveToHistory('file-delete', { fileId }, null);
+            } catch (error) {
+                showNotification('Error deleting file', 'error');
+                console.error('Error deleting file:', error);
+            }
+        }
+
+        // List files
+        async function listFiles() {
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/files', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display files
+                displayFiles(data.data);
+
+                // Save to history
+                saveToHistory('file-list', null, data);
+            } catch (error) {
+                showNotification('Error listing files', 'error');
+                console.error('Error listing files:', error);
+                fileListDisplay.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        // Display files
+        function displayFiles(files) {
+            fileListDisplay.innerHTML = '';
+
+            if (files.length === 0) {
+                fileListDisplay.innerHTML = '<p>No files found</p>';
+                return;
+            }
+
+            // Sort files
+            const sortBy = fileSort.value;
+            files.sort((a, b) => {
+                if (sortBy === 'created_at') {
+                    return b.created_at - a.created_at;
+                } else if (sortBy === 'filename') {
+                    return a.filename.localeCompare(b.filename);
+                } else if (sortBy === 'bytes') {
+                    return b.bytes - a.bytes;
+                }
+                return 0;
+            });
+
+            files.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'file-info';
+
+                const fileName = document.createElement('div');
+                fileName.className = 'file-name';
+                fileName.textContent = file.filename;
+
+                const fileDetails = document.createElement('div');
+                fileDetails.className = 'file-details';
+                fileDetails.textContent = `${formatFileSize(file.bytes)} • ${new Date(file.created_at * 1000).toLocaleString()}`;
+
+                const fileActions = document.createElement('div');
+                fileActions.className = 'file-actions';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-secondary';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.addEventListener('click', () => deleteFile(file.id, fileItem));
+
+                fileInfo.appendChild(fileName);
+                fileInfo.appendChild(fileDetails);
+                fileActions.appendChild(deleteBtn);
+
+                fileItem.appendChild(fileInfo);
+                fileItem.appendChild(fileActions);
+
+                fileListDisplay.appendChild(fileItem);
+            });
+        }
+
+        // Filter files
+        function filterFiles() {
+            const searchTerm = fileSearch.value.toLowerCase();
+            const fileItems = document.querySelectorAll('#fileListDisplay .file-item');
+
+            fileItems.forEach(item => {
+                const fileName = item.querySelector('.file-name').textContent.toLowerCase();
+
+                if (fileName.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Sort files
+        function sortFiles() {
+            // Reload files to trigger sorting
+            listFiles();
+        }
+
+        // Create assistant
+        async function createAssistant() {
+            const name = assistantName.value.trim();
+            const model = assistantModel.value;
+            const description = assistantDescription.value.trim();
+            const instructions = assistantInstructions.value.trim();
+            const tools = Array.from(document.querySelectorAll('.tool-card.active'))
+                .map(card => card.getAttribute('data-tool'));
+
+            if (!name || !instructions) {
+                showNotification('Please enter a name and instructions', 'error');
+                return;
+            }
+
+            // Prepare request data
+            const requestData = {
+                model: model,
+                name: name,
+                description: description,
+                instructions: instructions,
+                tools: tools.map(tool => ({ type: tool }))
+            };
+
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/assistants', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display assistant creation response
+                assistantResponse.textContent = JSON.stringify(data, null, 2);
+
+                // Update code content
+                updateCodeContent('curl', requestData);
+
+                // Save to history
+                saveToHistory('assistant-create', requestData, data);
+
+                // Check budget
+                checkBudget();
+            } catch (error) {
+                showNotification('Error creating assistant', 'error');
+                console.error('Error creating assistant:', error);
+                assistantResponse.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Create thread
+        async function createThread() {
+            try {
+                const response = await fetch('https://theserver-open-ai.replit.app/v1/threads', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display thread creation response
+                threadResponse.textContent = JSON.stringify(data, null, 2);
+
+                // Update code content
+                updateCodeContent('curl', {});
+
+                // Save to history
+                saveToHistory('thread-create', {}, data);
+            } catch (error) {
+                showNotification('Error creating thread', 'error');
+                console.error('Error creating thread:', error);
+                threadResponse.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // List messages in thread
+        async function listMessages() {
+            const threadIdValue = threadId.value.trim();
+
+            if (!threadIdValue) {
+                showNotification('Please enter a thread ID', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://theserver-open-ai.replit.app/v1/threads/${threadIdValue}/messages`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display messages
+                displayMessages(data.data);
+
+                // Save to history
+                saveToHistory('thread-messages', { threadId: threadIdValue }, data);
+            } catch (error) {
+                showNotification('Error listing messages', 'error');
+                console.error('Error listing messages:', error);
+                messageHistory.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        // Display messages
+        function displayMessages(messages) {
+            messageHistory.innerHTML = '';
+
+            if (messages.length === 0) {
+                messageHistory.innerHTML = '<p>No messages found</p>';
+                return;
+            }
+
+            // Sort messages by created_at in descending order
+            messages.sort((a, b) => b.created_at - a.created_at);
+
+            messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.role}`;
+
+                const messageHeader = document.createElement('div');
+                messageHeader.className = 'message-header';
+                messageHeader.textContent = `${message.role} - ${new Date(message.created_at * 1000).toLocaleString()}`;
+
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.textContent = message.content[0].text.value;
+
+                messageDiv.appendChild(messageHeader);
+                messageDiv.appendChild(messageContent);
+
+                messageHistory.appendChild(messageDiv);
+            });
+        }
+
+        // Add message to thread
+        async function addMessage() {
+            const threadIdValue = threadId.value.trim();
+            const content = messageContent.value.trim();
+
+            if (!threadIdValue || !content) {
+                showNotification('Please enter a thread ID and message content', 'error');
+                return;
+            }
+
+           

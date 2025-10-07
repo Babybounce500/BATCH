@@ -1,0 +1,3597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mistral AI Orchestrator</title>
+    <meta name="description" content="Comprehensive interface for Mistral AI API endpoints">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366F1;
+            --primary-dark: #4F46E5;
+            --primary-light: #A5B4FC;
+            --dark-bg: #1E1E2E;
+            --dark-surface: #2D2D3D;
+            --dark-text: #E0E0E0;
+            --dark-text-secondary: #A0A0A0;
+            --success: #10B981;
+            --error: #EF4444;
+            --warning: #F59E0B;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+
+        header {
+            background-color: var(--dark-surface);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .api-key-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .api-key-input {
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+        }
+
+        .api-key-input::placeholder {
+            color: var(--dark-text-secondary);
+        }
+
+        .api-key-toggle {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .api-key-toggle:hover {
+            background-color: var(--primary-dark);
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tabs-container {
+            display: flex;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            padding-bottom: 0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--dark-surface);
+        }
+
+        .tabs-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .tabs-container::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .tabs-container::-webkit-scrollbar-track {
+            background-color: var(--dark-surface);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--dark-surface);
+            color: var(--dark-text-secondary);
+            border: none;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .tab-content {
+            background-color: var(--dark-surface);
+            border-radius: 0 var(--border-radius) var(--border-radius) var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .endpoint-card {
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .endpoint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .endpoint-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .endpoint-method {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .post {
+            background-color: #3B82F6;
+            color: white;
+        }
+
+        .get {
+            background-color: #10B981;
+            color: white;
+        }
+
+        .delete {
+            background-color: #EF4444;
+            color: white;
+        }
+
+        .endpoint-path {
+            color: var(--primary-light);
+            font-style: italic;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .form-control::placeholder {
+            color: var(--dark-text-secondary);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em;
+        }
+
+        .form-checkbox {
+            margin-right: 0.5rem;
+        }
+
+        .form-range {
+            width: 100%;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: 1px solid var(--primary-light);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #DC2626;
+        }
+
+        .response-container {
+            margin-top: 2rem;
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .response-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .response-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-200 {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .status-400 {
+            background-color: var(--error);
+            color: white;
+        }
+
+        .status-500 {
+            background-color: #7C3AED;
+            color: white;
+        }
+
+        .response-content {
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .code-editor {
+            position: relative;
+            background-color: var(--dark-surface);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .code-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: var(--dark-bg);
+            border-bottom: 1px solid var(--primary-light);
+        }
+
+        .code-editor-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .code-editor-content {
+            min-height: 300px;
+            padding: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+
+        .code-editor-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem 1rem;
+            background-color: var(--dark-bg);
+            border-top: 1px solid var(--primary-light);
+        }
+
+        .suggestions-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--dark-surface);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .suggestion {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+
+        .suggestion:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--primary-light);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-upload:hover {
+            background-color: var(--dark-bg);
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            color: var(--primary-light);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-text {
+            color: var(--dark-text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
+            color: var(--dark-text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .file-list {
+            margin-top: 1.5rem;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-icon {
+            font-size: 2rem;
+            color: var(--primary-light);
+        }
+
+        .file-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-name {
+            font-weight: 500;
+        }
+
+        .file-meta {
+            color: var(--dark-text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .file-action {
+            padding: 0.5rem;
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-action:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem;
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .search-input::placeholder {
+            color: var(--dark-text-secondary);
+        }
+
+        .filter-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-select {
+            flex: 1;
+            padding: 0.75rem;
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em;
+        }
+
+        .sort-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sort-select {
+            flex: 1;
+            padding: 0.75rem;
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em;
+        }
+
+        .job-list {
+            margin-top: 1.5rem;
+        }
+
+        .job-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .job-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .job-id {
+            font-weight: 500;
+        }
+
+        .job-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-queued {
+            background-color: #F59E0B;
+            color: white;
+        }
+
+        .status-processing {
+            background-color: #3B82F6;
+            color: white;
+        }
+
+        .status-completed {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .status-failed {
+            background-color: var(--error);
+            color: white;
+        }
+
+        .job-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .job-action {
+            padding: 0.5rem;
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .job-action:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .progress-container {
+            margin-top: 0.5rem;
+            width: 100%;
+            background-color: var(--dark-surface);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: var(--primary-color);
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .dashboard-card {
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .dashboard-card-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .dashboard-metric {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-metric-label {
+            color: var(--dark-text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 1.5rem;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--dark-surface);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-text);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--primary-color);
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .confirmation-dialog {
+            text-align: center;
+        }
+
+        .confirmation-message {
+            margin-bottom: 1.5rem;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .embedding-visualization {
+            height: 300px;
+            margin-top: 1.5rem;
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .similarity-matrix {
+            height: 300px;
+            margin-top: 1.5rem;
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .timeline-container {
+            height: 300px;
+            margin-top: 1.5rem;
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .waveform-container {
+            height: 100px;
+            margin-top: 1.5rem;
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .agent-config-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .agent-capability {
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .agent-capability:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .agent-capability-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-capability-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-capability-description {
+            color: var(--dark-text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .conversation-designer {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .conversation-turn {
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .conversation-turn-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .conversation-turn-type {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .type-user {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .type-assistant {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .conversation-turn-content {
+            margin-bottom: 0.5rem;
+        }
+
+        .conversation-turn-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .conversation-turn-action {
+            padding: 0.25rem 0.5rem;
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .conversation-turn-action:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .conversation-analytics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .analytics-metric {
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+
+        .analytics-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .analytics-label {
+            color: var(--dark-text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .workflow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .workflow-step-icon {
+            font-size: 2rem;
+            color: var(--primary-light);
+        }
+
+        .workflow-step-content {
+            flex: 1;
+            background-color: var(--dark-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .workflow-step-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .workflow-step-description {
+            color: var(--dark-text-secondary);
+        }
+
+        .workflow-step-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .loading-spinner {
+            border: 4px solid var(--dark-surface);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .api-key-container {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .api-key-input {
+                width: 100%;
+            }
+
+            .tabs-container {
+                overflow-x: auto;
+            }
+
+            .tabs {
+                flex-wrap: nowrap;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .agent-config-container {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .conversation-analytics {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo">Mistral AI Orchestrator</a>
+            <div class="api-key-container">
+                <input type="password" class="api-key-input" id="apiKey" placeholder="Enter your API key">
+                <button class="api-key-toggle" id="apiKeyToggle">Show</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="tabs-container">
+            <div class="tabs" id="tabs">
+                <button class="tab active" data-tab="chat">Chat</button>
+                <button class="tab" data-tab="embeddings">Embeddings</button>
+                <button class="tab" data-tab="files">Files</button>
+                <button class="tab" data-tab="fine-tuning">Fine-tuning</button>
+                <button class="tab" data-tab="batch">Batch Processing</button>
+                <button class="tab" data-tab="moderation">Moderation</button>
+                <button class="tab" data-tab="audio">Audio</button>
+                <button class="tab" data-tab="agents">Agents</button>
+                <button class="tab" data-tab="conversations">Conversations</button>
+                <button class="tab" data-tab="workflows">Workflows</button>
+            </div>
+        </div>
+
+        <div class="tab-content active" id="chat">
+            <h2 class="section-title">Chat Endpoints</h2>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Chat Completions</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/chat/completions</span>
+
+                <div class="form-group">
+                    <label for="chatModel" class="form-label">Model</label>
+                    <select id="chatModel" class="form-select">
+                        <option value="mistral-tiny">Mistral Tiny</option>
+                        <option value="mistral-small" selected>Mistral Small</option>
+                        <option value="mistral-medium">Mistral Medium</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="chatMessages" class="form-label">Messages</label>
+                    <textarea id="chatMessages" class="form-control form-textarea" placeholder="Enter messages in JSON format"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="chatTemperature" class="form-label">Temperature</label>
+                    <input type="range" id="chatTemperature" class="form-range" min="0" max="1" step="0.1" value="0.7">
+                    <div class="range-value">0.7</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="chatStreaming" class="form-checkbox">
+                        Enable Streaming
+                    </label>
+                </div>
+
+                <button class="btn" id="chatSubmit">Submit</button>
+
+                <div class="response-container" id="chatResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="chatResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="chatResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">FIM Completions</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/fim/completions</span>
+
+                <div class="form-group">
+                    <label for="fimModel" class="form-label">Model</label>
+                    <select id="fimModel" class="form-select">
+                        <option value="mistral-tiny">Mistral Tiny</option>
+                        <option value="mistral-small" selected>Mistral Small</option>
+                        <option value="mistral-medium">Mistral Medium</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fimPrompt" class="form-label">Prompt</label>
+                    <div class="code-editor">
+                        <div class="code-editor-header">
+                            <span class="code-editor-title">Code Editor</span>
+                            <div class="code-editor-actions">
+                                <button class="btn btn-secondary btn-sm" id="fimFormat">Format</button>
+                            </div>
+                        </div>
+                        <div class="code-editor-content" id="fimPrompt" contenteditable="true"></div>
+                        <div class="suggestions-container" id="fimSuggestions"></div>
+                        <div class="code-editor-footer">
+                            <button class="btn" id="fimSubmit">Submit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="response-container" id="fimResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fimResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fimResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Async Chat Completions</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/chat/async</span>
+
+                <div class="form-group">
+                    <label for="asyncModel" class="form-label">Model</label>
+                    <select id="asyncModel" class="form-select">
+                        <option value="mistral-tiny">Mistral Tiny</option>
+                        <option value="mistral-small" selected>Mistral Small</option>
+                        <option value="mistral-medium">Mistral Medium</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="asyncMessages" class="form-label">Messages</label>
+                    <textarea id="asyncMessages" class="form-control form-textarea" placeholder="Enter messages in JSON format"></textarea>
+                </div>
+
+                <button class="btn" id="asyncSubmit">Submit</button>
+
+                <div class="response-container" id="asyncResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="asyncResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="asyncResponseContent"></div>
+                </div>
+
+                <div class="job-management" id="asyncJobManagement" style="display: none;">
+                    <h3 class="section-title">Job Management</h3>
+
+                    <div class="job-list" id="asyncJobList"></div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <h4 class="dashboard-card-title">Job Statistics</h4>
+                            <div class="dashboard-metric" id="asyncJobCount">0</div>
+                            <div class="dashboard-metric-label">Total Jobs</div>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <h4 class="dashboard-card-title">Status Distribution</h4>
+                            <div class="chart-container" id="asyncStatusChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Chat Vision</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/chat/vision</span>
+
+                <div class="form-group">
+                    <label for="visionModel" class="form-label">Model</label>
+                    <select id="visionModel" class="form-select">
+                        <option value="mistral-tiny">Mistral Tiny</option>
+                        <option value="mistral-small" selected>Mistral Small</option>
+                        <option value="mistral-medium">Mistral Medium</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="visionMessages" class="form-label">Messages</label>
+                    <textarea id="visionMessages" class="form-control form-textarea" placeholder="Enter messages in JSON format"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="visionImage" class="form-label">Image</label>
+                    <input type="file" id="visionImage" class="form-control" accept="image/*">
+                    <img id="visionImagePreview" class="image-preview">
+                </div>
+
+                <button class="btn" id="visionSubmit">Submit</button>
+
+                <div class="response-container" id="visionResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="visionResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="visionResponseContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="embeddings">
+            <h2 class="section-title">Embeddings Endpoints</h2>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Embeddings</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/embeddings</span>
+
+                <div class="form-group">
+                    <label for="embeddingsModel" class="form-label">Model</label>
+                    <select id="embeddingsModel" class="form-select">
+                        <option value="mistral-embed-tiny">Mistral Embed Tiny</option>
+                        <option value="mistral-embed-small" selected>Mistral Embed Small</option>
+                        <option value="mistral-embed-medium">Mistral Embed Medium</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="embeddingsInput" class="form-label">Input</label>
+                    <textarea id="embeddingsInput" class="form-control form-textarea" placeholder="Enter text to embed"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="embeddingsDimensions" class="form-label">Dimensions</label>
+                    <input type="number" id="embeddingsDimensions" class="form-control" min="1" max="4096" value="1536">
+                </div>
+
+                <button class="btn" id="embeddingsSubmit">Submit</button>
+
+                <div class="response-container" id="embeddingsResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="embeddingsResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="embeddingsResponseContent"></div>
+                </div>
+
+                <div class="embedding-visualization" id="embeddingsVisualization" style="display: none;"></div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Batch Embeddings</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/embeddings/batch</span>
+
+                <div class="form-group">
+                    <label for="batchEmbeddingsModel" class="form-label">Model</label>
+                    <select id="batchEmbeddingsModel" class="form-select">
+                        <option value="mistral-embed-tiny">Mistral Embed Tiny</option>
+                        <option value="mistral-embed-small" selected>Mistral Embed Small</option>
+                        <option value="mistral-embed-medium">Mistral Embed Medium</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="batchEmbeddingsInput" class="form-label">Input</label>
+                    <textarea id="batchEmbeddingsInput" class="form-control form-textarea" placeholder="Enter texts to embed (one per line)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="batchEmbeddingsDimensions" class="form-label">Dimensions</label>
+                    <input type="number" id="batchEmbeddingsDimensions" class="form-control" min="1" max="4096" value="1536">
+                </div>
+
+                <div class="form-group">
+                    <label for="batchEmbeddingsSimilarityThreshold" class="form-label">Similarity Threshold</label>
+                    <input type="range" id="batchEmbeddingsSimilarityThreshold" class="form-range" min="0" max="1" step="0.01" value="0.7">
+                    <div class="range-value">0.7</div>
+                </div>
+
+                <button class="btn" id="batchEmbeddingsSubmit">Submit</button>
+
+                <div class="response-container" id="batchEmbeddingsResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="batchEmbeddingsResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="batchEmbeddingsResponseContent"></div>
+                </div>
+
+                <div class="similarity-matrix" id="batchEmbeddingsSimilarityMatrix" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="files">
+            <h2 class="section-title">Files Endpoints</h2>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Upload File</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/files</span>
+
+                <div class="form-group">
+                    <label for="fileUpload" class="form-label">File</label>
+                    <div class="file-upload" id="fileUpload">
+                        <div class="file-upload-icon">📁</div>
+                        <div class="file-upload-text">Drag & drop files here or click to browse</div>
+                        <div class="file-upload-hint">Supported formats: .jsonl, .json, .txt, .csv, .pdf, .doc, .docx</div>
+                        <input type="file" id="fileInput" class="form-control" accept=".jsonl,.json,.txt,.csv,.pdf,.doc,.docx" style="display: none;">
+                    </div>
+                </div>
+
+                <button class="btn" id="fileUploadSubmit">Upload</button>
+
+                <div class="response-container" id="fileUploadResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fileUploadResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fileUploadResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">List Files</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/files</span>
+
+                <div class="search-container">
+                    <input type="text" id="fileSearch" class="search-input" placeholder="Search files...">
+                    <button class="btn" id="fileSearchSubmit">Search</button>
+                </div>
+
+                <div class="filter-container">
+                    <select id="fileTypeFilter" class="filter-select">
+                        <option value="">All File Types</option>
+                        <option value="jsonl">JSONL</option>
+                        <option value="json">JSON</option>
+                        <option value="txt">Text</option>
+                        <option value="csv">CSV</option>
+                        <option value="pdf">PDF</option>
+                        <option value="doc">DOC</option>
+                        <option value="docx">DOCX</option>
+                    </select>
+
+                    <select id="fileDateFilter" class="filter-select">
+                        <option value="">All Dates</option>
+                        <option value="last24h">Last 24 Hours</option>
+                        <option value="last7d">Last 7 Days</option>
+                        <option value="last30d">Last 30 Days</option>
+                    </select>
+                </div>
+
+                <div class="sort-container">
+                    <select id="fileSort" class="sort-select">
+                        <option value="created_at_desc">Date (Newest First)</option>
+                        <option value="created_at_asc">Date (Oldest First)</option>
+                        <option value="filename_asc">Name (A-Z)</option>
+                        <option value="filename_desc">Name (Z-A)</option>
+                        <option value="size_asc">Size (Smallest First)</option>
+                        <option value="size_desc">Size (Largest First)</option>
+                    </select>
+                </div>
+
+                <button class="btn" id="fileListSubmit">List Files</button>
+
+                <div class="file-list" id="fileList" style="display: none;"></div>
+
+                <div class="response-container" id="fileListResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fileListResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fileListResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Retrieve File</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/files/:id</span>
+
+                <div class="form-group">
+                    <label for="fileId" class="form-label">File ID</label>
+                    <input type="text" id="fileId" class="form-control" placeholder="Enter file ID">
+                </div>
+
+                <button class="btn" id="fileRetrieveSubmit">Retrieve</button>
+
+                <div class="response-container" id="fileRetrieveResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fileRetrieveResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fileRetrieveResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Delete File</h3>
+                    <span class="endpoint-method delete">DELETE</span>
+                </div>
+                <span class="endpoint-path">/mistral/files/:id</span>
+
+                <div class="form-group">
+                    <label for="fileDeleteId" class="form-label">File ID</label>
+                    <input type="text" id="fileDeleteId" class="form-control" placeholder="Enter file ID">
+                </div>
+
+                <button class="btn btn-danger" id="fileDeleteSubmit">Delete</button>
+
+                <div class="response-container" id="fileDeleteResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fileDeleteResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fileDeleteResponseContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="fine-tuning">
+            <h2 class="section-title">Fine-tuning Endpoints</h2>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Create Fine-tuning Job</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/fine-tuning/jobs</span>
+
+                <div class="form-group">
+                    <label for="fineTuningModel" class="form-label">Model</label>
+                    <select id="fineTuningModel" class="form-select">
+                        <option value="mistral-tiny">Mistral Tiny</option>
+                        <option value="mistral-small" selected>Mistral Small</option>
+                        <option value="mistral-medium">Mistral Medium</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fineTuningTrainingFile" class="form-label">Training File</label>
+                    <input type="text" id="fineTuningTrainingFile" class="form-control" placeholder="Enter training file ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="fineTuningValidationFile" class="form-label">Validation File (optional)</label>
+                    <input type="text" id="fineTuningValidationFile" class="form-control" placeholder="Enter validation file ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="fineTuningHyperparameters" class="form-label">Hyperparameters</label>
+                    <textarea id="fineTuningHyperparameters" class="form-control form-textarea" placeholder="Enter hyperparameters in JSON format"></textarea>
+                </div>
+
+                <button class="btn" id="fineTuningSubmit">Create Job</button>
+
+                <div class="response-container" id="fineTuningResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fineTuningResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fineTuningResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">List Fine-tuning Jobs</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/fine-tuning/jobs</span>
+
+                <button class="btn" id="fineTuningListSubmit">List Jobs</button>
+
+                <div class="job-list" id="fineTuningJobList" style="display: none;"></div>
+
+                <div class="response-container" id="fineTuningListResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fineTuningListResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fineTuningListResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Retrieve Fine-tuning Job</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/fine-tuning/jobs/:id</span>
+
+                <div class="form-group">
+                    <label for="fineTuningJobId" class="form-label">Job ID</label>
+                    <input type="text" id="fineTuningJobId" class="form-control" placeholder="Enter job ID">
+                </div>
+
+                <button class="btn" id="fineTuningRetrieveSubmit">Retrieve Job</button>
+
+                <div class="response-container" id="fineTuningRetrieveResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fineTuningRetrieveResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fineTuningRetrieveResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Cancel Fine-tuning Job</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/fine-tuning/jobs/:id/cancel</span>
+
+                <div class="form-group">
+                    <label for="fineTuningCancelJobId" class="form-label">Job ID</label>
+                    <input type="text" id="fineTuningCancelJobId" class="form-control" placeholder="Enter job ID">
+                </div>
+
+                <button class="btn btn-danger" id="fineTuningCancelSubmit">Cancel Job</button>
+
+                <div class="response-container" id="fineTuningCancelResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fineTuningCancelResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fineTuningCancelResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">List Fine-tuning Events</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/fine-tuning/jobs/:id/events</span>
+
+                <div class="form-group">
+                    <label for="fineTuningEventsJobId" class="form-label">Job ID</label>
+                    <input type="text" id="fineTuningEventsJobId" class="form-control" placeholder="Enter job ID">
+                </div>
+
+                <button class="btn" id="fineTuningEventsSubmit">List Events</button>
+
+                <div class="timeline-container" id="fineTuningTimeline" style="display: none;"></div>
+
+                <div class="response-container" id="fineTuningEventsResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fineTuningEventsResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fineTuningEventsResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">List Fine-tuning Checkpoints</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/fine-tuning/jobs/:id/checkpoints</span>
+
+                <div class="form-group">
+                    <label for="fineTuningCheckpointsJobId" class="form-label">Job ID</label>
+                    <input type="text" id="fineTuningCheckpointsJobId" class="form-control" placeholder="Enter job ID">
+                </div>
+
+                <button class="btn" id="fineTuningCheckpointsSubmit">List Checkpoints</button>
+
+                <div class="response-container" id="fineTuningCheckpointsResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="fineTuningCheckpointsResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="fineTuningCheckpointsResponseContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="batch">
+            <h2 class="section-title">Batch Processing Endpoints</h2>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Create Batch Job</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/batch/jobs</span>
+
+                <div class="form-group">
+                    <label for="batchInputFile" class="form-label">Input File</label>
+                    <input type="text" id="batchInputFile" class="form-control" placeholder="Enter input file ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="batchEndpoint" class="form-label">Endpoint</label>
+                    <select id="batchEndpoint" class="form-select">
+                        <option value="/mistral/chat/completions">Chat Completions</option>
+                        <option value="/mistral/embeddings">Embeddings</option>
+                        <option value="/mistral/moderations">Moderations</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="batchCompletionWindow" class="form-label">Completion Window</label>
+                    <select id="batchCompletionWindow" class="form-select">
+                        <option value="24h">24 Hours</option>
+                        <option value="72h">72 Hours</option>
+                        <option value="168h">1 Week</option>
+                    </select>
+                </div>
+
+                <button class="btn" id="batchSubmit">Create Job</button>
+
+                <div class="response-container" id="batchResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="batchResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="batchResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">List Batch Jobs</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/batch/jobs</span>
+
+                <button class="btn" id="batchListSubmit">List Jobs</button>
+
+                <div class="job-list" id="batchJobList" style="display: none;"></div>
+
+                <div class="response-container" id="batchListResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="batchListResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="batchListResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Retrieve Batch Job</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/batch/jobs/:id</span>
+
+                <div class="form-group">
+                    <label for="batchJobId" class="form-label">Job ID</label>
+                    <input type="text" id="batchJobId" class="form-control" placeholder="Enter job ID">
+                </div>
+
+                <button class="btn" id="batchRetrieveSubmit">Retrieve Job</button>
+
+                <div class="response-container" id="batchRetrieveResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="batchRetrieveResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="batchRetrieveResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Cancel Batch Job</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/batch/jobs/:id/cancel</span>
+
+                <div class="form-group">
+                    <label for="batchCancelJobId" class="form-label">Job ID</label>
+                    <input type="text" id="batchCancelJobId" class="form-control" placeholder="Enter job ID">
+                </div>
+
+                <button class="btn btn-danger" id="batchCancelSubmit">Cancel Job</button>
+
+                <div class="response-container" id="batchCancelResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="batchCancelResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="batchCancelResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Download Batch Job Results</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/batch/jobs/:id/results</span>
+
+                <div class="form-group">
+                    <label for="batchDownloadJobId" class="form-label">Job ID</label>
+                    <input type="text" id="batchDownloadJobId" class="form-control" placeholder="Enter job ID">
+                </div>
+
+                <button class="btn" id="batchDownloadSubmit">Download Results</button>
+
+                <div class="response-container" id="batchDownloadResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="batchDownloadResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="batchDownloadResponseContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="moderation">
+            <h2 class="section-title">Moderation Endpoints</h2>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Moderations</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/moderations</span>
+
+                <div class="form-group">
+                    <label for="moderationInput" class="form-label">Input</label>
+                    <textarea id="moderationInput" class="form-control form-textarea" placeholder="Enter text to moderate"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="moderationModel" class="form-label">Model</label>
+                    <select id="moderationModel" class="form-select">
+                        <option value="moderation-latest" selected>Latest Moderation Model</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="moderationThresholds" class="form-label">Category Thresholds</label>
+                    <textarea id="moderationThresholds" class="form-control form-textarea" placeholder="Enter thresholds in JSON format"></textarea>
+                </div>
+
+                <button class="btn" id="moderationSubmit">Submit</button>
+
+                <div class="response-container" id="moderationResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="moderationResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="moderationResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Batch Moderations</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/moderations/batch</span>
+
+                <div class="form-group">
+                    <label for="batchModerationInput" class="form-label">Input</label>
+                    <textarea id="batchModerationInput" class="form-control form-textarea" placeholder="Enter texts to moderate (one per line)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="batchModerationModel" class="form-label">Model</label>
+                    <select id="batchModerationModel" class="form-select">
+                        <option value="moderation-latest" selected>Latest Moderation Model</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="batchModerationThresholds" class="form-label">Category Thresholds</label>
+                    <textarea id="batchModerationThresholds" class="form-control form-textarea" placeholder="Enter thresholds in JSON format"></textarea>
+                </div>
+
+                <button class="btn" id="batchModerationSubmit">Submit</button>
+
+                <div class="response-container" id="batchModerationResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="batchModerationResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="batchModerationResponseContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="audio">
+            <h2 class="section-title">Audio Endpoints</h2>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Transcriptions</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/audio/transcriptions</span>
+
+                <div class="form-group">
+                    <label for="transcriptionFile" class="form-label">Audio File</label>
+                    <input type="file" id="transcriptionFile" class="form-control" accept="audio/*">
+                </div>
+
+                <div class="form-group">
+                    <label for="transcriptionModel" class="form-label">Model</label>
+                    <select id="transcriptionModel" class="form-select">
+                        <option value="whisper-1" selected>Whisper-1</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="transcriptionPrompt" class="form-label">Prompt (optional)</label>
+                    <textarea id="transcriptionPrompt" class="form-control form-textarea" placeholder="Enter prompt text"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="transcriptionResponseFormat" class="form-label">Response Format</label>
+                    <select id="transcriptionResponseFormat" class="form-select">
+                        <option value="json" selected>JSON</option>
+                        <option value="text">Text</option>
+                        <option value="srt">SRT</option>
+                        <option value="verbose_json">Verbose JSON</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="transcriptionLanguage" class="form-label">Language (optional)</label>
+                    <select id="transcriptionLanguage" class="form-select">
+                        <option value="">Auto-detect</option>
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="pt">Portuguese</option>
+                        <option value="ru">Russian</option>
+                        <option value="zh">Chinese</option>
+                        <option value="ja">Japanese</option>
+                        <option value="ko">Korean</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="transcriptionSpeakerDiarization" class="form-checkbox">
+                        Enable Speaker Diarization
+                    </label>
+                </div>
+
+                <button class="btn" id="transcriptionSubmit">Submit</button>
+
+                <div class="response-container" id="transcriptionResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="transcriptionResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="transcriptionResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Translations</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/audio/translations</span>
+
+                <div class="form-group">
+                    <label for="translationFile" class="form-label">Audio File</label>
+                    <input type="file" id="translationFile" class="form-control" accept="audio/*">
+                </div>
+
+                <div class="form-group">
+                    <label for="translationModel" class="form-label">Model</label>
+                    <select id="translationModel" class="form-select">
+                        <option value="whisper-1" selected>Whisper-1</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="translationPrompt" class="form-label">Prompt (optional)</label>
+                    <textarea id="translationPrompt" class="form-control form-textarea" placeholder="Enter prompt text"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="translationResponseFormat" class="form-label">Response Format</label>
+                    <select id="translationResponseFormat" class="form-select">
+                        <option value="json" selected>JSON</option>
+                        <option value="text">Text</option>
+                        <option value="srt">SRT</option>
+                        <option value="verbose_json">Verbose JSON</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="translationAccent" class="form-label">Accent (optional)</label>
+                    <select id="translationAccent" class="form-select">
+                        <option value="">Default</option>
+                        <option value="american">American</option>
+                        <option value="british">British</option>
+                        <option value="australian">Australian</option>
+                        <option value="canadian">Canadian</option>
+                        <option value="indian">Indian</option>
+                    </select>
+                </div>
+
+                <button class="btn" id="translationSubmit">Submit</button>
+
+                <div class="response-container" id="translationResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="translationResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="translationResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Speech</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/audio/speech</span>
+
+                <div class="form-group">
+                    <label for="speechModel" class="form-label">Model</label>
+                    <select id="speechModel" class="form-select">
+                        <option value="tts-1" selected>TTS-1</option>
+                        <option value="tts-1-hd">TTS-1-HD</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="speechInput" class="form-label">Input</label>
+                    <textarea id="speechInput" class="form-control form-textarea" placeholder="Enter text to convert to speech"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="speechVoice" class="form-label">Voice</label>
+                    <select id="speechVoice" class="form-select">
+                        <option value="alloy">Alloy</option>
+                        <option value="echo">Echo</option>
+                        <option value="fable">Fable</option>
+                        <option value="onyx">Onyx</option>
+                        <option value="nova">Nova</option>
+                        <option value="shimmer">Shimmer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="speechResponseFormat" class="form-label">Response Format</label>
+                    <select id="speechResponseFormat" class="form-select">
+                        <option value="mp3" selected>MP3</option>
+                        <option value="opus">Opus</option>
+                        <option value="aac">AAC</option>
+                        <option value="flac">FLAC</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="speechSpeed" class="form-label">Speed</label>
+                    <input type="range" id="speechSpeed" class="form-range" min="0.25" max="4" step="0.25" value="1">
+                    <div class="range-value">1.0</div>
+                </div>
+
+                <button class="btn" id="speechSubmit">Submit</button>
+
+                <div class="response-container" id="speechResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="speechResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="speechResponseContent"></div>
+                </div>
+
+                <audio id="speechAudio" controls style="display: none; width: 100%; margin-top: 1rem;"></audio>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Streaming Speech</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/audio/speech/streaming</span>
+
+                <div class="form-group">
+                    <label for="streamingSpeechModel" class="form-label">Model</label>
+                    <select id="streamingSpeechModel" class="form-select">
+                        <option value="tts-1" selected>TTS-1</option>
+                        <option value="tts-1-hd">TTS-1-HD</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="streamingSpeechInput" class="form-label">Input</label>
+                    <textarea id="streamingSpeechInput" class="form-control form-textarea" placeholder="Enter text to convert to speech"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="streamingSpeechVoice" class="form-label">Voice</label>
+                    <select id="streamingSpeechVoice" class="form-select">
+                        <option value="alloy">Alloy</option>
+                        <option value="echo">Echo</option>
+                        <option value="fable">Fable</option>
+                        <option value="onyx">Onyx</option>
+                        <option value="nova">Nova</option>
+                        <option value="shimmer">Shimmer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="streamingSpeechResponseFormat" class="form-label">Response Format</label>
+                    <select id="streamingSpeechResponseFormat" class="form-select">
+                        <option value="mp3" selected>MP3</option>
+                        <option value="opus">Opus</option>
+                        <option value="aac">AAC</option>
+                        <option value="flac">FLAC</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="streamingSpeechSpeed" class="form-label">Speed</label>
+                    <input type="range" id="streamingSpeechSpeed" class="form-range" min="0.25" max="4" step="0.25" value="1">
+                    <div class="range-value">1.0</div>
+                </div>
+
+                <button class="btn" id="streamingSpeechSubmit">Submit</button>
+
+                <div class="waveform-container" id="streamingSpeechWaveform" style="display: none;"></div>
+
+                <div class="response-container" id="streamingSpeechResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="streamingSpeechResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="streamingSpeechResponseContent"></div>
+                </div>
+
+                <audio id="streamingSpeechAudio" controls style="display: none; width: 100%; margin-top: 1rem;"></audio>
+            </div>
+        </div>
+
+        <div class="tab-content" id="agents">
+            <h2 class="section-title">Agents Endpoints</h2>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Create Agent</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents</span>
+
+                <div class="form-group">
+                    <label for="agentName" class="form-label">Name</label>
+                    <input type="text" id="agentName" class="form-control" placeholder="Enter agent name">
+                </div>
+
+                <div class="form-group">
+                    <label for="agentDescription" class="form-label">Description</label>
+                    <textarea id="agentDescription" class="form-control form-textarea" placeholder="Enter agent description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="agentInstructions" class="form-label">Instructions</label>
+                    <textarea id="agentInstructions" class="form-control form-textarea" placeholder="Enter agent instructions"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="agentTools" class="form-label">Tools</label>
+                    <div class="agent-config-container" id="agentTools">
+                        <div class="agent-capability" data-tool="code_interpreter">
+                            <div class="agent-capability-icon">💻</div>
+                            <div class="agent-capability-title">Code Interpreter</div>
+                            <div class="agent-capability-description">Execute Python code and analyze results</div>
+                        </div>
+                        <div class="agent-capability" data-tool="retrieval">
+                            <div class="agent-capability-icon">📚</div>
+                            <div class="agent-capability-title">Retrieval</div>
+                            <div class="agent-capability-description">Access specific documents uploaded by the user</div>
+                        </div>
+                        <div class="agent-capability" data-tool="function_calling">
+                            <div class="agent-capability-icon">🛠️</div>
+                            <div class="agent-capability-title">Function Calling</div>
+                            <div class="agent-capability-description">Call external functions and APIs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="agentModel" class="form-label">Model</label>
+                    <select id="agentModel" class="form-select">
+                        <option value="mistral-tiny">Mistral Tiny</option>
+                        <option value="mistral-small" selected>Mistral Small</option>
+                        <option value="mistral-medium">Mistral Medium</option>
+                    </select>
+                </div>
+
+                <button class="btn" id="agentSubmit">Create Agent</button>
+
+                <div class="response-container" id="agentResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="agentResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="agentResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">List Agents</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents</span>
+
+                <button class="btn" id="agentListSubmit">List Agents</button>
+
+                <div class="job-list" id="agentList" style="display: none;"></div>
+
+                <div class="response-container" id="agentListResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="agentListResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="agentListResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Retrieve Agent</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents/:id</span>
+
+                <div class="form-group">
+                    <label for="agentId" class="form-label">Agent ID</label>
+                    <input type="text" id="agentId" class="form-control" placeholder="Enter agent ID">
+                </div>
+
+                <button class="btn" id="agentRetrieveSubmit">Retrieve Agent</button>
+
+                <div class="response-container" id="agentRetrieveResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="agentRetrieveResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="agentRetrieveResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Modify Agent</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents/:id</span>
+
+                <div class="form-group">
+                    <label for="agentModifyId" class="form-label">Agent ID</label>
+                    <input type="text" id="agentModifyId" class="form-control" placeholder="Enter agent ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="agentModifyName" class="form-label">Name (optional)</label>
+                    <input type="text" id="agentModifyName" class="form-control" placeholder="Enter new agent name">
+                </div>
+
+                <div class="form-group">
+                    <label for="agentModifyDescription" class="form-label">Description (optional)</label>
+                    <textarea id="agentModifyDescription" class="form-control form-textarea" placeholder="Enter new agent description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="agentModifyInstructions" class="form-label">Instructions (optional)</label>
+                    <textarea id="agentModifyInstructions" class="form-control form-textarea" placeholder="Enter new agent instructions"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="agentModifyTools" class="form-label">Tools (optional)</label>
+                    <div class="agent-config-container" id="agentModifyTools">
+                        <div class="agent-capability" data-tool="code_interpreter">
+                            <div class="agent-capability-icon">💻</div>
+                            <div class="agent-capability-title">Code Interpreter</div>
+                            <div class="agent-capability-description">Execute Python code and analyze results</div>
+                        </div>
+                        <div class="agent-capability" data-tool="retrieval">
+                            <div class="agent-capability-icon">📚</div>
+                            <div class="agent-capability-title">Retrieval</div>
+                            <div class="agent-capability-description">Access specific documents uploaded by the user</div>
+                        </div>
+                        <div class="agent-capability" data-tool="function_calling">
+                            <div class="agent-capability-icon">🛠️</div>
+                            <div class="agent-capability-title">Function Calling</div>
+                            <div class="agent-capability-description">Call external functions and APIs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="agentModifyModel" class="form-label">Model (optional)</label>
+                    <select id="agentModifyModel" class="form-select">
+                        <option value="">Keep current model</option>
+                        <option value="mistral-tiny">Mistral Tiny</option>
+                        <option value="mistral-small">Mistral Small</option>
+                        <option value="mistral-medium">Mistral Medium</option>
+                    </select>
+                </div>
+
+                <button class="btn" id="agentModifySubmit">Modify Agent</button>
+
+                <div class="response-container" id="agentModifyResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="agentModifyResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="agentModifyResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Delete Agent</h3>
+                    <span class="endpoint-method delete">DELETE</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents/:id</span>
+
+                <div class="form-group">
+                    <label for="agentDeleteId" class="form-label">Agent ID</label>
+                    <input type="text" id="agentDeleteId" class="form-control" placeholder="Enter agent ID">
+                </div>
+
+                <button class="btn btn-danger" id="agentDeleteSubmit">Delete Agent</button>
+
+                <div class="response-container" id="agentDeleteResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="agentDeleteResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="agentDeleteResponseContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="conversations">
+            <h2 class="section-title">Conversations Endpoints</h2>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Create Conversation</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents/:id/conversations</span>
+
+                <div class="form-group">
+                    <label for="conversationAgentId" class="form-label">Agent ID</label>
+                    <input type="text" id="conversationAgentId" class="form-control" placeholder="Enter agent ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="conversationModel" class="form-label">Model</label>
+                    <select id="conversationModel" class="form-select">
+                        <option value="mistral-tiny">Mistral Tiny</option>
+                        <option value="mistral-small" selected>Mistral Small</option>
+                        <option value="mistral-medium">Mistral Medium</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="conversationMessages" class="form-label">Messages</label>
+                    <textarea id="conversationMessages" class="form-control form-textarea" placeholder="Enter messages in JSON format"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="conversationTemperature" class="form-label">Temperature</label>
+                    <input type="range" id="conversationTemperature" class="form-range" min="0" max="1" step="0.1" value="0.7">
+                    <div class="range-value">0.7</div>
+                </div>
+
+                <button class="btn" id="conversationSubmit">Create Conversation</button>
+
+                <div class="response-container" id="conversationResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="conversationResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="conversationResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">List Conversations</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents/:id/conversations</span>
+
+                <div class="form-group">
+                    <label for="conversationListAgentId" class="form-label">Agent ID</label>
+                    <input type="text" id="conversationListAgentId" class="form-control" placeholder="Enter agent ID">
+                </div>
+
+                <button class="btn" id="conversationListSubmit">List Conversations</button>
+
+                <div class="job-list" id="conversationList" style="display: none;"></div>
+
+                <div class="response-container" id="conversationListResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="conversationListResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="conversationListResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Retrieve Conversation</h3>
+                    <span class="endpoint-method get">GET</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents/:agent_id/conversations/:conversation_id</span>
+
+                <div class="form-group">
+                    <label for="conversationRetrieveAgentId" class="form-label">Agent ID</label>
+                    <input type="text" id="conversationRetrieveAgentId" class="form-control" placeholder="Enter agent ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="conversationRetrieveId" class="form-label">Conversation ID</label>
+                    <input type="text" id="conversationRetrieveId" class="form-control" placeholder="Enter conversation ID">
+                </div>
+
+                <button class="btn" id="conversationRetrieveSubmit">Retrieve Conversation</button>
+
+                <div class="response-container" id="conversationRetrieveResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="conversationRetrieveResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="conversationRetrieveResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Modify Conversation</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents/:agent_id/conversations/:conversation_id</span>
+
+                <div class="form-group">
+                    <label for="conversationModifyAgentId" class="form-label">Agent ID</label>
+                    <input type="text" id="conversationModifyAgentId" class="form-control" placeholder="Enter agent ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="conversationModifyId" class="form-label">Conversation ID</label>
+                    <input type="text" id="conversationModifyId" class="form-control" placeholder="Enter conversation ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="conversationModifyMessages" class="form-label">Messages (optional)</label>
+                    <textarea id="conversationModifyMessages" class="form-control form-textarea" placeholder="Enter messages in JSON format"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="conversationModifyModel" class="form-label">Model (optional)</label>
+                    <select id="conversationModifyModel" class="form-select">
+                        <option value="">Keep current model</option>
+                        <option value="mistral-tiny">Mistral Tiny</option>
+                        <option value="mistral-small">Mistral Small</option>
+                        <option value="mistral-medium">Mistral Medium</option>
+                    </select>
+                </div>
+
+                <button class="btn" id="conversationModifySubmit">Modify Conversation</button>
+
+                <div class="response-container" id="conversationModifyResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="conversationModifyResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="conversationModifyResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Delete Conversation</h3>
+                    <span class="endpoint-method delete">DELETE</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents/:agent_id/conversations/:conversation_id</span>
+
+                <div class="form-group">
+                    <label for="conversationDeleteAgentId" class="form-label">Agent ID</label>
+                    <input type="text" id="conversationDeleteAgentId" class="form-control" placeholder="Enter agent ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="conversationDeleteId" class="form-label">Conversation ID</label>
+                    <input type="text" id="conversationDeleteId" class="form-control" placeholder="Enter conversation ID">
+                </div>
+
+                <button class="btn btn-danger" id="conversationDeleteSubmit">Delete Conversation</button>
+
+                <div class="response-container" id="conversationDeleteResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="conversationDeleteResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="conversationDeleteResponseContent"></div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <h3 class="endpoint-title">Submit Tool Outputs</h3>
+                    <span class="endpoint-method post">POST</span>
+                </div>
+                <span class="endpoint-path">/mistral/agents/:agent_id/conversations/:conversation_id/submit_tool_outputs</span>
+
+                <div class="form-group">
+                    <label for="toolOutputsAgentId" class="form-label">Agent ID</label>
+                    <input type="text" id="toolOutputsAgentId" class="form-control" placeholder="Enter agent ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="toolOutputsConversationId" class="form-label">Conversation ID</label>
+                    <input type="text" id="toolOutputsConversationId" class="form-control" placeholder="Enter conversation ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="toolOutputs" class="form-label">Tool Outputs</label>
+                    <textarea id="toolOutputs" class="form-control form-textarea" placeholder="Enter tool outputs in JSON format"></textarea>
+                </div>
+
+                <button class="btn" id="toolOutputsSubmit">Submit Tool Outputs</button>
+
+                <div class="response-container" id="toolOutputsResponseContainer" style="display: none;">
+                    <div class="response-header">
+                        <h4 class="response-title">Response</h4>
+                        <span class="response-status" id="toolOutputsResponseStatus"></span>
+                    </div>
+                    <div class="response-content" id="toolOutputsResponseContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="workflows">
+            <h2 class="section-title">Workflows</h2>
+
+            <div class="workflow-container">
+                <div class="workflow-step">
+                    <div class="workflow-step-icon">📂</div>
+                    <div class="workflow-step-content">
+                        <h3 class="workflow-step-title">Files Management</h3>
+                        <p class="workflow-step-description">Upload, manage, and organize your files for fine-tuning and other operations.</p>
+                        <div class="workflow-step-actions">
+                            <button class="btn" id="workflowFiles">Go to Files</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="workflow-step-icon">🧠</div>
+                    <div class="workflow-step-content">
+                        <h3 class="workflow-step-title">Fine-tuning Studio</h3>
+                        <p class="workflow-step-description">Prepare datasets, configure hyperparameters, and train custom models.</p>
+                        <div class="workflow-step-actions">
+                            <button class="btn" id="workflowFineTuning">Go to Fine-tuning</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="workflow-step-icon">🧪</div>
+                    <div class="workflow-step-content">
+                        <h3 class="workflow-step-title">Test Model</h3>
+                        <p class="workflow-step-description">Evaluate your fine-tuned model with sample inputs and analyze the results.</p>
+                        <div class="workflow-step-actions">
+                            <button class="btn" id="workflowTestModel">Go to Chat</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="workflow-step-icon">🔍</div>
+                    <div class="workflow-step-content">
+                        <h3 class="workflow-step-title">FIM→Chat Explain→Embed Search</h3>
+                        <p class="workflow-step-description">Use FIM to generate code, explain it with chat, and perform semantic search with embeddings.</p>
+                        <div class="workflow-step-actions">
+                            <button class="btn" id="workflowFimChatEmbed">Start Workflow</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Action</h3>
+                <button class="modal-close" id="confirmationModalClose">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-dialog">
+                    <p class="confirmation-message" id="confirmationMessage">Are you sure you want to perform this action?</p>
+                    <div class="confirmation-actions">
+                        <button class="btn btn-secondary" id="confirmationCancel">Cancel</button>
+                        <button class="btn btn-danger" id="confirmationConfirm">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-spinner" id="loadingSpinner"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // API Key Management
+            const apiKeyInput = document.getElementById('apiKey');
+            const apiKeyToggle = document.getElementById('apiKeyToggle');
+
+            apiKeyToggle.addEventListener('click', function() {
+                if (apiKeyInput.type === 'password') {
+                    apiKeyInput.type = 'text';
+                    apiKeyToggle.textContent = 'Hide';
+                } else {
+                    apiKeyInput.type = 'password';
+                    apiKeyToggle.textContent = 'Show';
+                }
+            });
+
+            // Tab Navigation
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+
+                    this.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+
+            // Range Input Value Display
+            const rangeInputs = document.querySelectorAll('.form-range');
+
+            rangeInputs.forEach(input => {
+                const rangeValue = input.nextElementSibling;
+
+                input.addEventListener('input', function() {
+                    rangeValue.textContent = this.value;
+                });
+            });
+
+            // File Upload
+            const fileUpload = document.getElementById('fileUpload');
+            const fileInput = document.getElementById('fileInput');
+
+            fileUpload.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    const fileUploadText = fileUpload.querySelector('.file-upload-text');
+                    fileUploadText.textContent = file.name;
+                }
+            });
+
+            // Image Preview
+            const visionImageInput = document.getElementById('visionImage');
+            const visionImagePreview = document.getElementById('visionImagePreview');
+
+            visionImageInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        visionImagePreview.src = e.target.result;
+                        visionImagePreview.style.display = 'block';
+                    };
+
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            // Code Editor Auto-completion
+            const fimPrompt = document.getElementById('fimPrompt');
+            const fimSuggestions = document.getElementById('fimSuggestions');
+
+            fimPrompt.addEventListener('input', function() {
+                const cursorPosition = getCaretPosition(this);
+                const textBeforeCursor = this.textContent.substring(0, cursorPosition);
+                const lastWordMatch = textBeforeCursor.match(/(\w+)$/);
+
+                if (lastWordMatch) {
+                    const lastWord = lastWordMatch[1];
+                    showSuggestions(lastWord, cursorPosition);
+                } else {
+                    fimSuggestions.style.display = 'none';
+                }
+            });
+
+            fimPrompt.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab' && fimSuggestions.style.display === 'block') {
+                    e.preventDefault();
+                    const firstSuggestion = fimSuggestions.querySelector('.suggestion');
+                    if (firstSuggestion) {
+                        insertSuggestion(firstSuggestion.textContent);
+                    }
+                }
+            });
+
+            function getCaretPosition(element) {
+                let caretOffset = 0;
+                const doc = element.ownerDocument || element.document;
+                const win = doc.defaultView || doc.parentWindow;
+                let sel;
+
+                if (typeof win.getSelection !== 'undefined') {
+                    sel = win.getSelection();
+                    if (sel.rangeCount > 0) {
+                        const range = win.getSelection().getRangeAt(0);
+                        const preCaretRange = range.cloneRange();
+                        preCaretRange.selectNodeContents(element);
+                        preCaretRange.setEnd(range.endContainer, range.endOffset);
+                        caretOffset = preCaretRange.toString().length;
+                    }
+                } else if ((sel = doc.selection) && sel.type !== 'Control') {
+                    const textRange = sel.createRange();
+                    const preCaretTextRange = doc.body.createTextRange();
+                    preCaretTextRange.moveToElementText(element);
+                    preCaretTextRange.setEndPoint('EndToEnd', textRange);
+                    caretOffset = preCaretTextRange.text.length;
+                }
+
+                return caretOffset;
+            }
+
+            function showSuggestions(lastWord, cursorPosition) {
+                // In a real application, you would fetch suggestions from a server or a local database
+                const suggestions = [
+                    'function', 'if', 'else', 'for', 'while', 'return', 'var', 'let', 'const',
+                    'console.log', 'document.getElementById', 'addEventListener', 'querySelector',
+                    'createElement', 'appendChild', 'textContent', 'innerHTML', 'style'
+                ].filter(suggestion => suggestion.startsWith(lastWord));
+
+                if (suggestions.length > 0) {
+                    fimSuggestions.innerHTML = '';
+                    suggestions.forEach(suggestion => {
+                        const suggestionElement = document.createElement('div');
+                        suggestionElement.className = 'suggestion';
+                        suggestionElement.textContent = suggestion;
+                        suggestionElement.addEventListener('click', function() {
+                            insertSuggestion(suggestion);
+                        });
+                        fimSuggestions.appendChild(suggestionElement);
+                    });
+
+                    fimSuggestions.style.display = 'block';
+                } else {
+                    fimSuggestions.style.display = 'none';
+                }
+            }
+
+            function insertSuggestion(suggestion) {
+                const cursorPosition = getCaretPosition(fimPrompt);
+                const textBeforeCursor = fimPrompt.textContent.substring(0, cursorPosition);
+                const textAfterCursor = fimPrompt.textContent.substring(cursorPosition);
+                const lastWordMatch = textBeforeCursor.match(/(\w+)$/);
+
+                if (lastWordMatch) {
+                    const lastWord = lastWordMatch[1];
+                    const newText = textBeforeCursor.replace(new RegExp(lastWord + '$'), suggestion) + textAfterCursor;
+                    fimPrompt.textContent = newText;
+                    fimSuggestions.style.display = 'none';
+
+                    // Move cursor to the end of the inserted suggestion
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.setStart(fimPrompt.childNodes[0], newText.length);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            }
+
+            // Format Code
+            const fimFormatButton = document.getElementById('fimFormat');
+
+            fimFormatButton.addEventListener('click', function() {
+                const code = fimPrompt.textContent;
+                // In a real application, you would use a proper code formatting library
+                const formattedCode = formatCode(code);
+                fimPrompt.textContent = formattedCode;
+            });
+
+            function formatCode(code) {
+                // Simple code formatting for demonstration purposes
+                return code.replace(/;/g, ';\n').replace(/\n+/g, '\n').trim();
+            }
+
+            // Agent Tools Selection
+            const agentTools = document.querySelectorAll('#agentTools .agent-capability');
+            const agentModifyTools = document.querySelectorAll('#agentModifyTools .agent-capability');
+
+            agentTools.forEach(tool => {
+                tool.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
+
+            agentModifyTools.forEach(tool => {
+                tool.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
+
+            // Workflow Navigation
+            const workflowFilesButton = document.getElementById('workflowFiles');
+            const workflowFineTuningButton = document.getElementById('workflowFineTuning');
+            const workflowTestModelButton = document.getElementById('workflowTestModel');
+            const workflowFimChatEmbedButton = document.getElementById('workflowFimChatEmbed');
+
+            workflowFilesButton.addEventListener('click', function() {
+                tabs.forEach(tab => tab.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+
+                document.querySelector('.tab[data-tab="files"]').classList.add('active');
+                document.getElementById('files').classList.add('active');
+            });
+
+            workflowFineTuningButton.addEventListener('click', function() {
+                tabs.forEach(tab => tab.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+
+                document.querySelector('.tab[data-tab="fine-tuning"]').classList.add('active');
+                document.getElementById('fine-tuning').classList.add('active');
+            });
+
+            workflowTestModelButton.addEventListener('click', function() {
+                tabs.forEach(tab => tab.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+
+                document.querySelector('.tab[data-tab="chat"]').classList.add('active');
+                document.getElementById('chat').classList.add('active');
+            });
+
+            workflowFimChatEmbedButton.addEventListener('click', function() {
+                tabs.forEach(tab => tab.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+
+                document.querySelector('.tab[data-tab="chat"]').classList.add('active');
+                document.getElementById('chat').classList.add('active');
+
+                // Scroll to the FIM endpoint
+                document.getElementById('fimPrompt').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Confirmation Modal
+            const confirmationModal = document.getElementById('confirmationModal');
+            const confirmationModalClose = document.getElementById('confirmationModalClose');
+            const confirmationCancel = document.getElementById('confirmationCancel');
+            const confirmationConfirm = document.getElementById('confirmationConfirm');
+            const confirmationMessage = document.getElementById('confirmationMessage');
+
+            let currentConfirmationCallback = null;
+
+            function showConfirmationModal(message, callback) {
+                confirmationMessage.textContent = message;
+                currentConfirmationCallback = callback;
+                confirmationModal.classList.add('active');
+            }
+
+            function hideConfirmationModal() {
+                confirmationModal.classList.remove('active');
+                currentConfirmationCallback = null;
+            }
+
+            confirmationModalClose.addEventListener('click', hideConfirmationModal);
+            confirmationCancel.addEventListener('click', hideConfirmationModal);
+
+            confirmationConfirm.addEventListener('click', function() {
+                if (currentConfirmationCallback) {
+                    currentConfirmationCallback();
+                    hideConfirmationModal();
+                }
+            });
+
+            // API Requests
+            const baseUrl = 'https://theserver-open-ai.replit.app';
+
+            async function makeApiRequest(method, endpoint, data = null, headers = {}) {
+                const apiKey = apiKeyInput.value.trim();
+
+                if (!apiKey) {
+                    alert('Please enter your API key');
+                    return null;
+                }
+
+                const url = `${baseUrl}${endpoint}`;
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        ...headers
+                    }
+                };
+
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+
+                try {
+                    showLoadingSpinner();
+                    const response = await fetch(url, options);
+                    const responseData = await response.json();
+                    hideLoadingSpinner();
+                    return { status: response.status, data: responseData };
+                } catch (error) {
+                    hideLoadingSpinner();
+                    console.error('Error:', error);
+                    alert('An error occurred while making the API request');
+                    return null;
+                }
+            }
+
+            function showLoadingSpinner() {
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                loadingSpinner.style.display = 'block';
+            }
+
+            function hideLoadingSpinner() {
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                loadingSpinner.style.display = 'none';
+            }
+
+            // Chat Endpoints
+            const chatSubmit = document.getElementById('chatSubmit');
+            const fimSubmit = document.getElementById('fimSubmit');
+            const asyncSubmit = document.getElementById('asyncSubmit');
+            const visionSubmit = document.getElementById('visionSubmit');
+
+            chatSubmit.addEventListener('click', async function() {
+                const model = document.getElementById('chatModel').value;
+                const messages = document.getElementById('chatMessages').value;
+                const temperature = parseFloat(document.getElementById('chatTemperature').value);
+                const streaming = document.getElementById('chatStreaming').checked;
+
+                try {
+                    const messagesJson = JSON.parse(messages);
+                    const data = {
+                        model: model,
+                        messages: messagesJson,
+                        temperature: temperature,
+                        stream: streaming
+                    };
+
+                    const response = await makeApiRequest('POST', '/mistral/chat/completions', data);
+
+                    if (response) {
+                        const chatResponseContainer = document.getElementById('chatResponseContainer');
+                        const chatResponseStatus = document.getElementById('chatResponseStatus');
+                        const chatResponseContent = document.getElementById('chatResponseContent');
+
+                        chatResponseStatus.textContent = `Status: ${response.status}`;
+                        chatResponseStatus.className = `response-status status-${response.status}`;
+
+                        if (streaming) {
+                            // Handle streaming response
+                            chatResponseContent.textContent = 'Streaming response...';
+                            // In a real application, you would process the streaming response here
+                        } else {
+                            chatResponseContent.textContent = JSON.stringify(response.data, null, 2);
+                        }
+
+                        chatResponseContainer.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Invalid JSON format for messages');
+                }
+            });
+
+            fimSubmit.addEventListener('click', async function() {
+                const model = document.getElementById('fimModel').value;
+                const prompt = fimPrompt.textContent;
+
+                const data = {
+                    model: model,
+                    prompt: prompt
+                };
+
+                const response = await makeApiRequest('POST', '/mistral/fim/completions', data);
+
+                if (response) {
+                    const fimResponseContainer = document.getElementById('fimResponseContainer');
+                    const fimResponseStatus = document.getElementById('fimResponseStatus');
+                    const fimResponseContent = document.getElementById('fimResponseContent');
+
+                    fimResponseStatus.textContent = `Status: ${response.status}`;
+                    fimResponseStatus.className = `response-status status-${response.status}`;
+                    fimResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                    fimResponseContainer.style.display = 'block';
+                }
+            });
+
+            asyncSubmit.addEventListener('click', async function() {
+                const model = document.getElementById('asyncModel').value;
+                const messages = document.getElementById('asyncMessages').value;
+
+                try {
+                    const messagesJson = JSON.parse(messages);
+                    const data = {
+                        model: model,
+                        messages: messagesJson
+                    };
+
+                    const response = await makeApiRequest('POST', '/mistral/chat/async', data);
+
+                    if (response) {
+                        const asyncResponseContainer = document.getElementById('asyncResponseContainer');
+                        const asyncResponseStatus = document.getElementById('asyncResponseStatus');
+                        const asyncResponseContent = document.getElementById('asyncResponseContent');
+
+                        asyncResponseStatus.textContent = `Status: ${response.status}`;
+                        asyncResponseStatus.className = `response-status status-${response.status}`;
+                        asyncResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                        asyncResponseContainer.style.display = 'block';
+
+                        if (response.status === 200) {
+                            // Show job management dashboard
+                            const asyncJobManagement = document.getElementById('asyncJobManagement');
+                            asyncJobManagement.style.display = 'block';
+
+                            // Simulate job retrieval (in a real application, you would fetch this from the API)
+                            const jobId = response.data.id;
+                            const jobStatus = 'queued'; // This would come from the API response
+
+                            const jobList = document.getElementById('asyncJobList');
+                            jobList.innerHTML = `
+                                <div class="job-item">
+                                    <div class="job-info">
+                                        <div class="job-id">Job ID: ${jobId}</div>
+                                        <div class="job-status status-${jobStatus}">${jobStatus}</div>
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: ${jobStatus === 'completed' ? '100%' : '0%'};"></div>
+                                        </div>
+                                    </div>
+                                    <div class="job-actions">
+                                        <button class="job-action" title="View Details">👁️</button>
+                                        <button class="job-action" title="Cancel Job">❌</button>
+                                    </div>
+                                </div>
+                            `;
+
+                            // Update job count
+                            const jobCount = document.getElementById('asyncJobCount');
+                            jobCount.textContent = '1';
+
+                            // Update status chart (simplified for demonstration)
+                            const statusChart = document.getElementById('asyncStatusChart');
+                            statusChart.innerHTML = `
+                                <div style="height: 100%; display: flex; align-items: flex-end; gap: 0.5rem;">
+                                    <div style="background-color: #F59E0B; flex: 1; height: 100%;"></div>
+                                    <div style="background-color: #3B82F6; flex: 0; height: 0%;"></div>
+                                    <div style="background-color: #10B981; flex: 0; height: 0%;"></div>
+                                    <div style="background-color: #EF4444; flex: 0; height: 0%;"></div>
+                                </div>
+                            `;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Invalid JSON format for messages');
+                }
+            });
+
+            visionSubmit.addEventListener('click', async function() {
+                const model = document.getElementById('visionModel').value;
+                const messages = document.getElementById('visionMessages').value;
+                const imageFile = document.getElementById('visionImage').files[0];
+
+                try {
+                    const messagesJson = JSON.parse(messages);
+
+                    // In a real application, you would need to handle the image file upload
+                    // and include the image URL in the messages array
+                    const data = {
+                        model: model,
+                        messages: messagesJson
+                    };
+
+                    const response = await makeApiRequest('POST', '/mistral/chat/vision', data);
+
+                    if (response) {
+                        const visionResponseContainer = document.getElementById('visionResponseContainer');
+                        const visionResponseStatus = document.getElementById('visionResponseStatus');
+                        const visionResponseContent = document.getElementById('visionResponseContent');
+
+                        visionResponseStatus.textContent = `Status: ${response.status}`;
+                        visionResponseStatus.className = `response-status status-${response.status}`;
+                        visionResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                        visionResponseContainer.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Invalid JSON format for messages');
+                }
+            });
+
+            // Embeddings Endpoints
+            const embeddingsSubmit = document.getElementById('embeddingsSubmit');
+            const batchEmbeddingsSubmit = document.getElementById('batchEmbeddingsSubmit');
+
+            embeddingsSubmit.addEventListener('click', async function() {
+                const model = document.getElementById('embeddingsModel').value;
+                const input = document.getElementById('embeddingsInput').value;
+                const dimensions = parseInt(document.getElementById('embeddingsDimensions').value);
+
+                const data = {
+                    model: model,
+                    input: input,
+                    dimensions: dimensions
+                };
+
+                const response = await makeApiRequest('POST', '/mistral/embeddings', data);
+
+                if (response) {
+                    const embeddingsResponseContainer = document.getElementById('embeddingsResponseContainer');
+                    const embeddingsResponseStatus = document.getElementById('embeddingsResponseStatus');
+                    const embeddingsResponseContent = document.getElementById('embeddingsResponseContent');
+
+                    embeddingsResponseStatus.textContent = `Status: ${response.status}`;
+                    embeddingsResponseStatus.className = `response-status status-${response.status}`;
+                    embeddingsResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                    embeddingsResponseContainer.style.display = 'block';
+
+                    if (response.status === 200 && response.data.data && response.data.data[0].embedding) {
+                        // Visualize the embedding (simplified for demonstration)
+                        const embeddingsVisualization = document.getElementById('embeddingsVisualization');
+                        embeddingsVisualization.innerHTML = `
+                            <div style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                                <div style="width: 80%; height: 80%; background-color: #6366F1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                    Embedding Visualization
+                                </div>
+                            </div>
+                        `;
+                        embeddingsVisualization.style.display = 'block';
+                    }
+                }
+            });
+
+            batchEmbeddingsSubmit.addEventListener('click', async function() {
+                const model = document.getElementById('batchEmbeddingsModel').value;
+                const input = document.getElementById('batchEmbeddingsInput').value.split('\n').filter(line => line.trim() !== '');
+                const dimensions = parseInt(document.getElementById('batchEmbeddingsDimensions').value);
+                const similarityThreshold = parseFloat(document.getElementById('batchEmbeddingsSimilarityThreshold').value);
+
+                const data = {
+                    model: model,
+                    input: input,
+                    dimensions: dimensions
+                };
+
+                const response = await makeApiRequest('POST', '/mistral/embeddings/batch', data);
+
+                if (response) {
+                    const batchEmbeddingsResponseContainer = document.getElementById('batchEmbeddingsResponseContainer');
+                    const batchEmbeddingsResponseStatus = document.getElementById('batchEmbeddingsResponseStatus');
+                    const batchEmbeddingsResponseContent = document.getElementById('batchEmbeddingsResponseContent');
+
+                    batchEmbeddingsResponseStatus.textContent = `Status: ${response.status}`;
+                    batchEmbeddingsResponseStatus.className = `response-status status-${response.status}`;
+                    batchEmbeddingsResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                    batchEmbeddingsResponseContainer.style.display = 'block';
+
+                    if (response.status === 200 && response.data.data && response.data.data.length > 0) {
+                        // Calculate similarity matrix (simplified for demonstration)
+                        const similarityMatrix = calculateSimilarityMatrix(response.data.data.map(item => item.embedding), similarityThreshold);
+
+                        // Visualize the similarity matrix (simplified for demonstration)
+                        const batchEmbeddingsSimilarityMatrix = document.getElementById('batchEmbeddingsSimilarityMatrix');
+                        batchEmbeddingsSimilarityMatrix.innerHTML = `
+                            <div style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                                <div style="width: 80%; height: 80%; background-color: #6366F1; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                    Similarity Matrix Visualization
+                                </div>
+                            </div>
+                        `;
+                        batchEmbeddingsSimilarityMatrix.style.display = 'block';
+                    }
+                }
+            });
+
+            function calculateSimilarityMatrix(embeddings, threshold) {
+                // In a real application, you would calculate the actual similarity matrix
+                // For demonstration purposes, we'll create a simplified version
+                const matrix = [];
+
+                for (let i = 0; i < embeddings.length; i++) {
+                    matrix[i] = [];
+                    for (let j = 0; j < embeddings.length; j++) {
+                        if (i === j) {
+                            matrix[i][j] = 1; // Self-similarity
+                        } else {
+                            // Calculate cosine similarity (simplified for demonstration)
+                            const similarity = Math.random() * 0.5 + 0.5; // Random value between 0.5 and 1
+                            matrix[i][j] = similarity >= threshold ? similarity : 0;
+                        }
+                    }
+                }
+
+                return matrix;
+            }
+
+            // Files Endpoints
+            const fileUploadSubmit = document.getElementById('fileUploadSubmit');
+            const fileListSubmit = document.getElementById('fileListSubmit');
+            const fileRetrieveSubmit = document.getElementById('fileRetrieveSubmit');
+            const fileDeleteSubmit = document.getElementById('fileDeleteSubmit');
+
+            fileUploadSubmit.addEventListener('click', async function() {
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    alert('Please select a file to upload');
+                    return;
+                }
+
+                // In a real application, you would use FormData to upload the file
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    showLoadingSpinner();
+                    const response = await fetch(`${baseUrl}/mistral/files`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKeyInput.value.trim()}`
+                        },
+                        body: formData
+                    });
+
+                    const responseData = await response.json();
+                    hideLoadingSpinner();
+
+                    const fileUploadResponseContainer = document.getElementById('fileUploadResponseContainer');
+                    const fileUploadResponseStatus = document.getElementById('fileUploadResponseStatus');
+                    const fileUploadResponseContent = document.getElementById('fileUploadResponseContent');
+
+                    fileUploadResponseStatus.textContent = `Status: ${response.status}`;
+                    fileUploadResponseStatus.className = `response-status status-${response.status}`;
+                    fileUploadResponseContent.textContent = JSON.stringify(responseData, null, 2);
+
+                    fileUploadResponseContainer.style.display = 'block';
+                } catch (error) {
+                    hideLoadingSpinner();
+                    console.error('Error:', error);
+                    alert('An error occurred while uploading the file');
+                }
+            });
+
+            fileListSubmit.addEventListener('click', async function() {
+                const searchQuery = document.getElementById('fileSearch').value;
+                const fileType = document.getElementById('fileTypeFilter').value;
+                const dateFilter = document.getElementById('fileDateFilter').value;
+                const sortBy = document.getElementById('fileSort').value;
+
+                // Build query parameters
+                const params = new URLSearchParams();
+
+                if (searchQuery) params.append('q', searchQuery);
+                if (fileType) params.append('purpose', fileType);
+                if (dateFilter) params.append('created_after', getDateFilterValue(dateFilter));
+                if (sortBy) params.append('order', sortBy.includes('desc') ? 'desc' : 'asc');
+
+                const endpoint = `/mistral/files${params.toString() ? `?${params.toString()}` : ''}`;
+
+                const response = await makeApiRequest('GET', endpoint);
+
+                if (response) {
+                    const fileListResponseContainer = document.getElementById('fileListResponseContainer');
+                    const fileListResponseStatus = document.getElementById('fileListResponseStatus');
+                    const fileListResponseContent = document.getElementById('fileListResponseContent');
+
+                    fileListResponseStatus.textContent = `Status: ${response.status}`;
+                    fileListResponseStatus.className = `response-status status-${response.status}`;
+                    fileListResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                    fileListResponseContainer.style.display = 'block';
+
+                    if (response.status === 200 && response.data.data && response.data.data.length > 0) {
+                        const fileList = document.getElementById('fileList');
+                        fileList.innerHTML = '';
+
+                        response.data.data.forEach(file => {
+                            const fileItem = document.createElement('div');
+                            fileItem.className = 'file-item';
+                            fileItem.innerHTML = `
+                                <div class="file-info">
+                                    <div class="file-icon">📄</div>
+                                    <div class="file-details">
+                                        <div class="file-name">${file.filename}</div>
+                                        <div class="file-meta">ID: ${file.id} | Size: ${formatFileSize(file.bytes)} | Created: ${new Date(file.created_at * 1000).toLocaleString()}</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action" title="View Details">👁️</button>
+                                    <button class="file-action" title="Download">📥</button>
+                                    <button class="file-action" title="Delete">❌</button>
+                                </div>
+                            `;
+
+                            fileList.appendChild(fileItem);
+                        });
+
+                        fileList.style.display = 'block';
+                    }
+                }
+            });
+
+            function getDateFilterValue(filter) {
+                const now = new Date();
+                let date;
+
+                switch (filter) {
+                    case 'last24h':
+                        date = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                        break;
+                    case 'last7d':
+                        date = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        break;
+                    case 'last30d':
+                        date = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                        break;
+                    default:
+                        return '';
+                }
+
+                return Math.floor(date.getTime() / 1000);
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            fileRetrieveSubmit.addEventListener('click', async function() {
+                const fileId = document.getElementById('fileId').value.trim();
+
+                if (!fileId) {
+                    alert('Please enter a file ID');
+                    return;
+                }
+
+                const response = await makeApiRequest('GET', `/mistral/files/${fileId}`);
+
+                if (response) {
+                    const fileRetrieveResponseContainer = document.getElementById('fileRetrieveResponseContainer');
+                    const fileRetrieveResponseStatus = document.getElementById('fileRetrieveResponseStatus');
+                    const fileRetrieveResponseContent = document.getElementById('fileRetrieveResponseContent');
+
+                    fileRetrieveResponseStatus.textContent = `Status: ${response.status}`;
+                    fileRetrieveResponseStatus.className = `response-status status-${response.status}`;
+                    fileRetrieveResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                    fileRetrieveResponseContainer.style.display = 'block';
+                }
+            });
+
+            fileDeleteSubmit.addEventListener('click', function() {
+                const fileId = document.getElementById('fileDeleteId').value.trim();
+
+                if (!fileId) {
+                    alert('Please enter a file ID');
+                    return;
+                }
+
+                showConfirmationModal('Are you sure you want to delete this file? This action cannot be undone.', async function() {
+                    const response = await makeApiRequest('DELETE', `/mistral/files/${fileId}`);
+
+                    if (response) {
+                        const fileDeleteResponseContainer = document.getElementById('fileDeleteResponseContainer');
+                        const fileDeleteResponseStatus = document.getElementById('fileDeleteResponseStatus');
+                        const fileDeleteResponseContent = document.getElementById('fileDeleteResponseContent');
+
+                        fileDeleteResponseStatus.textContent = `Status: ${response.status}`;
+                        fileDeleteResponseStatus.className = `response-status status-${response.status}`;
+                        fileDeleteResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                        fileDeleteResponseContainer.style.display = 'block';
+                    }
+                });
+            });
+
+            // Fine-tuning Endpoints
+            const fineTuningSubmit = document.getElementById('fineTuningSubmit');
+            const fineTuningListSubmit = document.getElementById('fineTuningListSubmit');
+            const fineTuningRetrieveSubmit = document.getElementById('fineTuningRetrieveSubmit');
+            const fineTuningCancelSubmit = document.getElementById('fineTuningCancelSubmit');
+            const fineTuningEventsSubmit = document.getElementById('fineTuningEventsSubmit');
+            const fineTuningCheckpointsSubmit = document.getElementById('fineTuningCheckpointsSubmit');
+
+            fineTuningSubmit.addEventListener('click', async function() {
+                const model = document.getElementById('fineTuningModel').value;
+                const trainingFile = document.getElementById('fineTuningTrainingFile').value.trim();
+                const validationFile = document.getElementById('fineTuningValidationFile').value.trim();
+                const hyperparameters = document.getElementById('fineTuningHyperparameters').value;
+
+                if (!trainingFile) {
+                    alert('Please enter a training file ID');
+                    return;
+                }
+
+                const data = {
+                    model: model,
+                    training_file: trainingFile
+                };
+
+                if (validationFile) data.validation_file = validationFile;
+                if (hyperparameters) {
+                    try {
+                        data.hyperparameters = JSON.parse(hyperparameters);
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Invalid JSON format for hyperparameters');
+                        return;
+                    }
+                }
+
+                const response = await makeApiRequest('POST', '/mistral/fine-tuning/jobs', data);
+
+                if (response) {
+                    const fineTuningResponseContainer = document.getElementById('fineTuningResponseContainer');
+                    const fineTuningResponseStatus = document.getElementById('fineTuningResponseStatus');
+                    const fineTuningResponseContent = document.getElementById('fineTuningResponseContent');
+
+                    fineTuningResponseStatus.textContent = `Status: ${response.status}`;
+                    fineTuningResponseStatus.className = `response-status status-${response.status}`;
+                    fineTuningResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                    fineTuningResponseContainer.style.display = 'block';
+                }
+            });
+
+            fineTuningListSubmit.addEventListener('click', async function() {
+                const response = await makeApiRequest('GET', '/mistral/fine-tuning/jobs');
+
+                if (response) {
+                    const fineTuningListResponseContainer = document.getElementById('fineTuningListResponseContainer');
+                    const fineTuningListResponseStatus = document.getElementById('fineTuningListResponseStatus');
+                    const fineTuningListResponseContent = document.getElementById('fineTuningListResponseContent');
+
+                    fineTuningListResponseStatus.textContent = `Status: ${response.status}`;
+                    fineTuningListResponseStatus.className = `response-status status-${response.status}`;
+                    fineTuningListResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                    fineTuningListResponseContainer.style.display = 'block';
+
+                    if (response.status === 200 && response.data.data && response.data.data.length > 0) {
+                        const fineTuningJobList = document.getElementById('fineTuningJobList');
+                        fineTuningJobList.innerHTML = '';
+
+                        response.data.data.forEach(job => {
+                            const jobItem = document.createElement('div');
+                            jobItem.className = 'job-item';
+                            jobItem.innerHTML = `
+                                <div class="job-info">
+                                    <div class="job-id">Job ID: ${job.id}</div>
+                                    <div class="job-status status-${job.status}">${job.status}</div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: ${getJobProgress(job)}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="job-actions">
+                                    <button class="job-action" title="View Details">👁️</button>
+                                    <button class="job-action" title="Cancel Job">❌</button>
+                                </div>
+                            `;
+
+                            fineTuningJobList.appendChild(jobItem);
+                        });
+
+                        fineTuningJobList.style.display = 'block';
+                    }
+                }
+            });
+
+            function getJobProgress(job) {
+                // Simplified progress calculation for demonstration
+                switch (job.status) {
+                    case 'validating_files':
+                        return 10;
+                    case 'queued':
+                        return 20;
+                    case 'running':
+                        return 50;
+                    case 'succeeded':
+                        return 100;
+                    case 'failed':
+                        return 0;
+                    case 'cancelled':
+                        return 0;
+                    default:
+                        return 0;
+                }
+            }
+
+            fineTuningRetrieveSubmit.addEventListener('click', async function() {
+                const jobId = document.getElementById('fineTuningJobId').value.trim();
+
+                if (!jobId) {
+                    alert('Please enter a job ID');
+                    return;
+                }
+
+                const response = await makeApiRequest('GET', `/mistral/fine-tuning/jobs/${jobId}`);
+
+                if (response) {
+                    const fineTuningRetrieveResponseContainer = document.getElementById('fineTuningRetrieveResponseContainer');
+                    const fineTuningRetrieveResponseStatus = document.getElementById('fineTuningRetrieveResponseStatus');
+                    const fineTuningRetrieveResponseContent = document.getElementById('fineTuningRetrieveResponseContent');
+
+                    fineTuningRetrieveResponseStatus.textContent = `Status: ${response.status}`;
+                    fineTuningRetrieveResponseStatus.className = `response-status status-${response.status}`;
+                    fineTuningRetrieveResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                    fineTuningRetrieveResponseContainer.style.display = 'block';
+                }
+            });
+
+            fineTuningCancelSubmit.addEventListener('click', function() {
+                const jobId = document.getElementById('fineTuningCancelJobId').value.trim();
+
+                if (!jobId) {
+                    alert('Please enter a job ID');
+                    return;
+                }
+
+                showConfirmationModal('Are you sure you want to cancel this fine-tuning job?', async function() {
+                    const response = await makeApiRequest('POST', `/mistral/fine-tuning/jobs/${jobId}/cancel`);
+
+                    if (response) {
+                        const fineTuningCancelResponseContainer = document.getElementById('fineTuningCancelResponseContainer');
+                        const fineTuningCancelResponseStatus = document.getElementById('fineTuningCancelResponseStatus');
+                        const fineTuningCancelResponseContent = document.getElementById('fineTuningCancelResponseContent');
+
+                        fineTuningCancelResponseStatus.textContent = `Status: ${response.status}`;
+                        fineTuningCancelResponseStatus.className = `response-status status-${response.status}`;
+                        fineTuningCancelResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                        fineTuningCancelResponseContainer.style.display = 'block';
+                    }
+                });
+            });
+
+            fineTuningEventsSubmit.addEventListener('click', async function() {
+                const jobId = document.getElementById('fineTuningEventsJobId').value.trim();
+
+                if (!jobId) {
+                    alert('Please enter a job ID');
+                    return;
+                }
+
+                const response = await makeApiRequest('GET', `/mistral/fine-tuning/jobs/${jobId}/events`);
+
+                if (response) {
+                    const fineTuningEventsResponseContainer = document.getElementById('fineTuningEventsResponseContainer');
+                    const fineTuningEventsResponseStatus = document.getElementById('fineTuningEventsResponseStatus');
+                    const fineTuningEventsResponseContent = document.getElementById('fineTuningEventsResponseContent');
+
+                    fineTuningEventsResponseStatus.textContent = `Status: ${response.status}`;
+                    fineTuningEventsResponseStatus.className = `response-status status-${response.status}`;
+                    fineTuningEventsResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                    fineTuningEventsResponseContainer.style.display = 'block';
+
+                    if (response.status === 200 && response.data.data && response.data.data.length > 0) {
+                        // Visualize the timeline (simplified for demonstration)
+                        const fineTuningTimeline = document.getElementById('fineTuningTimeline');
+                        fineTuningTimeline.innerHTML = `
+                            <div style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                                <div style="width: 80%; height: 80%; background-color: #6366F1; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                    Timeline Visualization
+                                </div>
+                            </div>
+                        `;
+                        fineTuningTimeline.style.display = 'block';
+                    }
+                }
+            });
+
+            fineTuningCheckpointsSubmit.addEventListener('click', async function() {
+                const jobId = document.getElementById('fineTuningCheckpointsJobId').value.trim();
+
+                if (!jobId) {
+                    alert('Please enter a job ID');
+                    return;
+                }
+
+                const response = await makeApiRequest('GET', `/mistral/fine-tuning/jobs/${jobId}/checkpoints`);
+
+                if (response) {
+                    const fineTuningCheckpointsResponseContainer = document.getElementById('fineTuningCheckpointsResponseContainer');
+                    const fineTuningCheckpointsResponseStatus = document.getElementById('fineTuningCheckpointsResponseStatus');
+                    const fineTuningCheckpointsResponseContent = document.getElementById('fineTuningCheckpointsResponseContent');
+
+                    fineTuningCheckpointsResponseStatus.textContent = `Status: ${response.status}`;
+                    fineTuningCheckpointsResponseStatus.className = `response-status status-${response.status}`;
+                    fineTuningCheckpointsResponseContent.textContent = JSON.stringify(response.data, null, 2);
+
+                    fineTuningCheckpointsResponseContainer.style.display = 'block';
+                }
+            });
+
+            // Batch Processing Endpoints
+            const batchSubmit = document.getElementById('batchSubmit');
+            const batchListSubmit = document.getElementById('batchListSubmit');
+            const batchRetrieveSubmit = document.getElementById('batchRetrieveSubmit');
+            const batchCancelSubmit = document.getElementById('batchCancelSubmit');
+            const batchDownloadSubmit = document.getElementById('batchDownloadSubmit');
+
+            batchSubmit.addEventListener('click', async function() {
+                const inputFile = document.getElementById('batchInputFile').value.trim();
+                const endpoint = document.getElementById('batchEndpoint').value;
+                const completionWindow = document.getElementById('batchCompletionWindow').value;
+
+                if (!inputFile)
