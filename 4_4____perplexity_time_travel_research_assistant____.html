@@ -1,0 +1,421 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perplexity Time Travel Research Assistant</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder@3.1.0/dist/universal-sentence-encoder.min.js"></script>
+    <style>
+        body {
+            padding: 20px;
+        }
+        .timeline-container {
+            height: 600px;
+            margin: 20px 0;
+        }
+        .visualization-container {
+            height: 500px;
+            margin: 20px 0;
+        }
+        .cluster-container {
+            height: 400px;
+            margin: 20px 0;
+        }
+        .pattern-container {
+            height: 300px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Perplexity Time Travel Research Assistant</h1>
+
+        <div class="field is-grouped">
+            <div class="control is-expanded">
+                <input class="input" type="text" id="searchQuery" placeholder="Enter historical event or time period">
+            </div>
+            <div class="control">
+                <button class="button is-primary" id="searchButton">Search</button>
+            </div>
+        </div>
+
+        <div class="timeline-container" id="timeline"></div>
+
+        <div class="columns">
+            <div class="column">
+                <h2 class="subtitle">Historical Events</h2>
+                <div id="eventsList"></div>
+            </div>
+            <div class="column">
+                <h2 class="subtitle">Data Visualization</h2>
+                <div class="visualization-container" id="visualization"></div>
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <h2 class="subtitle">Event Clustering</h2>
+                <div class="cluster-container" id="cluster"></div>
+            </div>
+            <div class="column">
+                <h2 class="subtitle">Temporal Patterns</h2>
+                <div class="pattern-container" id="pattern"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchButton = document.getElementById('searchButton');
+            const searchQuery = document.getElementById('searchQuery');
+            const timeline = document.getElementById('timeline');
+            const eventsList = document.getElementById('eventsList');
+            const visualization = document.getElementById('visualization');
+            const cluster = document.getElementById('cluster');
+            const pattern = document.getElementById('pattern');
+
+            let historicalData = [];
+            let currentEvents = [];
+
+            searchButton.addEventListener('click', async () => {
+                const query = searchQuery.value.trim();
+                if (query) {
+                    try {
+                        const data = await fetchHistoricalData(query);
+                        historicalData = data;
+                        currentEvents = data.events;
+                        renderTimeline();
+                        renderEventsList();
+                        renderVisualization();
+                        renderCluster();
+                        renderPattern();
+                    } catch (error) {
+                        console.error('Error fetching historical data:', error);
+                    }
+                }
+            });
+
+            async function fetchHistoricalData(query) {
+                // In a real application, this would call the Perplexity API
+                // For demonstration, we'll use mock data
+                return {
+                    query: query,
+                    events: generateMockEvents(query)
+                };
+            }
+
+            function generateMockEvents(query) {
+                const events = [];
+                const startYear = Math.floor(Math.random() * 1000) + 1000;
+                const endYear = startYear + Math.floor(Math.random() * 500) + 100;
+
+                for (let i = 0; i < 20; i++) {
+                    const year = startYear + Math.floor(Math.random() * (endYear - startYear));
+                    events.push({
+                        id: i,
+                        year: year,
+                        title: `${query} Event ${i + 1}`,
+                        description: `This is a description of ${query} Event ${i + 1} that occurred in ${year}.`,
+                        importance: Math.random()
+                    });
+                }
+
+                return events;
+            }
+
+            function renderTimeline() {
+                d3.select(timeline).selectAll('*').remove();
+
+                const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+                const width = timeline.clientWidth - margin.left - margin.right;
+                const height = timeline.clientHeight - margin.top - margin.bottom;
+
+                const svg = d3.select(timeline)
+                    .append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append('g')
+                    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+                const x = d3.scaleTime()
+                    .domain(d3.extent(currentEvents, d => new Date(d.year, 0, 1)))
+                    .range([0, width]);
+
+                const y = d3.scaleLinear()
+                    .domain([0, d3.max(currentEvents, d => d.importance)])
+                    .range([height, 0]);
+
+                svg.append('g')
+                    .attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x));
+
+                svg.append('g')
+                    .call(d3.axisLeft(y));
+
+                svg.selectAll('circle')
+                    .data(currentEvents)
+                    .enter()
+                    .append('circle')
+                    .attr('cx', d => x(new Date(d.year, 0, 1)))
+                    .attr('cy', d => y(d.importance))
+                    .attr('r', 5)
+                    .attr('fill', 'steelblue')
+                    .on('click', (event, d) => {
+                        showEventDetails(d);
+                    });
+            }
+
+            function renderEventsList() {
+                eventsList.innerHTML = '';
+
+                currentEvents.forEach(event => {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'box';
+                    eventElement.innerHTML = `
+                        <h3 class="title is-5">${event.title} (${event.year})</h3>
+                        <p>${event.description}</p>
+                    `;
+                    eventElement.addEventListener('click', () => {
+                        showEventDetails(event);
+                    });
+                    eventsList.appendChild(eventElement);
+                });
+            }
+
+            function showEventDetails(event) {
+                // In a real application, this would show detailed information about the event
+                alert(`Details for ${event.title} (${event.year}):\n\n${event.description}`);
+            }
+
+            function renderVisualization() {
+                d3.select(visualization).selectAll('*').remove();
+
+                const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+                const width = visualization.clientWidth - margin.left - margin.right;
+                const height = visualization.clientHeight - margin.top - margin.bottom;
+
+                const svg = d3.select(visualization)
+                    .append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append('g')
+                    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+                const x = d3.scaleLinear()
+                    .domain(d3.extent(currentEvents, d => d.year))
+                    .range([0, width]);
+
+                const y = d3.scaleLinear()
+                    .domain([0, d3.max(currentEvents, d => d.importance)])
+                    .range([height, 0]);
+
+                svg.append('g')
+                    .attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x));
+
+                svg.append('g')
+                    .call(d3.axisLeft(y));
+
+                svg.selectAll('rect')
+                    .data .enter()
+                    .append('rect')
+                    .attr('x', d => x(d.year) - 5)
+                    .attr('y', d => y(d.importance))
+                    .attr('width', 10)
+                    .attr('height', d => height - y(d.importance))
+fill', 'steelblue');
+            }
+
+            async function renderCluster()3.select(cluster).selectAll('*').remove();
+
+                const width = cluster.clientWidth;
+                const height = cluster.clientHeight;
+
+                const svg = d3.select(cluster)
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height);
+
+                // In a real application, we would use NLP to cluster events
+                // For demonstration, we'll use a simple random clustering
+                const clusters = [];
+                const clusterCount = Math.min(5, currentEvents.length);
+
+                for (let i = 0; i < clusterCount; i++) {
+                    clusters.push({
+                        id: i,
+                        events: [],
+                        color: d3.schemeCategory10[i % 10]
+                    });
+                }
+
+                currentEvents.forEach(event => {
+                    const clusterIndex = Math.floor(Math.random() * clusterCount);
+                    clusters[clusterIndex].events.push(event);
+                });
+
+                const simulation = d3.forceSimulation()
+                    .force('link', d3.forceLink().id(d => d.id))
+                    .force('charge', d3.forceManyBody().strength(-50))
+                    .force('center', d3.forceCenter(width / 2, height / 2));
+
+                const nodes = [];
+                const links = [];
+
+                clusters.forEach((cluster, i) => {
+                    nodes.push({
+                        id: `cluster-${i}`,
+                        group: i,
+                        radius: Math.sqrt(cluster.events.length) * 5,
+                        color: cluster.color
+                    });
+
+                    cluster.events.forEach(event => {
+                        nodes.push({
+                            id: `event-${event.id}`,
+                            group: i,
+                            radius: 3,
+                            color: cluster.color
+                        });
+
+                        links.push({
+                            source: `cluster-${i}`,
+                            target: `event-${event.id}`,
+                            value: 1
+                        });
+                    });
+                });
+
+                const link = svg.append('g')
+                    .selectAll('line')
+                    .data(links)
+                    .enter()
+                    .append('line')
+                    .attr('stroke', '#999')
+                    .attr('stroke-opacity', 0.6)
+                    .attr('stroke-width', d => Math.sqrt(d.value));
+
+                const node = svg.append('g')
+                    .selectAll('circle')
+                    .data(nodes)
+                    .enter()
+                    .append('circle')
+                    .attr('r', d => d.radius)
+                    .attr('fill', d => d.color)
+                    .call(drag(simulation));
+
+                simulation
+                    .nodes(nodes)
+                    .on('tick', () => {
+                        link
+                            .attr('x1', d => d.source.x)
+                            .attr('y1', d => d.source.y)
+                            .attr('x2', d => d.target.x)
+                            .attr('y2', d => d.target.y);
+
+                        node
+                            .attr('cx', d => d.x)
+                            .attr('cy', d => d.y);
+                    });
+
+                simulation.force('link')
+                    .links(links);
+
+                function drag(simulation) {
+                    function dragstarted(event, d) {
+                        if (!event.active) simulation.alphaTarget(0.3).restart();
+                        d.fx = d.x;
+                        d.fy = d.y;
+                    }
+
+                    function dragged(event, d) {
+                        d.fx = event.x;
+                        d.fy = event.y;
+                    }
+
+                    function dragended(event, d) {
+                        if (!event.active) simulation.alphaTarget(0);
+                        d.fx = null;
+                        d.fy = null;
+                    }
+
+                    return d3.drag()
+                        .on('start', dragstarted)
+                        .on('drag', dragged)
+                        .on('end', dragended);
+                }
+            }
+
+            async function renderPattern() {
+                d3.select(pattern).selectAll('*').remove();
+
+                const width = pattern.clientWidth;
+                const height = pattern.clientHeight;
+
+                const svg = d3.select(pattern)
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height);
+
+                // In a real application, we would use machine learning to detect patterns
+                // For demonstration, we'll use a simple pattern detection
+                const years = currentEvents.map(event => event.year);
+                const minYear = Math.min(...years);
+                const maxYear = Math.max(...years);
+                const yearRange = maxYear - minYear;
+
+                const patternData = [];
+                const patternCount = 5;
+
+                for (let i = 0; i < patternCount; i++) {
+                    const startYear = minYear + (i * yearRange / patternCount);
+                    const endYear = startYear + (yearRange / patternCount);
+
+                    const eventsInPattern = currentEvents.filter(event =>
+                        event.year >= startYear && event.year <= endYear
+                    );
+
+                    patternData.push({
+                        startYear: startYear,
+                        endYear: endYear,
+                        eventCount: eventsInPattern.length,
+                        importance: d3.mean(eventsInPattern, d => d.importance)
+                    });
+                }
+
+                const x = d3.scaleLinear()
+                    .domain([minYear, maxYear])
+                    .range([0, width]);
+
+                const y = d3.scaleLinear()
+                    .domain([0, d3.max(patternData, d => d.eventCount)])
+                    .range([height, 0]);
+
+                svg.append('g')
+                    .attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x));
+
+                svg.append('g')
+                    .call(d3.axisLeft(y));
+
+                svg.selectAll('rect')
+                    .data(patternData)
+                    .enter()
+                    .append('rect')
+                    .attr('x', d => x(d.startYear))
+                    .attr('y', d => y(d.eventCount))
+                    .attr('width', d => x(d.endYear) - x(d.startYear))
+                    .attr('height', d => height - y(d.eventCount))
+                    .attr('fill', 'steelblue')
+                    .attr('opacity', d => d.importance);
+            }
+        });
+    </script>
+</body>
+</html>
+```

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mistral Code Review Assistant Pro - Professional code review and quality assessment tool">
+    <title>Mistral Code Review Assistant Pro</title>
+    <style>
+        :root {
+            --primary-color: #3a7bd5;
+            --secondary-color: #00d2ff;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --accent-color: #ff6b6b;
+            --success-color: #51cf66;
+            --warning-color: #fcc419;
+            --danger-color: #ff6b6b;
+            --text-color: #333;
+            --text-light: #f8f9fa;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            margin-right: 0.5rem;
+            font-size: 1.5em;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+
+        .editor-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+
+        .editor-header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-tabs {
+            display: flex;
+        }
+
+        .editor-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+
+        .editor-tab.active {
+            border-bottom-color: var(--accent-color);
+        }
+
+        .editor-actions {
+            display: flex;
+        }
+
+        .editor-action {
+            margin-left: 0.5rem;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .editor-action:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #editor {
+            height: 600px;
+            width: 100%;
+        }
+
+        .sidebar {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 1.5rem;
+        }
+
+        .review-panel {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1rem;
+        }
+
+        .panel-header {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .metrics {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .metric-label {
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-weight: 700;
+        }
+
+        .progress-container {
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .suggestions {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .suggestion {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .suggestion-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .suggestion-content {
+            font-size: 0.9rem;
+        }
+
+        .vulnerabilities {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .vulnerability {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .vulnerability-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .vulnerability-content {
+            font-size: 0.9rem;
+        }
+
+        .vulnerability-severity {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--border-radius);
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .severity-low {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+        }
+
+        .severity-medium {
+            background-color: #ff9f43;
+            color: var(--dark-color);
+        }
+
+        .severity-high {
+            background-color: var(--danger-color);
+            color: var(--text-light);
+        }
+
+        .severity-critical {
+            background-color: #8b0000;
+            color: var(--text-light);
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-light);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            color: var(--text-light);
+            font-size: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 992px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            @media (max-width: 768px) {
+                .sidebar {
+                    grid-template-columns: 1fr;
+                }
+
+                nav ul {
+                    display: none;
+                }
+
+                .header-container {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+            }
+
+            @media (max-width: 576px) {
+                .editor-actions {
+                    display: none;
+                }
+
+                .actions {
+                    flex-direction: column;
+                }
+
+                .btn {
+                    width: 100%;
+                }
+            }
+
+            .loading {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+
+            .spinner {
+                width: 50px;
+                height: 50px;
+                border: 5px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top-color: var(--accent-color);
+                animation: spin 1s ease-in-out infinite;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span>Mistral Code Review Assistant Pro</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="editor-container">
+            <div class="editor-header">
+                <div class="editor-tabs">
+                    <div class="editor-tab active">index.html</div>
+                    <div class="editor-tab">script.js</div>
+                    <div class="editor-tab">styles.css</div>
+                </div>
+                <div class="editor-actions">
+                    <div class="editor-action" title="Save"><span>💾</span></div>
+                    <div class="editor-action" title="Run"><span>▶️</span></div>
+                    <div class="editor-action" title="Share"><span>🔗</span></div>
+                </div>
+            </div>
+            <div id="editor"></div>
+        </div>
+
+        <div class="sidebar">
+            <div class="review-panel">
+                <h2 class="panel-header">Code Metrics</h2>
+                <div class="metrics">
+                    <div class="metric">
+                        <span class="metric-label">Lines of Code</span>
+                        <span class="metric-value" id="loc">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Complexity</span>
+                        <span class="metric-value" id="complexity">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Maintainability</span>
+                        <span class="metric-value" id="maintainability">0%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Code Quality</span>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="quality-progress" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-panel">
+                <h2 class="panel-header">Suggestions</h2>
+                <div class="suggestions" id="suggestions">
+                    <!-- Suggestions will be added here by JavaScript -->
+                </div>
+            </div>
+
+            <div class="review-panel">
+                <h2 class="panel-header">Security Vulnerabilities</h2>
+                <div class="vulnerabilities" id="vulnerabilities">
+                    <!-- Vulnerabilities will be added here by JavaScript -->
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" id="analyze-btn">Analyze Code</button>
+                <button class="btn btn-secondary" id="export-btn">Export Report</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="copyright">
+                &copy; 2023 Mistral Code Review Assistant Pro. All rights reserved.
+            </div>
+            <div class="social-links">
+                <a href="#" class="social-link">📱</a>
+                <a href="#" class="social-link">🐦</a>
+                <a href="#" class="social-link">📸</a>
+                <a href="#" class="social-link">🎥</a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="loading" id="loading" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // Initialize Monaco Editor
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            const editor = monaco.editor.create(document.getElementById('editor'), {
+                value: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+</body>
+</html>`,
+                language: 'html',
+                theme: 'vs-dark',
+                automaticLayout: true
+            });
+
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.editor-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    // Change editor language based on tab
+                    const language = tab.textContent.includes('.html') ? 'html' :
+                                    tab.textContent.includes('.js') ? 'javascript' : 'css';
+                    monaco.editor.setModelLanguage(editor.getModel(), language);
+                });
+            });
+
+            // Analyze button functionality
+            const analyzeBtn = document.getElementById('analyze-btn');
+            analyzeBtn.addEventListener('click', analyzeCode);
+
+            // Export button functionality
+            const exportBtn = document.getElementById('export-btn');
+            exportBtn.addEventListener('click', exportReport);
+
+            // Simulate code analysis
+            async function analyzeCode() {
+                showLoading();
+
+                // Get code from editor
+                const code = editor.getValue();
+
+                // Simulate API call to Mistral's FIM
+                try {
+                    const analysis = await simulateCodeAnalysis(code);
+
+                    // Update UI with analysis results
+                    updateMetrics(analysis.metrics);
+                    updateSuggestions(analysis.suggestions);
+                    updateVulnerabilities(analysis.vulnerabilities);
+                } catch (error) {
+                    console.error('Error analyzing code:', error);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // Simulate code analysis (replace with actual API call)
+            async function simulateCodeAnalysis(code) {
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Calculate metrics based on code length
+                const lines = code.split('\n').length;
+                const loc = lines;
+                const complexity = Math.min(Math.floor(loc / 20), 10);
+                const maintainability = Math.max(100 - (loc / 5), 0);
+                const quality = Math.max(100 - (loc / 10), 0);
+
+                // Generate random suggestions
+                const suggestions = generateSuggestions(loc);
+
+                // Generate random vulnerabilities
+                const vulnerabilities = generateVulnerabilities(loc);
+
+                return {
+                    metrics: { loc, complexity, maintainability, quality },
+                    suggestions,
+                    vulnerabilities
+                };
+            }
+
+            // Update metrics display
+            function updateMetrics(metrics) {
+                document.getElementById('loc').textContent = metrics.loc;
+                document.getElementById('complexity').textContent = metrics.complexity;
+                document.getElementById('maintainability').textContent = `${metrics.maintainability}%`;
+                document.getElementById('quality-progress').style.width = `${metrics.quality}%`;
+            }
+
+            // Update suggestions display
+            function updateSuggestions(suggestions) {
+                const suggestionsContainer = document.getElementById('suggestions');
+                suggestionsContainer.innerHTML = '';
+
+                suggestions.forEach(suggestion => {
+                    const suggestionElement = document.createElement('div');
+                    suggestionElement.className = 'suggestion';
+                    suggestionElement.innerHTML = `
+                        <div class="suggestion-title">${suggestion.title}</div>
+                        <div class="suggestion-content">${suggestion.content}</div>
+                    `;
+                    suggestionsContainer.appendChild(suggestionElement);
+                });
+            }
+
+            // Update vulnerabilities display
+            function updateVulnerabilities(vulnerabilities) {
+                const vulnerabilitiesContainer = document.getElementById('vulnerabilities');
+                vulnerabilitiesContainer.innerHTML = '';
+
+                vulnerabilities.forEach(vulnerability => {
+                    const vulnerabilityElement = document.createElement('div');
+                    vulnerabilityElement.className = 'vulnerability';
+                    vulnerabilityElement.innerHTML = `
+                        <div class="vulnerability-severity severity-${vulnerability.severity.toLowerCase()}">${vulnerability.severity}</div>
+                        <div class="vulnerability-title">${vulnerability.title}</div>
+                        <div class="vulnerability-content">${vulnerability.content}</div>
+                    `;
+                    vulnerabilitiesContainer.appendChild(vulnerabilityElement);
+                });
+            }
+
+            // Generate random suggestions based on code length
+            function generateSuggestions(loc) {
+                const suggestions = [];
+                const suggestionCount = Math.min(Math.floor(loc / 50), 5);
+
+                for (let i = 0; i < suggestionCount; i++) {
+                    suggestions.push({
+                        title: `Improve code readability (Suggestion ${i + 1})`,
+                        content: `Consider breaking down this function into smaller, more manageable parts to improve readability and maintainability.`
+                    });
+                }
+
+                return suggestions;
+            }
+
+            // Generate random vulnerabilities based on code length
+            function generateVulnerabilities(loc) {
+                const vulnerabilities = [];
+                const vulnerabilityCount = Math.min(Math.floor(loc / 100), 3);
+                const severities = ['Low', 'Medium', 'High', 'Critical'];
+
+                for (let i = 0; i < vulnerabilityCount; i++) {
+                    const severity = severities[Math.floor(Math.random() * severities.length)];
+                    vulnerabilities.push({
+                        title: `Potential security vulnerability (Vulnerability ${i + 1})`,
+                        content: `This code might be vulnerable to ${severity.toLowerCase()} level security issues. Consider reviewing and addressing these concerns.`,
+                        severity: severity
+                    });
+                }
+
+                return vulnerabilities;
+            }
+
+            // Export report functionality
+            function exportReport() {
+                const code = editor.getValue();
+                const loc = document.getElementById('loc').textContent;
+                const complexity = document.getElementById('complexity').textContent;
+                const maintainability = document.getElementById('maintainability').textContent;
+                const quality = document.getElementById('quality-progress').style.width;
+
+                const report = {
+                    code,
+                    metrics: {
+                        linesOfCode: loc,
+                        complexity,
+                        maintainability,
+                        codeQuality: quality
+                    },
+                    suggestions: Array.from(document.querySelectorAll('.suggestion')).map(s => ({
+                        title: s.querySelector('.suggestion-title').textContent,
+                        content: s.querySelector('.suggestion-content').textContent
+                    })),
+                    vulnerabilities: Array.from(document.querySelectorAll('.vulnerability')).map(v => ({
+                        title: v.querySelector('.vulnerability-title').textContent,
+                        content: v.querySelector('.vulnerability-content').textContent,
+                        severity: v.querySelector('.vulnerability-severity').textContent
+                    }))
+                };
+
+                // Create download link
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(report, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", "code_review_report.json");
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            }
+
+            // Show loading indicator
+            function showLoading() {
+                document.getElementById('loading').style.display = 'flex';
+            }
+
+            // Hide loading indicator
+            function hideLoading() {
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

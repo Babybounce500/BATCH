@@ -1,0 +1,143 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width-scale=1.0">
+    <title>Claude AI Therapist's Office</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <style>
+        body {
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        #pdf-viewer {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .therapist-response {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .patient-input {
+            margin-bottom: 15px;
+        }
+        .analysis-results {
+            background-color: #e9f7fe;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Claude AI Therapist's Office</h1>
+
+        <div class="row">
+            <div class="six columns">
+                <div id="pdf-viewer"></div>
+            </div>
+            <div class="six columns">
+                <div id="therapy-content"></div>
+                <div class="patient-input">
+                    <textarea id="patient-response" class="u-full-width" rows="5" placeholder="Enter your thoughts..."></textarea>
+                    <button id="submit-response" class="button-primary">Submit Response</button>
+                </div>
+                <div id="analysis-results" class="analysis-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
+        // DOM elements
+        const therapyContentEl = document.getElementById('therapy-content');
+        const patientResponseEl = document.getElementById('patient-response');
+        const submitResponseEl = document.getElementById('submit-response');
+        const analysisResultsEl = document.getElementById('analysis-results');
+
+        // Load PDF document
+        const loadingTask = pdfjsLib.getDocument('therapy_session.pdf');
+        loadingTask.promise.then(function(pdf) {
+            pdf.getPage(1).then(function(page) {
+                const scale = 1.5;
+                const viewport = page.getViewport({ scale: scale });
+
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+
+                page.render(renderContext).promise.then(function() {
+                    document.getElementById('pdf-viewer').appendChild(canvas);
+                });
+            });
+        });
+
+        // Generate therapy content
+        function generateTherapyContent() {
+            // In a real application, this would call the Claude API
+            const content = `
+                <div class="therapist-response">
+                    <h3>Therapist:</h3>
+                    <p>Welcome to your therapy session. Today we'll focus on cognitive-behavioral techniques. Please share your thoughts about your recent experiences.</p>
+                </div>
+            `;
+            therapyContentEl.innerHTML = content;
+        }
+
+        // Analyze patient response
+        function analyzeResponse(response) {
+            // In a real application, this would call the Claude API for NLP analysis
+            const analysis = `
+                <h4>Analysis Results:</h4>
+                <p><strong>Sentiment:</strong> Positive</p>
+                <p><strong>Key Themes:</strong> Stress, Anxiety, Work-related</p>
+                <p><strong>CBT Suggestion:</strong> Try reframing your thoughts about work to reduce stress.</p>
+            `;
+            analysisResultsEl.innerHTML = analysis;
+        }
+
+        // Event listeners
+        submitResponseEl.addEventListener('click', function() {
+            const response = patientResponseEl.value.trim();
+            if (response) {
+                // Add patient response to therapy content
+                const patientResponseHTML = `
+                    <div class="patient-response">
+                        <h3>You:</h3>
+                        <p>${response}</p>
+                    </div>
+                `;
+                therapyContentEl.innerHTML += patientResponseHTML;
+
+                // Analyze the response
+                analyzeResponse(response);
+
+                // Clear the input
+                patientResponseEl.value = '';
+            }
+        });
+
+        // Initialize the therapy session
+        generateTherapyContent();
+    </script>
+</body>
+</html>
+```

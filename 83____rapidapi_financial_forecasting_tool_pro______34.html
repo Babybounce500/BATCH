@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Financial Forecasting Tool with predictive modeling and scenario analysis">
+    <title>RapidAPI Financial Forecasting Tool Pro</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --text-color: #333;
+            --text-light: #fff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .main-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+        }
+
+        h3 {
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #1a252f;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 2rem;
+        }
+
+        .scenario-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .scenario-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .scenario-meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .scenario-content {
+            margin-bottom: 1rem;
+        }
+
+        .scenario-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .scenario-actions button {
+            margin-left: 0.5rem;
+        }
+
+        .risk-meter {
+            width: 100%;
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .risk-level {
+            height: 100%;
+            width: 0%;
+            transition: var(--transition);
+            border-radius: 10px;
+        }
+
+        .risk-low {
+            background-color: var(--success-color);
+        }
+
+        .risk-medium {
+            background-color: var(--warning-color);
+        }
+
+        .risk-high {
+            background-color: var(--accent-color);
+        }
+
+        .risk-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-label span {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--secondary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: var(--border-radius);
+            display: none;
+        }
+
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-error {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent-color);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: var(--text-light);
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .mobile-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary-color);
+                padding: 1rem;
+                display: none;
+            }
+
+            .mobile-menu.active {
+                display: block;
+            }
+
+            .mobile-menu ul {
+                flex-direction: column;
+            }
+
+            .mobile-menu ul li {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">Financial Forecasting Pro</div>
+            <button class="menu-toggle">☰</button>
+            <nav>
+                <ul>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#forecast">Forecast</a></li>
+                    <li><a href="#scenarios">Scenarios</a></li>
+                    <li><a href="#risk">Risk Analysis</a></li>
+                </ul>
+            </nav>
+            <div class="mobile-menu">
+                <ul>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#forecast">Forecast</a></li>
+                    <li><a href="#scenarios">Scenarios</a></li>
+                    <li><a href="#risk">Risk Analysis</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <aside class="sidebar">
+            <div class="alert alert-success" id="success-alert">Operation completed successfully!</div>
+            <div class="alert alert-error" id="error-alert">An error occurred. Please try again.</div>
+
+            <section id="dashboard">
+                <h2>Dashboard</h2>
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </section>
+
+            <section id="forecast">
+                <h2>Financial Forecast</h2>
+                <form id="forecast-form">
+                    <div class="form-group">
+                        <label for="symbol">Stock Symbol</label>
+                        <input type="text" id="symbol" name="symbol" required placeholder="e.g., AAPL">
+                    </div>
+                    <div class="form-group">
+                        <label for="timeframe">Timeframe</label>
+                        <select id="timeframe" name="timeframe">
+                            <option value="1mo">1 Month</option>
+                            <option value="3mo">3 Months</option>
+                            <option value="6mo">6 Months</option>
+                            <option value="1y" selected>1 Year</option>
+                            <option value="2y">2 Years</option>
+                            <option value="5y">5 Years</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="model">Forecasting Model</label>
+                        <select id="model" name="model">
+                            <option value="arima">ARIMA</option>
+                            <option value="lstm">LSTM</option>
+                            <option value="prophet" selected>Prophet</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">Generate Forecast</button>
+                </form>
+            </section>
+
+            <section id="scenarios">
+                <h2>Scenario Analysis</h2>
+                <form id="scenario-form">
+                    <div class="form-group">
+                        <label for="scenario-name">Scenario Name</label>
+                        <input type="text" id="scenario-name" name="scenario-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="scenario-description">Description</label>
+                        <textarea id="scenario-description" name="scenario-description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="scenario-type">Scenario Type</label>
+                        <select id="scenario-type" name="scenario-type">
+                            <option value="optimistic">Optimistic</option>
+                            <option value="neutral" selected>Neutral</option>
+                            <option value="pessimistic">Pessimistic</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="scenario-parameters">Parameters (JSON)</label>
+                        <textarea id="scenario-parameters" name="scenario-parameters" rows="5" placeholder='{"growth_rate": 0.05, "inflation_rate": 0.02, "interest_rate": 0.03}'></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Create Scenario</button>
+                </form>
+            </section>
+
+            <section id="risk">
+                <h2>Risk Analysis</h2>
+                <form id="risk-form">
+                    <div class="form-group">
+                        <label for="risk-symbol">Stock Symbol</label>
+                        <input type="text" id="risk-symbol" name="risk-symbol" required placeholder="e.g., AAPL">
+                    </div>
+                    <div class="form-group">
+                        <label for="risk-timeframe">Timeframe</label>
+                        <select id="risk-timeframe" name="risk-timeframe">
+                            <option value="1mo">1 Month</option>
+                            <option value="3mo">3 Months</option>
+                            <option value="6mo">6 Months</option>
+                            <option value="1y" selected>1 Year</option>
+                            <option value="2y">2 Years</option>
+                            <option value="5y">5 Years</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">Analyze Risk</button>
+                </form>
+            </section>
+        </aside>
+
+        <div class="main-content">
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading data and generating forecast...</p>
+            </div>
+
+            <section id="forecast-results">
+                <h2>Forecast Results</h2>
+                <div class="chart-container">
+                    <canvas id="forecastChart"></canvas>
+                </div>
+                <div id="forecast-metrics">
+                    <h3>Forecast Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <h4>Mean Absolute Error (MAE)</h4>
+                            <p id="mae">-</p>
+                        </div>
+                        <div class="metric">
+                            <h4>Root Mean Squared Error (RMSE)</h4>
+                            <p id="rmse">-</p>
+                        </div>
+                        <div class="metric">
+                            <h4>R-squared (R²)</h4>
+                            <p id="r2">-</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="scenario-results">
+                <h2>Scenario Results</h2>
+                <div id="scenario-list">
+                    <!-- Scenarios will be added here dynamically -->
+                </div>
+            </section>
+
+            <section id="risk-results">
+                <h2>Risk Analysis Results</h2>
+                <div class="risk-analysis">
+                    <h3 id="risk-title">Risk Analysis for</h3>
+                    <div class="risk-label">
+                        <span>Low Risk</span>
+                        <span>High Risk</span>
+                    </div>
+                    <div class="risk-meter">
+                        <div class="risk-level" id="risk-level"></div>
+                    </div>
+                    <div class="risk-metrics">
+                        <div class="metric">
+                            <h4>Value at Risk (VaR)</h4>
+                            <p id="var">-</p>
+                        </div>
+                        <div class="metric">
+                            <h4>Conditional Value at Risk (CVaR)</h4>
+                            <p id="cvar">-</p>
+                        </div>
+                        <div class="metric">
+                            <h4>Sharpe Ratio</h4>
+                            <p id="sharpe">-</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 RapidAPI Financial Forecasting Tool Pro. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const menuToggle = document.querySelector('.menu-toggle');
+            const mobileMenu = document.querySelector('.mobile-menu');
+
+            menuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+            });
+
+            // Initialize charts
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+
+            const performanceChart = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Portfolio Performance',
+                        data: [100, 105, 110, 115, 120, 125],
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+
+            let forecastChart = new Chart(forecastCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Actual',
+                            data: [],
+                            backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: false
+                        },
+                        {
+                            label: 'Forecast',
+                            data: [],
+                            backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+
+            // Form submissions
+            const forecastForm = document.getElementById('forecast-form');
+            const scenarioForm = document.getElementById('scenario-form');
+            const riskForm = document.getElementById('risk-form');
+
+            forecastForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateForecast();
+            });
+
+            scenarioForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                createScenario();
+            });
+
+            riskForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                analyzeRisk();
+            });
+
+            // Simulate forecast generation
+            async function generateForecast() {
+                const loading = document.getElementById('loading');
+                const successAlert = document.getElementById('success-alert');
+                const errorAlert = document.getElementById('error-alert');
+
+                loading.style.display = 'block';
+                successAlert.style.display = 'none';
+                errorAlert.style.display = 'none';
+
+                try {
+                    // Simulate API call delay
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // Generate mock forecast data
+                    const labels = [];
+                    const actualData = [];
+                    const forecastData = [];
+                    const currentDate = new Date();
+                    const timeframe = document.getElementById('timeframe').value;
+
+                    let months;
+                    switch(timeframe) {
+                        case '1mo': months = 1; break;
+                        case '3mo': months = 3; break;
+                        case '6mo': months = 6; break;
+                        case '1y': months = 12; break;
+                        case '2y': months = 24; break;
+                        case '5y': months = 60; break;
+                        default: months = 12;
+                    }
+
+                    // Generate historical data
+                    for (let i = months; i > 0; i--) {
+                        const date = new Date(currentDate);
+                        date.setMonth(currentDate.getMonth() - i);
+                        labels.push(date.toLocaleString('default', { month: 'short', year: 'numeric' }));
+
+                        // Generate random price between 100 and 200
+                        actualData.push(100 + Math.random() * 100);
+                    }
+
+                    // Generate forecast data
+                    const lastPrice = actualData[actualData.length - 1];
+                    for (let i = 0; i < months; i++) {
+                        const date = new Date(currentDate);
+                        date.setMonth(currentDate.getMonth() + i);
+                        labels.push(date.toLocaleString('default', { month: 'short', year: 'numeric' }));
+
+                        // Generate forecast with some randomness
+                        forecastData.push(lastPrice * (1 + (Math.random() - 0.5) * 0.1));
+                    }
+
+                    // Update chart
+                    forecastChart.data.labels = labels;
+                    forecastChart.data.datasets[0].data = actualData.concat(new Array(months).fill(null));
+                    forecastChart.data.datasets[1].data = new Array(months).fill(null).concat(forecastData);
+                    forecastChart.update();
+
+                    // Update metrics
+                    document.getElementById('mae').textContent = (Math.random() * 5).toFixed(2);
+                    document.getElementById('rmse').textContent = (Math.random() * 5).toFixed(2);
+                    document.getElementById('r2').textContent = (0.7 + Math.random() * 0.3).toFixed(2);
+
+                    successAlert.textContent = 'Forecast generated successfully!';
+                    successAlert.style.display = 'block';
+                } catch (error) {
+                    errorAlert.textContent = 'Failed to generate forecast. Please try again.';
+                    errorAlert.style.display = 'block';
+                } finally {
+                    loading.style.display = 'none';
+                }
+            }
+
+            // Create scenario
+            function createScenario() {
+                const scenarioName = document.getElementById('scenario-name').value;
+                const scenarioDescription = document.getElementById('scenario-description').value;
+                const scenarioType = document.getElementById('scenario-type').value;
+                const scenarioParameters = document.getElementById('scenario-parameters').value;
+
+                const scenarioList = document.getElementById('scenario-list');
+
+                const scenarioCard = document.createElement('div');
+                scenarioCard.className = 'scenario-card';
+
+                scenarioCard.innerHTML = `
+                    <div class="scenario-header">
+                        <h3 class="scenario-title">${scenarioName}</h3>
+                        <span class="scenario-meta">${new Date().toLocaleDateString()}</span>
+                    </div>
+                    <div class="scenario-content">
+                        <p>${scenarioDescription}</p>
+                        <p><strong>Type:</strong> ${scenarioType}</p>
+                        <p><strong>Parameters:</strong> ${scenarioParameters}</p>
+                    </div>
+                    <div class="scenario-actions">
+                        <button class="btn-primary view-btn">View</button>
+                        <button class="btn-danger delete-btn">Delete</button>
+                    </div>
+                `;
+
+                scenarioList.appendChild(scenarioCard);
+
+                // Clear form
+                scenarioForm.reset();
+
+                // Show success message
+                const successAlert = document.getElementById('success-alert');
+                successAlert.textContent = 'Scenario created successfully!';
+                successAlert.style.display = 'block';
+
+                // Add event listeners to new buttons
+                const viewBtn = scenarioCard.querySelector('.view-btn');
+                const deleteBtn = scenarioCard.querySelector('.delete-btn');
+
+                viewBtn.addEventListener('click', function() {
+                    alert(`Viewing scenario: ${scenarioName}`);
+                });
+
+                deleteBtn.addEventListener('click', function() {
+                    scenarioCard.remove();
+                    const successAlert = document.getElementById('success-alert');
+                    successAlert.textContent = 'Scenario deleted successfully!';
+                    successAlert.style.display = 'block';
+                });
+            }
+
+            // Simulate risk analysis
+            async function analyzeRisk() {
+                const loading = document.getElementById('loading');
+                const successAlert = document.getElementById('success-alert');
+                const errorAlert = document.getElementById('error-alert');
+
+                loading.style.display = 'block';
+                successAlert.style.display = 'none';
+                errorAlert.style.display = 'none';
+
+                try {
+                    // Simulate API call delay
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    const symbol = document.getElementById('risk-symbol').value;
+                    const timeframe = document.getElementById('risk-timeframe').value;
+
+                    // Update risk title
+                    document.getElementById('risk-title').textContent = `Risk Analysis for ${symbol} (${timeframe})`;
+
+                    // Generate random risk metrics
+                    const riskLevel = Math.random();
+                    const riskPercentage = Math.floor(riskLevel * 100);
+
+                    // Update risk meter
+                    const riskLevelElement = document.getElementById('risk-level');
+                    riskLevelElement.style.width = `${riskPercentage}%`;
+
+                    // Set risk level color
+                    if (riskLevel < 0.33) {
+                        riskLevelElement.className = 'risk-level risk-low';
+                    } else if (riskLevel < 0.66) {
+                        riskLevelElement.className = 'risk-level risk-medium';
+                    } else {
+                        riskLevelElement.className = 'risk-level risk-high';
+                    }
+
+                    // Update risk metrics
+                    document.getElementById('var').textContent = (Math.random() * 10).toFixed(2) + '%';
+                    document.getElementById('cvar').textContent = (Math.random() * 10).toFixed(2) + '%';
+                    document.getElementById('sharpe').textContent = (Math.random() * 3).toFixed(2);
+
+                    successAlert.textContent = 'Risk analysis completed successfully!';
+                    successAlert.style.display = 'block';
+                } catch (error) {
+                    errorAlert.textContent = 'Failed to analyze risk. Please try again.';
+                    errorAlert.style.display = 'block';
+                } finally {
+                    loading.style.display = 'none';
+                }
+            }
+
+            // Smooth scrolling for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+
+                        // Close mobile menu if open
+                        if (mobileMenu.classList.contains('active')) {
+                            mobileMenu.classList.remove('active');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

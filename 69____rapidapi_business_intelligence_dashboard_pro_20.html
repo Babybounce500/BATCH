@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RapidAPI Business Intelligence Dashboard Pro">
+    <title>Business Intelligence Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --text-color: #333;
+            --text-light: #fff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeframe-selector {
+            display: flex;
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+
+        .timeframe-selector button {
+            padding: 0.5rem 1rem;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .timeframe-selector button.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        .timeframe-selector button:hover:not(.active) {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 0.5rem;
+        }
+
+        .search-box button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+
+        .predictive-model {
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .model-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .model-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .model-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .model-controls button {
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .model-controls button:hover {
+            background-color: #2980b9;
+        }
+
+        .model-parameters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .parameter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .parameter-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .parameter-group input,
+        .parameter-group select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            outline: none;
+        }
+
+        .model-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .result-card {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .result-change {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .change-positive {
+            color: var(--secondary-color);
+        }
+
+        .change-negative {
+            color: var(--danger-color);
+        }
+
+        .arrow-up {
+            margin-right: 0.25rem;
+        }
+
+        .arrow-down {
+            margin-right: 0.25rem;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            margin: 0 1rem;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .timeframe-selector {
+                width: 100%;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .model-parameters {
+                grid-template-columns: 1fr;
+            }
+
+            .model-results {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">Business Intelligence Dashboard</div>
+            <nav>
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Analytics</a></li>
+                    <li><a href="#">Reports</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="controls">
+            <div class="timeframe-selector">
+                <button class="active">1D</button>
+                <button>1W</button>
+                <button>1M</button>
+                <button>3M</button>
+                <button>1Y</button>
+                <button>YTD</button>
+                <button>ALL</button>
+            </div>
+            <div class="search-box">
+                <input type="text" placeholder="Search...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Revenue</h3>
+                    <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Expenses</h3>
+                    <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="expensesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Profit</h3>
+                    <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="profitChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Customer Acquisition</h3>
+                    <div class="card-icon"><i class="fas fa-users"></i></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="customerChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Sales Performance</h3>
+                    <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Market Trends</h3>
+                    <div class="card-icon"><i class="fas fa-chart-area"></i></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="marketChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="predictive-model">
+            <div class="model-header">
+                <h3 class="model-title">Predictive Modeling</h3>
+                <div class="model-controls">
+                    <button id="runModel">Run Model</button>
+                    <button id="saveModel">Save Model</button>
+                </div>
+            </div>
+
+            <div class="model-parameters">
+                <div class="parameter-group">
+                    <label for="modelType">Model Type</label>
+                    <select id="modelType">
+                        <option value="linear">Linear Regression</option>
+                        <option value="logistic">Logistic Regression</option>
+                        <option value="decision">Decision Tree</option>
+                        <option value="random">Random Forest</option>
+                    </select>
+                </div>
+
+                <div class="parameter-group">
+                    <label for="timeHorizon">Time Horizon</label>
+                    <select id="timeHorizon">
+                        <option value="3">3 Months</option>
+                        <option value="6">6 Months</option>
+                        <option value="12">12 Months</option>
+                        <option value="24">24 Months</option>
+                    </select>
+                </div>
+
+                <div class="parameter-group">
+                    <label for="confidenceLevel">Confidence Level</label>
+                    <select id="confidenceLevel">
+                        <option value="90">90%</option>
+                        <option value="95">95%</option>
+                        <option value="99">99%</option>
+                    </select>
+                </div>
+
+                <div class="parameter-group">
+                    <label for="scenario">Scenario</label>
+                    <select id="scenario">
+                        <option value="base">Base Case</option>
+                        <option value="optimistic">Optimistic</option>
+                        <option value="pessimistic">Pessimistic</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="model-results">
+                <div class="result-card">
+                    <h4 class="result-title">Predicted Revenue</h4>
+                    <div class="result-value" id="predictedRevenue">$0</div>
+                    <div class="result-change" id="revenueChange">
+                        <span class="arrow-up"><i class="fas fa-arrow-up"></i></span>
+                        <span id="revenueChangeValue">0%</span>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h4 class="result-title">Predicted Expenses</h4>
+                    <div class="result-value" id="predictedExpenses">$0</div>
+                    <div class="result-change" id="expensesChange">
+                        <span class="arrow-up"><i class="fas fa-arrow-up"></i></span>
+                        <span id="expensesChangeValue">0%</span>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h4 class="result-title">Predicted Profit</h4>
+                    <div class="result-value" id="predictedProfit">$0</div>
+                    <div class="result-change" id="profitChange">
+                        <span class="arrow-up"><i class="fas fa-arrow-up"></i></span>
+                        <span id="profitChangeValue">0%</span>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h4 class="result-title">Predicted Customers</h4>
+                    <div class="result-value" id="predictedCustomers">0</div>
+                    <div class="result-change" id="customersChange">
+                        <span class="arrow-up"><i class="fas fa-arrow-up"></i></span>
+                        <span id="customersChangeValue">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#">Home</a>
+                <a href="#">About</a>
+                <a href="#">Services</a>
+                <a href="#">Contact</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <div class="copyright">
+                &copy; 2023 Business Intelligence Dashboard. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        // Sample data for charts
+        const revenueData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Revenue',
+                data: [12000, 15000, 18000, 20000, 22000, 25000, 28000, 30000, 32000, 35000, 38000, 40000],
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        };
+
+        const expensesData = {
+            labels: ['Marketing', 'Operations', 'Salaries', 'Rent', 'Utilities', 'Other'],
+            datasets: [{
+                label: 'Expenses',
+                data: [3000, 5000, 8000, 2000, 1000, 1000],
+                backgroundColor: [
+                    'rgba(231, 76, 60, 0.7)',
+                    'rgba(241, 196, 15, 0.7)',
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(52, 152, 219, 0.7)',
+                    'rgba(155, 89, 182, 0.7)',
+                    'rgba(52, 73, 94, 0.7)'
+                ],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        };
+
+        const profitData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Profit',
+                data: [2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000],
+                backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                borderColor: 'rgba(46, 204, 113, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        };
+
+        const customerData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'New Customers',
+                data: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160],
+                backgroundColor: 'rgba(155, 89, 182, 0.2)',
+                borderColor: 'rgba(155, 89, 182, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        };
+
+        const salesData = {
+            labels: ['Product A', 'Product B', 'Product C', 'Product D', 'Product E'],
+            datasets: [{
+                label: 'Sales',
+                data: [120, 150, 180, 200, 220],
+                backgroundColor: [
+                    'rgba(52, 152, 219, 0.7)',
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(241, 196, 15, 0.7)',
+                    'rgba(231, 76, 60, 0.7)',
+                    'rgba(155, 89, 182, 0.7)'
+                ],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        };
+
+        const marketData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Market Trends',
+                data: [10, 12, 15, 18, 20, 22, 25, 28, 30, 32, 35, 38],
+                backgroundColor: 'rgba(52, 73, 94, 0.2)',
+                borderColor: 'rgba(52, 73, 94, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        };
+
+        // Initialize charts
+        const revenueChart = new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: revenueData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const expensesChart = new Chart(document.getElementById('expensesChart'), {
+            type: 'doughnut',
+            data: expensesData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const profitChart = new Chart(document.getElementById('profitChart'), {
+            type: 'line',
+            data: profitData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const customerChart = new Chart(document.getElementById('customerChart'), {
+            type: 'bar',
+            data: customerData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' customers';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const salesChart = new Chart(document.getElementById('salesChart'), {
+            type: 'bar',
+            data: salesData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' units sold';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const marketChart = new Chart(document.getElementById('marketChart'), {
+            type: 'line',
+            data: marketData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Timeframe selector functionality
+        const timeframeButtons = document.querySelectorAll('.timeframe-selector button');
+        timeframeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                timeframeButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                // Here you would typically fetch new data based on the selected timeframe
+                console.log(`Selected timeframe: ${button.textContent}`);
+            });
+        });
+
+        // Search functionality
+        const searchButton = document.querySelector('.search-box button');
+        searchButton.addEventListener('click', () => {
+            const searchInput = document.querySelector('.search-box input');
+            console.log(`Searching for: ${searchInput.value}`);
+            // Here you would typically perform the search and update the dashboard
+        });
+
+        // Predictive model functionality
+        const runModelButton = document.getElementById('runModel');
+        runModelButton.addEventListener('click', () => {
+            // Simulate running the predictive model
+            simulateModelRun();
+        });
+
+        function simulateModelRun() {
+            // Get selected parameters
+            const modelType = document.getElementById('modelType').value;
+            const timeHorizon = document.getElementById('timeHorizon').value;
+            const confidenceLevel = document.getElementById('confidenceLevel').value;
+            const scenario = document.getElementById('scenario').value;
+
+            // Simulate processing
+            runModelButton.textContent = 'Running...';
+            runModelButton.disabled = true;
+
+            // Simulate API call with delay
+            setTimeout(() => {
+                // Generate random results based on parameters
+                const baseRevenue = 40000;
+                const baseExpenses = 10000;
+                const baseProfit = 30000;
+                const baseCustomers = 160;
+
+                // Adjust values based on scenario
+                let scenarioMultiplier = 1;
+                if (scenario === 'optimistic') {
+                    scenarioMultiplier = 1.2;
+                } else if (scenario === 'pessimistic') {
+                    scenarioMultiplier = 0.8;
+                }
+
+                // Calculate predicted values
+                const predictedRevenue = Math.round(baseRevenue * scenarioMultiplier * (1 + (Math.random() - 0.5) * 0.2));
+                const predictedExpenses = Math.round(baseExpenses * scenarioMultiplier * (1 + (Math.random() - 0.5) * 0.2));
+                const predictedProfit = predictedRevenue - predictedExpenses;
+                const predictedCustomers = Math.round(baseCustomers * scenarioMultiplier * (1 + (Math.random() - 0.5) * 0.2));
+
+                // Calculate changes
+                const revenueChange = ((predictedRevenue - baseRevenue) / baseRevenue * 100).toFixed(1);
+                const expensesChange = ((predictedExpenses - baseExpenses) / baseExpenses * 100).toFixed(1);
+                const profitChange = ((predictedProfit - baseProfit) / baseProfit * 100).toFixed(1);
+                const customersChange = ((predictedCustomers - baseCustomers) / baseCustomers * 100).toFixed(1);
+
+                // Update the UI
+                document.getElementById('predictedRevenue').textContent = `$${predictedRevenue.toLocaleString()}`;
+                document.getElementById('predictedExpenses').textContent = `$${predictedExpenses.toLocaleString()}`;
+                document.getElementById('predictedProfit').textContent = `$${predictedProfit.toLocaleString()}`;
+                document.getElementById('predictedCustomers').textContent = predictedCustomers.toLocaleString();
+
+                document.getElementById('revenueChangeValue').textContent = `${revenueChange}%`;
+                document.getElementById('expensesChangeValue').textContent = `${expensesChange}%`;
+                document.getElementById('profitChangeValue').textContent = `${profitChange}%`;
+                document.getElementById('customersChangeValue').textContent = `${customersChange}%`;
+
+                // Update change indicators
+                updateChangeIndicator('revenueChange', revenueChange);
+                updateChangeIndicator('expensesChange', expensesChange);
+                updateChangeIndicator('profitChange', profitChange);
+                updateChangeIndicator('customersChange', customersChange);
+
+                // Reset button
+                runModelButton.textContent = 'Run Model';
+                runModelButton.disabled = false;
+
+                console.log('Model run complete');
+            }, 2000);
+        }
+
+        function updateChangeIndicator(elementId, changeValue) {
+            const element = document.getElementById(elementId);
+            const arrowUp = element.querySelector('.arrow-up');
+            const arrowDown = element.querySelector('.arrow-down');
+
+            if (parseFloat(changeValue) >= 0) {
+                element.classList.remove('change-negative');
+                element.classList.add('change-positive');
+                if (arrowDown) arrowDown.style.display = 'none';
+                if (arrowUp) arrowUp.style.display = 'inline-block';
+            } else {
+                element.classList.remove('change-positive');
+                element.classList.add('change-negative');
+                if (arrowUp) arrowUp.style.display = 'none';
+                if (arrowDown) arrowDown.style.display = 'inline-block';
+            }
+        }
+
+        // Save model functionality
+        const saveModelButton = document.getElementById('saveModel');
+        saveModelButton.addEventListener('click', () => {
+            // Get current model parameters
+            const modelType = document.getElementById('modelType').value;
+            const timeHorizon = document.getElementById('timeHorizon').value;
+            const confidenceLevel = document.getElementById('confidenceLevel').value;
+            const scenario = document.getElementById('scenario').value;
+
+            // Create model configuration object
+            const modelConfig = {
+                modelType,
+                timeHorizon,
+                confidenceLevel,
+                scenario,
+                timestamp: new Date().toISOString()
+            };
+
+            // Simulate saving the model
+            console.log('Saving model configuration:', modelConfig);
+            alert('Model configuration saved successfully!');
+        });
+    </script>
+</body>
+</html>

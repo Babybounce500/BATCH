@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Astro Market Analyzer - Analyze market trends with astrological insights">
+    <title>Astro Market Analyzer</title>
+    <style>
+        :root {
+            --primary-color: #2185d0;
+            --secondary-color: #1b1c1d;
+            --text-color: #ffffff;
+            --background-color: #f5f5f5;
+            --card-background: #ffffff;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--secondary-color);
+            background-color: var(--background-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 40px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--secondary-color);
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 30px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: #1678c2;
+        }
+
+        .chart-container {
+            margin-top: 30px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+            }
+
+            nav ul {
+                margin-top: 20px;
+            }
+
+            nav ul li {
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <h1 class="logo">Astro Market Analyzer</h1>
+            <nav>
+                <ul>
+                    <li><a href="#market-data">Market Data</a></li>
+                    <li><a href="#astrological-insights">Astrological Insights</a></li>
+                    <li><a href="#trend-analysis">Trend Analysis</a></li>
+                    <li><a href="#astrological-charts">Astrological Charts</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="market-data">
+            <h2 class="section-title">Market Data</h2>
+            <div class="card">
+                <h3>Market Data Analysis</h3>
+                <div class="form-group">
+                    <label for="symbol">Stock Symbol:</label>
+                    <input type="text" id="symbol" placeholder="e.g., AAPL">
+                </div>
+                <div class="form-group">
+                    <label for="timeframe">Timeframe:</label>
+                    <select id="timeframe">
+                        <option value="1D">1 Day</option>
+                        <option value="1W">1 Week</option>
+                        <option value="1M">1 Month</option>
+                        <option value="3M">3 Months</option>
+                        <option value="1Y">1 Year</option>
+                    </select>
+                </div>
+                <button id="analyze-market">Analyze Market Data</button>
+                <div class="loading" id="market-loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing market data...</p>
+                </div>
+                <div class="chart-container" id="market-chart"></div>
+            </div>
+        </section>
+
+        <section id="astrological-insights">
+            <h2 class="section-title">Astrological Insights</h2>
+            <div class="card">
+                <h3>Astrological Analysis</h3>
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date">
+                </div>
+                <button id="generate-insights">Generate Astrological Insights</button>
+                <div class="loading" id="insights-loading">
+                    <div class="spinner"></div>
+                    <p>Generating astrological insights...</p>
+                </div>
+                <div id="insights-results" class="card" style="display: none; margin-top: 20px;"></div>
+            </div>
+        </section>
+
+        <section id="trend-analysis">
+            <h2 class="section-title">Trend Analysis</h2>
+            <div class="card">
+                <h3>Market Trend Analysis</h3>
+                <div class="form-group">
+                    <label for="trend-symbol">Stock Symbol:</label>
+                    <input type="text" id="trend-symbol" placeholder="e.g., AAPL">
+                </div>
+                <div class="form-group">
+                    <label for="trend-timeframe">Timeframe:</label>
+                    <select id="trend-timeframe">
+                        <option value="1M">1 Month</option>
+                        <option value="3M">3 Months</option>
+                        <option value="6M">6 Months</option>
+                        <option value="1Y">1 Year</option>
+                    </select>
+                </div>
+                <button id="analyze-trends">Analyze Trends</button>
+                <div class="loading" id="trend-loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing trends...</p>
+                </div>
+                <div class="chart-container" id="trend-chart"></div>
+            </div>
+        </section>
+
+        <section id="astrological-charts">
+            <h2 class="section-title">Astrological Charts</h2>
+            <div class="card">
+                <h3>Generate Astrological Chart</h3>
+                <div class="form-group">
+                    <label for="chart-date">Date:</label>
+                    <input type="date" id="chart-date">
+                </div>
+                <div class="form-group">
+                    <label for="chart-time">Time:</label>
+                    <input type="time" id="chart-time">
+                </div>
+                <div class="form-group">
+                    <label for="chart-location">Location:</label>
+                    <input type="text" id="chart-location" placeholder="e.g., New York, USA">
+                </div>
+                <button id="generate-chart">Generate Chart</button>
+                <div class="loading" id="chart-loading">
+                    <div class="spinner"></div>
+                    <p>Generating astrological chart...</p>
+                </div>
+                <div class="chart-container" id="astrological-chart"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Astro Market Analyzer. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Market Data Analysis
+            const marketForm = document.getElementById('analyze-market');
+            marketForm.addEventListener('click', async function() {
+                const symbol = document.getElementById('symbol').value;
+                const timeframe = document.getElementById('timeframe').value;
+
+                if (!symbol) {
+                    alert('Please enter a stock symbol');
+                    return;
+                }
+
+                const loading = document.getElementById('market-loading');
+                loading.style.display = 'block';
+
+                // Simulate API call to RapidAPI
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Generate mock data
+                const dates = [];
+                const prices = [];
+                const now = new Date();
+
+                for (let i = 0; i < 30; i++) {
+                    const date = new Date(now);
+                    date.setDate(now.getDate() - i);
+                    dates.unshift(date.toISOString().split('T')[0]);
+
+                    // Generate random price data
+                    prices.unshift(Math.random() * 100 + 100);
+                }
+
+                // Create chart
+                const chartData = [{
+                    x: dates,
+                    y: prices,
+                    type: 'line',
+                    name: symbol
+                }];
+
+                const layout = {
+                    title: `${symbol} Stock Price (${timeframe})`,
+                    xaxis: { title: 'Date' },
+                    yaxis: { title: 'Price (USD)' }
+                };
+
+                Plotly.newPlot('market-chart', chartData, layout);
+
+                loading.style.display = 'none';
+            });
+
+            // Astrological Insights
+            const insightsForm = document.getElementById('generate-insights');
+            insightsForm.addEventListener('click', async function() {
+                const date = document.getElementById('date').value;
+
+                if (!date) {
+                    alert('Please select a date');
+                    return;
+                }
+
+                const loading = document.getElementById('insights-loading');
+                loading.style.display = 'block';
+
+                // Simulate API call to RapidAPI
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Generate mock astrological insights
+                const insights = `
+                    <h4>Astrological Insights for ${date}</h4>
+                    <p><strong>Sun in Aries:</strong> This is a day of initiative and energy. New projects may begin, and you may feel motivated to take action.</p>
+                    <p><strong>Moon in Libra:</strong> Relationships and social interactions are important today. You may feel a need for balance and harmony in your personal life.</p>
+                    <p><strong>Mercury in Gemini:</strong> Communication is key today. You may receive or send important messages, and it's a good day for learning new things.</p>
+                    <p><strong>Overall:</strong> Today is a day of action and communication. Take initiative in your projects and focus on maintaining balance in your relationships.</p>
+                `;
+
+                const results = document.getElementById('insights-results');
+                results.innerHTML = insights;
+                results.style.display = 'block';
+
+                loading.style.display = 'none';
+            });
+
+            // Trend Analysis
+            const trendForm = document.getElementById('analyze-trends');
+            trendForm.addEventListener('click', async function() {
+                const symbol = document.getElementById('trend-symbol').value;
+                const timeframe = document.getElementById('trend-timeframe').value;
+
+                if (!symbol) {
+                    alert('Please enter a stock symbol');
+                    return;
+                }
+
+                const loading = document.getElementById('trend-loading');
+                loading.style.display = 'block';
+
+                // Simulate API call to RapidAPI
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Generate mock trend data
+                const dates = [];
+                const prices = [];
+                const now = new Date();
+
+                for (let i = 0; i < parseInt(timeframe); i++) {
+                    const date = new Date(now);
+                    date.setMonth(now.getMonth() - i);
+                    dates.unshift(date.toISOString().split('T')[0]);
+
+                    // Generate random price data
+                    prices.unshift(Math.random() * 100 + 100);
+                }
+
+                // Create trend chart
+                const trendData = [{
+                    x: dates,
+                    y: prices,
+                    type: 'line',
+                    name: symbol
+                }];
+
+                const trendLayout = {
+                    title: `${symbol} Stock Price Trend (${timeframe})`,
+                    xaxis: { title: 'Date' },
+                    yaxis: { title: 'Price (USD)' }
+                };
+
+                Plotly.newPlot('trend-chart', trendData, trendLayout);
+
+                loading.style.display = 'none';
+            });
+
+            // Astrological Chart Generation
+            const chartForm = document.getElementById('generate-chart');
+            chartForm.addEventListener('click', async function() {
+                const date = document.getElementById('chart-date').value;
+                const time = document.getElementById('chart-time').value;
+                const location = document.getElementById('chart-location').value;
+
+                if (!date || !time || !location) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                const loading = document.getElementById('chart-loading');
+                loading.style.display = 'block';
+
+                // Simulate API call to RapidAPI
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Generate mock astrological chart
+                const chart = `
+                    <div style="text-align: center;">
+                        <h4>Astrological Chart for ${date} ${time} at ${location}</h4>
+                        <img src="https://via.placeholder.com/500x500?text=Astrological+Chart" alt="Astrological Chart" style="max-width: 100%; height: auto; border-radius: var(--border-radius);">
+                        <p style="margin-top: 20px;">This is a simulated astrological chart. In a real application, this would be generated using astrological software or API.</p>
+                    </div>
+                `;
+
+                const chartContainer = document.getElementById('astrological-chart');
+                chartContainer.innerHTML = chart;
+
+                loading.style.display = 'none';
+            });
+        });
+    </script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</body>
+</html>

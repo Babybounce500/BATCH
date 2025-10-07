@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini AI Music Producer's Studio - Create and produce music with AI assistance">
+    <title>Gemini AI Music Producer's Studio</title>
+    <style>
+        :root {
+            --primary-color: #6e48aa;
+            --secondary-color: #9d50bb;
+            --accent-color: #ff6584;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --light-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        select, input, textarea {
+            padding: 0.5rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            font-family: var(--font-main);
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #ff8a9d;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .track-list {
+            margin-top: 1rem;
+        }
+
+        .track-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .track-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .track-icon {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .track-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .visualizer {
+            height: 200px;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+
+        .status-bar {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+        }
+
+        .dark-mode {
+            --primary-color: #9d50bb;
+            --secondary-color: #6e48aa;
+            --background-color: #343a40;
+            --text-color: #f8f9fa;
+            --light-gray: #495057;
+            --dark-gray: #adb5bd;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Gemini Music Studio</div>
+                <ul class="nav-links">
+                    <li><a href="#composition">Composition</a></li>
+                    <li><a href="#sound-effects">Sound Effects</a></li>
+                    <li><a href="#tracks">Tracks</a></li>
+                    <li><a href="#settings">Settings</a></li>
+                </ul>
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="composition">
+            <h2>AI Music Composition</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="genre">Genre</label>
+                    <select id="genre">
+                        <option value="pop">Pop</option>
+                        <option value="rock">Rock</option>
+                        <option value="jazz">Jazz</option>
+                        <option value="electronic">Electronic</option>
+                        <option value="classical">Classical</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="tempo">Tempo (BPM)</label>
+                    <input type="number" id="tempo" min="60" max="200" value="120">
+                </div>
+                <div class="control-group">
+                    <label for="key">Key</label>
+                    <select id="key">
+                        <option value="C">C Major</option>
+                        <option value="G">G Major</option>
+                        <option value="D">D Major</option>
+                        <option value="A">A Major</option>
+                        <option value="E">E Major</option>
+                        <option value="B">B Major</option>
+                        <option value="F#">F# Major</option>
+                        <option value="C#">C# Major</option>
+                        <option value="F">F Major</option>
+                        <option value="Bb">Bb Major</option>
+                        <option value="Eb">Eb Major</option>
+                        <option value="Ab">Ab Major</option>
+                        <option value="Db">Db Major</option>
+                        <option value="Gb">Gb Major</option>
+                        <option value="Cb">Cb Major</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="duration">Duration (seconds)</label>
+                    <input type="number" id="duration" min="10" max="300" value="60">
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="prompt">Composition Prompt</label>
+                <textarea id="prompt" rows="3" placeholder="Describe the mood or style you want for your composition..."></textarea>
+            </div>
+            <button id="generateComposition" class="btn-primary">Generate Composition</button>
+            <div class="visualizer" id="compositionVisualizer"></div>
+            <div class="status-bar" id="compositionStatus">Ready to generate music</div>
+        </section>
+
+        <section id="sound-effects">
+            <h2>AI Sound Effects</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="effectType">Effect Type</label>
+                    <select id="effectType">
+                        <option value="ambient">Ambient</option>
+                        <option value="impact">Impact</option>
+                        <option value="loop">Loop</option>
+                        <option value="transition">Transition</option>
+                        <option value="voice">Voice</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="effectDuration">Duration (seconds)</label>
+                    <input type="number" id="effectDuration" min="1" max="30" value="5">
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="effectPrompt">Sound Effect Prompt</label>
+                <textarea id="effectPrompt" rows="3" placeholder="Describe the sound effect you want..."></textarea>
+            </div>
+            <button id="generateEffect" class="btn-primary">Generate Sound Effect</button>
+            <div class="visualizer" id="effectVisualizer"></div>
+            <div class="status-bar" id="effectStatus">Ready to generate sound effects</div>
+        </section>
+
+        <section id="tracks">
+            <h2>Your Tracks</h2>
+            <div class="track-list" id="trackList">
+                <!-- Tracks will be added here dynamically -->
+            </div>
+            <div class="controls">
+                <button id="exportProject" class="btn-secondary">Export Project</button>
+                <button id="clearTracks" class="btn-danger">Clear All Tracks</button>
+            </div>
+        </section>
+
+        <section id="settings">
+            <h2>Settings</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="outputFormat">Output Format</label>
+                    <select id="outputFormat">
+                        <option value="mp3">MP3</option>
+                        <option value="wav">WAV</option>
+                        <option value="ogg">OGG</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="bitrate">Bitrate (kbps)</label>
+                    <select id="bitrate">
+                        <option value="128">128 kbps</option>
+                        <option value="192">192 kbps</option>
+                        <option value="256">256 kbps</option>
+                        <option value="320">320 kbps</option>
+                    </select>
+                </div>
+            </div>
+            <button id="saveSettings" class="btn-success">Save Settings</button>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            });
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Mock AI generation functions
+            const generateComposition = document.getElementById('generateComposition');
+            const compositionStatus = document.getElementById('compositionStatus');
+            const compositionVisualizer = document.getElementById('compositionVisualizer');
+
+            generateComposition.addEventListener('click', async function() {
+                const genre = document.getElementById('genre').value;
+                const tempo = document.getElementById('tempo').value;
+                const key = document.getElementById('key').value;
+                const duration = document.getElementById('duration').value;
+                const prompt = document.getElementById('prompt').value;
+
+                compositionStatus.textContent = 'Generating composition...';
+                generateComposition.disabled = true;
+                generateComposition.innerHTML = 'Generating <span class="loading"></span>';
+
+                // Simulate AI generation process
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                // Create visualizer animation
+                createVisualizer(compositionVisualizer);
+
+                // Add track to list
+                addTrackToList('Composition', `${genre} - ${key} - ${tempo} BPM`, duration);
+
+                compositionStatus.textContent = 'Composition generated successfully!';
+                generateComposition.disabled = false;
+                generateComposition.textContent = 'Generate Composition';
+            });
+
+            const generateEffect = document.getElementById('generateEffect');
+            const effectStatus = document.getElementById('effectStatus');
+            const effectVisualizer = document.getElementById('effectVisualizer');
+
+            generateEffect.addEventListener('click', async function() {
+                const effectType = document.getElementById('effectType').value;
+                const effectDuration = document.getElementById('effectDuration').value;
+                const effectPrompt = document.getElementById('effectPrompt').value;
+
+                effectStatus.textContent = 'Generating sound effect...';
+                generateEffect.disabled = true;
+                generateEffect.innerHTML = 'Generating <span class="loading"></span>';
+
+                // Simulate AI generation process
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Create visualizer animation
+                createVisualizer(effectVisualizer);
+
+                // Add track to list
+                addTrackToList('Sound Effect', effectType, effectDuration);
+
+                effectStatus.textContent = 'Sound effect generated successfully!';
+                generateEffect.disabled = false;
+                generateEffect.textContent = 'Generate Sound Effect';
+            });
+
+            // Track list functionality
+            const trackList = document.getElementById('trackList');
+            const exportProject = document.getElementById('exportProject');
+            const clearTracks = document.getElementById('clearTracks');
+
+            function addTrackToList(type, details, duration) {
+                const trackItem = document.createElement('div');
+                trackItem.className = 'track-item';
+
+                trackItem.innerHTML = `
+                    <div class="track-info">
+                        <span class="track-icon">🎵</span>
+                        <div>
+                            <div>${type}</div>
+                            <div>${details} - ${duration} seconds</div>
+                        </div>
+                    </div>
+                    <div class="track-actions">
+                        <button class="btn-small play-track">▶️</button>
+                        <button class="btn-small delete-track">🗑️</button>
+                    </div>
+                `;
+
+                trackList.appendChild(trackItem);
+
+                // Add event listeners to the new buttons
+                trackItem.querySelector('.play-track').addEventListener('click', function() {
+                    alert(`Playing ${type}: ${details}`);
+                });
+
+                trackItem.querySelector('.delete-track').addEventListener('click', function() {
+                    trackItem.remove();
+                });
+            }
+
+            exportProject.addEventListener('click', function() {
+                const format = document.getElementById('outputFormat').value;
+                const bitrate = document.getElementById('bitrate').value;
+                alert(`Exporting project as ${format} at ${bitrate} kbps`);
+            });
+
+            clearTracks.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all tracks?')) {
+                    trackList.innerHTML = '';
+                }
+            });
+
+            // Settings functionality
+            const saveSettings = document.getElementById('saveSettings');
+            saveSettings.addEventListener('click', function() {
+                const format = document.getElementById('outputFormat').value;
+                const bitrate = document.getElementById('bitrate').value;
+                alert(`Settings saved: ${format} format, ${bitrate} kbps bitrate`);
+            });
+
+            // Helper function to create visualizer animation
+            function createVisualizer(container) {
+                container.innerHTML = '';
+                const canvas = document.createElement('canvas');
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                container.appendChild(canvas);
+
+                const ctx = canvas.getContext('2d');
+                let animationId;
+
+                function draw() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw random bars for visual effect
+                    for (let i = 0; i < 20; i++) {
+                        const x = i * (canvas.width / 20);
+                        const height = Math.random() * canvas.height;
+                        const hue = Math.floor(Math.random() * 360);
+                        ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+                        ctx.fillRect(x, canvas.height - height, canvas.width / 20 - 2, height);
+                    }
+
+                    animationId = requestAnimationFrame(draw);
+                }
+
+                draw();
+
+                // Stop animation after 5 seconds
+                setTimeout(() => {
+                    cancelAnimationFrame(animationId);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

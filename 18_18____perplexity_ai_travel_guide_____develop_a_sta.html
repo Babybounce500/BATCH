@@ -1,0 +1,225 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perplexity AI Travel Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Perplexity AI Travel Guide</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="#search" class="text-blue-500 hover:underline">Search</a></li>
+                    <li><a href="#recommendations" class="text-blue-500 hover:underline">Recommendations</a></li>
+                    <li><a href="#itinerary" class="text-blue-500 hover:underline">Itinerary</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section id="search" class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Search Travel Information</h2>
+            <div class="flex space-x-4">
+                <input type="text" id="searchInput" placeholder="Enter destination or interest" class="flex-1 p-2 border rounded">
+                <button id="searchButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Search</button>
+            </div>
+            <div id="searchResults" class="mt-4"></div>
+        </section>
+
+        <section id="recommendations" class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Travel Recommendations</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="font-semibold mb-2">Top Destinations</h3>
+                    <canvas id="destinationsChart"></canvas>
+                </div>
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="font-semibold mb-2">Popular Activities</h3>
+                    <canvas id="activitiesChart"></canvas>
+                </div>
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="font-semibold mb-2">Travel Tips</h3>
+                    <div id="travelTips"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="itinerary" class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Create Your Itinerary</h2>
+            <div class="bg-white p-4 rounded shadow">
+                <div class="flex space-x-4 mb-4">
+                    <input type="text" id="itineraryInput" placeholder="Add activity or destination" class="flex-1 p-2 border rounded">
+                    <button id="addToItinerary" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Add</button>
+                </div>
+                <div id="itineraryList"></div>
+                <button id="optimizeRoute" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Optimize Route</button>
+                <div id="optimizedRoute" class="mt-4"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts
+            const destinationsCtx = document.getElementById('destinationsChart').getContext('2d');
+            const activitiesCtx = document.getElementById('activitiesChart').getContext('2d');
+
+            const destinationsChart = new Chart(destinationsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Paris', 'Tokyo', 'New York', 'Rome', 'Sydney'],
+                    datasets: [{
+                        label: 'Popularity',
+                        data: [85, 78, 92, 70, 88],
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            const activitiesChart = new Chart(activitiesCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Sightseeing', 'Food', 'Adventure', 'Shopping', 'Relaxation'],
+                    datasets: [{
+                        data: [35, 25, 15, 15, 10],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.5)',
+                            'rgba(16, 185, 129, 0.5)',
+                            'rgba(245, 158, 11, 0.5)',
+                            'rgba(139, 92, 246, 0.5)',
+                            'rgba(239, 68, 68, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(139, 92, 246, 1)',
+                            'rgba(239, 68, 68, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+
+            // Mock travel tips
+            const travelTips = [
+                "Always carry a universal adapter for your electronics.",
+                "Learn basic phrases in the local language to show respect.",
+                "Pack light and consider using a travel backpack for convenience.",
+                "Check travel advisories before your trip.",
+                "Keep important documents in a digital wallet for easy access."
+            ];
+
+            const travelTipsContainer = document.getElementById('travelTips');
+            travelTips.forEach(tip => {
+                const tipElement = document.createElement('p');
+                tipElement.className = 'mb-2';
+                tipElement.textContent = tip;
+                travelTipsContainer.appendChild(tipElement);
+            });
+
+            // Search functionality
+            const searchButton = document.getElementById('searchButton');
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+
+            searchButton.addEventListener('click', function() {
+                const query = searchInput.value.trim();
+                if (query) {
+                    // Mock search results
+                    const results = [
+                        { title: `Travel Guide to ${query}`, description: `Comprehensive guide to ${query} including top attractions, cultural insights, and travel tips.` },
+                        { title: `Best Time to Visit ${query}`, description: `Information on the optimal time to visit ${query} for pleasant weather and fewer crowds.` },
+                        { title: `${query} Itinerary`, description: `Sample itinerary for ${query} covering must-see attractions and hidden gems.` }
+                    ];
+
+                    searchResults.innerHTML = '';
+                    results.forEach(result => {
+                        const resultElement = document.createElement('div');
+                        resultElement.className = 'mb-4 p-4 bg-white rounded shadow';
+                        resultElement.innerHTML = `
+                            <h3 class="font-semibold">${result.title}</h3>
+                            <p>${result.description}</p>
+                        `;
+                        searchResults.appendChild(resultElement);
+                    });
+                }
+            });
+
+            // Itinerary functionality
+            const itineraryInput = document.getElementById('itineraryInput');
+            const addToItinerary = document.getElementById('addToItinerary');
+            const itineraryList = document.getElementById('itineraryList');
+            const optimizeRoute = document.getElementById('optimizeRoute');
+            const optimizedRoute = document.getElementById('optimizedRoute');
+
+            let itineraryItems = [];
+
+            addToItinerary.addEventListener('click', function() {
+                const item = itineraryInput.value.trim();
+                if (item) {
+                    itineraryItems.push(item);
+                    updateItineraryList();
+                    itineraryInput.value = '';
+                }
+            });
+
+            function updateItineraryList() {
+                itineraryList.innerHTML = '';
+                itineraryItems.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'flex justify-between items-center mb-2 p-2 bg-gray-100 rounded';
+                    itemElement.innerHTML = `
+                        <span>${item}</span>
+                        <button class="removeItem text-red-500 hover:text-red-700" data-index="${index}">Remove</button>
+                    `;
+                    itineraryList.appendChild(itemElement);
+                });
+
+                document.querySelectorAll('.removeItem').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        itineraryItems.splice(index, 1);
+                        updateItineraryList();
+                    });
+                });
+            }
+
+            optimizeRoute.addEventListener('click', function() {
+                if (itineraryItems.length > 0) {
+                    // Mock route optimization
+                    const optimizedItems = [...itineraryItems].sort(() => Math.random() - 0.5);
+
+                    optimizedRoute.innerHTML = '<h3 class="font-semibold mb-2">Optimized Route</h3>';
+                    optimizedItems.forEach((item, index) => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'mb-2 p-2 bg-gray-100 rounded';
+                        itemElement.innerHTML = `
+                            <span class="font-semibold">Day ${index + 1}:</span> ${item}
+                        `;
+                        optimizedRoute.appendChild(itemElement);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+```

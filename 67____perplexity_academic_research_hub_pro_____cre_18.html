@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perplexity Academic Research Hub Pro</title>
+    <meta name="description" content="Advanced academic research assistance with Perplexity's search API">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --background-color: #f8f9fa;
+            --text-color: #333333;
+            --light-text: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1rem 0;
+            box-shadow: var(--box-shadow);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--light-text);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            padding: 0 1.5rem;
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            border: none;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-button:hover {
+            background-color: #3367d6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            color: #666;
+        }
+
+        .tools-section {
+            margin-bottom: 3rem;
+        }
+
+        .tools-section h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tool-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .tool-card h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .tool-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .results-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-header h2 {
+            font-size: 1.8rem;
+        }
+
+        .results-header button {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .results-header button:hover {
+            background-color: #3367d6;
+        }
+
+        .results-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-right: 1rem;
+            border-bottom: 2px solid transparent;
+        }
+
+        .results-tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .results-content {
+            display: none;
+        }
+
+        .results-content.active {
+            display: block;
+        }
+
+        .result-item {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .result-title a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .result-title a:hover {
+            text-decoration: underline;
+        }
+
+        .result-snippet {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-meta {
+            display: flex;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .result-meta span {
+            margin-right: 1rem;
+        }
+
+        .citation-tools {
+            display: flex;
+            margin-top: 1rem;
+        }
+
+        .citation-btn {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+
+        .citation-btn:hover {
+            background-color: #2d8a43;
+        }
+
+        .loading-spinner {
+            display: none;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        footer {
+            background-color: #333;
+            color: var(--light-text);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-column h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-column ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-column ul li a:hover {
+            color: var(--light-text);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #444;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="container">
+                <nav>
+                    <div class="logo">Perplexity Research Hub Pro</div>
+                    <ul class="nav-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#tools">Tools</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section id="home" class="hero">
+                <div class="container">
+                    <h1>Advanced Academic Research Assistance</h1>
+                    <p>Leverage Perplexity's powerful search API to enhance your research with citation generation, literature reviews, research methodology support, and publication assistance tools.</p>
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Enter your research topic..." v-model="searchQuery" @keyup.enter="search">
+                        <button class="search-button" @click="search">Search</button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="loading-spinner" v-if="isLoading"></div>
+
+            <section id="results" class="results-section" v-if="showResults">
+                <div class="container">
+                    <div class="results-container">
+                        <div class="results-header">
+                            <h2>Search Results</h2>
+                            <button @click="clearResults">New Search</button>
+                        </div>
+                        <div class="results-tabs">
+                            <div class="results-tab" :class="{ active: activeTab === 'all' }" @click="setActiveTab('all')">All Results</div>
+                            <div class="results-tab" :class="{ active: activeTab === 'citations' }" @click="setActiveTab('citations')">Citations</div>
+                            <div class="results-tab" :class="{ active: activeTab === 'literature' }" @click="setActiveTab('literature')">Literature Review</div>
+                            <div class="results-tab" :class="{ active: activeTab === 'methodology' }" @click="setActiveTab('methodology')">Research Methodology</div>
+                            <div class="results-tab" :class="{ active: activeTab === 'publication' }" @click="setActiveTab('publication')">Publication Support</div>
+                        </div>
+
+                        <div class="results-content" :class="{ active: activeTab === 'all' }">
+                            <div v-for="(result, index) in searchResults" :key="index" class="result-item">
+                                <h3 class="result-title"><a :href="result.link" target="_blank">{{ result.title }}</a></h3>
+                                <p class="result-snippet">{{ result.snippet }}</p>
+                                <div class="result-meta">
+                                    <span>{{ result.displayLink }}</span>
+                                    <span>{{ formatDate(result.date) }}</span>
+                                </div>
+                                <div class="citation-tools">
+                                    <button class="citation-btn" @click="generateCitation(result)">APA</button>
+                                    <button class="citation-btn" @click="generateCitation(result)">MLA</button>
+                                    <button class="citation-btn" @click="generateCitation(result)">Chicago</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="results-content" :class="{ active: activeTab === 'citations' }">
+                            <h3>Generated Citations</h3>
+                            <div v-if="generatedCitations.length > 0">
+                                <div v-for="(citation, index) in generatedCitations" :key="'citation-' + index" class="citation-item">
+                                    <p>{{ citation }}</p>
+                                </div>
+                            </div>
+                            <p v-else>No citations generated yet. Use the citation buttons on search results.</p>
+                        </div>
+
+                        <div class="results-content" :class="{ active: activeTab === 'literature' }">
+                            <h3>Literature Review</h3>
+                            <p v-if="literatureReview">Your literature review content will be displayed here.</p>
+                            <p v-else>No literature review generated yet. Our AI will analyze your search results to create a comprehensive literature review.</p>
+                        </div>
+
+                        <div class="results-content" :class="{ active: activeTab === 'methodology' }">
+                            <h3>Research Methodology</h3>
+                            <p v-if="researchMethodology">Your research methodology suggestions will be displayed here.</p>
+                            <p v-else>No methodology suggestions generated yet. Our AI will analyze your search results to provide appropriate research methodology advice.</p>
+                        </div>
+
+                        <div class="results-content" :class="{ active: activeTab === 'publication' }">
+                            <h3>Publication Support</h3>
+                            <p v-if="publicationSupport">Your publication support tools will be displayed here.</p>
+                            <p v-else>No publication support tools available yet. Our AI will analyze your search results to provide publication assistance.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="features" class="features">
+                <div class="container">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3>Advanced Search</h3>
+                        <p>Utilize Perplexity's powerful search API to find the most relevant academic sources for your research.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📄</div>
+                        <h3>Citation Generation</h3>
+                        <p>Generate citations in APA, MLA, and Chicago styles with just one click.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📚</div>
+                        <h3>Literature Review</h3>
+                        <p>Get comprehensive literature reviews based on your search results.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Research Methodology</h3>
+                        <p>Receive tailored research methodology advice based on your topic.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📝</div>
+                        <h3>Publication Support</h3>
+                        <p>Access tools to help you prepare and publish your research findings.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tools" class="tools-section">
+                <div class="container">
+                    <h2>Research Tools</h2>
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <div class="tool-icon">📊</div>
+                            <h3>Data Analysis</h3>
+                            <p>Advanced tools for analyzing your research data.</p>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-icon">📈</div>
+                            <h3>Visualization</h3>
+                            <p>Create professional visualizations for your research.</p>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-icon">📝</div>
+                            <h3>Writing Assistant</h3>
+                            <p>Get help with writing and editing your research papers.</p>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-icon">🔗</div>
+                            <h3>Reference Manager</h3>
+                            <p>Organize and manage your references efficiently.</p>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-icon">📅</div>
+                            <h3>Project Planner</h3>
+                            <p>Plan and track your research project timeline.</p>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-icon">💡</div>
+                            <h3>Idea Generator</h3>
+                            <p>Get inspiration for new research ideas and topics.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-column">
+                        <h3>About Us</h3>
+                        <p>Perplexity Research Hub Pro is dedicated to providing advanced tools for academic research and publication support.</p>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Quick Links</h3>
+                        <ul>
+                            <li><a href="#home">Home</a></li>
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#tools">Tools</a></li>
+                            <li><a href="#about">About</a></li>
+                            <li><a href="#contact">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Legal</h3>
+                        <ul>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Cookie Policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Contact Us</h3>
+                        <p>Email: info@perplexityresearch.com</p>
+                        <p>Phone: (123) 456-7890</p>
+                        <p>Address: 123 Research Street, Academic City, 12345</p>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <p>&copy; 2023 Perplexity Research Hub Pro. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const searchQuery = ref('');
+                const searchResults = ref([]);
+                const showResults = ref(false);
+                const isLoading = ref(false);
+                const activeTab = ref('all');
+                const generatedCitations = ref([]);
+                const literatureReview = ref('');
+                const researchMethodology = ref('');
+                const publicationSupport = ref('');
+
+                const search = async () => {
+                    if (!searchQuery.value.trim()) return;
+
+                    isLoading.value = true;
+                    showResults.value = false;
+
+                    // Simulate API call to Perplexity search
+                    try {
+                        // In a real application, you would call the Perplexity API here
+                        // For demonstration, we'll use mock data
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+
+                        searchResults.value = generateMockResults(searchQuery.value);
+                        showResults.value = true;
+                        activeTab.value = 'all';
+                    } catch (error) {
+                        console.error('Error fetching search results:', error);
+                    } finally {
+                        isLoading.value = false;
+                    }
+                };
+
+                const generateMockResults = (query) => {
+                    // Generate mock search results based on the query
+                    return Array.from({ length: 10 }, (_, i) => ({
+                        title: `Research on ${query} - Result ${i + 1}`,
+                        snippet: `This is a mock search result about ${query}. In a real application, this would contain actual content from academic sources.`,
+                        link: `https://example.com/research-${i + 1}`,
+                        displayLink: `example.com/research-${i + 1}`,
+                        date: new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)).toISOString()
+                    }));
+                };
+
+                const formatDate = (dateString) => {
+                    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                    return new Date(dateString).toLocaleDateString(undefined, options);
+                };
+
+                const setActiveTab = (tab) => {
+                    activeTab.value = tab;
+                };
+
+                const generateCitation = (result) => {
+                    // In a real application, this would generate a proper citation
+                    // For demonstration, we'll create a simple mock citation
+                    const citation = `${result.title}. Retrieved from ${result.link}`;
+                    generatedCitations.value.push(citation);
+
+                    // Switch to citations tab
+                    activeTab.value = 'citations';
+                };
+
+                const clearResults = () => {
+                    searchQuery.value = '';
+                    searchResults.value = [];
+                    showResults.value = false;
+                    generatedCitations.value = [];
+                    literatureReview.value = '';
+                    researchMethodology.value = '';
+                    publicationSupport.value = '';
+                };
+
+                onMounted(() => {
+                    // Initialize any necessary components or event listeners
+                });
+
+                return {
+                    searchQuery,
+                    searchResults,
+                    showResults,
+                    isLoading,
+                    activeTab,
+                    generatedCitations,
+                    literatureReview,
+                    researchMethodology,
+                    publicationSupport,
+                    search,
+                    formatDate,
+                    setActiveTab,
+                    generateCitation,
+                    clearResults
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

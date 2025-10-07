@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Perplexity Research Paper Assistant Pro - Professional research paper writing and editing tool">
+    <title>Perplexity Research Paper Assistant Pro</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --dark-gray: #666;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 2rem;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            padding: 8rem 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .sidebar-section ul {
+            list-style: none;
+        }
+
+        .sidebar-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-section ul li a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            transition: var(--transition);
+        }
+
+        .sidebar-section ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        .main-content {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+        }
+
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            height: 70vh;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .editor-header h1 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .editor-toolbar {
+            display: flex;
+            background-color: var(--light-gray);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+
+        .editor-toolbar button {
+            background: none;
+            border: none;
+            margin: 0 0.25rem;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .editor-toolbar button:hover {
+            background-color: var(--white);
+        }
+
+        .editor-textarea {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            resize: none;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .search-container {
+            margin-top: 2rem;
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .search-header h2 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .search-form {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .search-button {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-button:hover {
+            background-color: #3367d6;
+        }
+
+        .search-results {
+            background-color: var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+        }
+
+        .search-result {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .search-result h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .search-result p {
+            margin-bottom: 0.5rem;
+        }
+
+        .search-result .source {
+            font-style: italic;
+            color: var(--dark-gray);
+        }
+
+        .search-result .actions {
+            display: flex;
+            margin-top: 1rem;
+        }
+
+        .search-result .actions button {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            margin-right: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .search-result .actions button:hover {
+            background-color: #2d8a46;
+        }
+
+        .search-result .actions button.cite {
+            background-color: var(--accent-color);
+        }
+
+        .search-result .actions button.cite:hover {
+            background-color: #c23a2e;
+        }
+
+        footer {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content p {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin: 0 1rem;
+        }
+
+        .footer-links li a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            transition: var(--transition);
+        }
+
+        .footer-links li a:hover {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-input {
+                border-radius: var(--border-radius);
+                margin-bottom: 0.5rem;
+            }
+
+            .search-button {
+                border-radius: var(--border-radius);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">Perplexity Research Paper Assistant Pro</div>
+            <nav>
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Search</a></li>
+                    <li><a href="#">Citations</a></li>
+                    <li><a href="#">Publication</a></li>
+                    <li><a href="#">Account</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h2>Document</h2>
+                    <ul>
+                        <li><a href="#">New Document</a></li>
+                        <li><a href="#">Open Document</a></li>
+                        <li><a href="#">Save Document</a></li>
+                        <li><a href="#">Export Document</a></li>
+                    </ul>
+                </div>
+                <div class="sidebar-section">
+                    <h2>Research Tools</h2>
+                    <ul>
+                        <li><a href="#">Literature Review</a></li>
+                        <li><a href="#">Research Methodology</a></li>
+                        <li><a href="#">Data Analysis</a></li>
+                        <li><a href="#">Visualization</a></li>
+                    </ul>
+                </div>
+                <div class="sidebar-section">
+                    <h2>Publication</h2>
+                    <ul>
+                        <li><a href="#">Journal Submission</a></li>
+                        <li><a href="#">Conference Submission</a></li>
+                        <li><a href="#">Open Access</a></li>
+                        <li><a href="#">Peer Review</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <div class="main-content">
+                <div class="editor-container">
+                    <div class="editor-header">
+                        <h1>Research Paper Title</h1>
+                        <div class="editor-actions">
+                            <button id="save-btn">Save</button>
+                            <button id="export-btn">Export</button>
+                        </div>
+                    </div>
+                    <div class="editor-toolbar">
+                        <button id="bold-btn"><strong>B</strong></button>
+                        <button id="italic-btn"><em>I</em></button>
+                        <button id="underline-btn"><u>U</u></button>
+                        <button id="heading-btn">H1</button>
+                        <button id="bullet-btn">•</button>
+                        <button id="number-btn">1.</button>
+                        <button id="link-btn">Link</button>
+                        <button id="image-btn">Image</button>
+                    </div>
+                    <textarea class="editor-textarea" id="paper-editor" placeholder="Start writing your research paper here..."></textarea>
+                </div>
+
+                <div class="search-container">
+                    <div class="search-header">
+                        <h2>Search for Sources</h2>
+                        <button id="advanced-search-btn">Advanced Search</button>
+                    </div>
+                    <div class="search-form">
+                        <input type="text" class="search-input" id="search-input" placeholder="Search for research papers, articles, and more...">
+                        <button class="search-button" id="search-btn">Search</button>
+                    </div>
+                    <div class="search-results" id="search-results">
+                        <!-- Search results will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2023 Perplexity Research Paper Assistant Pro. All rights reserved.</p>
+            <ul class="footer-links">
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Editor functionality
+            const editor = document.getElementById('paper-editor');
+            const boldBtn = document.getElementById('bold-btn');
+            const italicBtn = document.getElementById('italic-btn');
+            const underlineBtn = document.getElementById('underline-btn');
+            const headingBtn = document.getElementById('heading-btn');
+            const bulletBtn = document.getElementById('bullet-btn');
+            const numberBtn = document.getElementById('number-btn');
+            const linkBtn = document.getElementById('link-btn');
+            const imageBtn = document.getElementById('image-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const exportBtn = document.getElementById('export-btn');
+
+            boldBtn.addEventListener('click', function() {
+                formatText('bold');
+            });
+
+            italicBtn.addEventListener('click', function() {
+                formatText('italic');
+            });
+
+            underlineBtn.addEventListener('click', function() {
+                formatText('underline');
+            });
+
+            headingBtn.addEventListener('click', function() {
+                formatText('heading');
+            });
+
+            bulletBtn.addEventListener('click', function() {
+                formatText('bullet');
+            });
+
+            numberBtn.addEventListener('click', function() {
+                formatText('number');
+            });
+
+            linkBtn.addEventListener('click', function() {
+                const url = prompt('Enter the URL:');
+                if (url) {
+                    formatText('link', url);
+                }
+            });
+
+            imageBtn.addEventListener('click', function() {
+                const url = prompt('Enter the image URL:');
+                if (url) {
+                    formatText('image', url);
+                }
+            });
+
+            saveBtn.addEventListener('click', function() {
+                alert('Document saved successfully!');
+            });
+
+            exportBtn.addEventListener('click', function() {
+                alert('Document exported successfully!');
+            });
+
+            function formatText(command, value = null) {
+                document.execCommand(command, false, value);
+                editor.focus();
+            }
+
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.getElementById('search-btn');
+            const searchResults = document.getElementById('search-results');
+
+            searchBtn.addEventListener('click', function() {
+                performSearch();
+            });
+
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            function performSearch() {
+                const query = searchInput.value.trim();
+                if (query) {
+                    // Simulate API call to Perplexity's search API
+                    simulateSearchAPI(query)
+                        .then(results => {
+                            displaySearchResults(results);
+                        })
+                        .catch(error => {
+                            console.error('Error performing search:', error);
+                        });
+                }
+            }
+
+            function simulateSearchAPI(query) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        // Simulated search results
+                        const results = [
+                            {
+                                title: 'The Impact of Artificial Intelligence on Modern Society',
+                                snippet: 'This paper explores the profound effects of AI on various aspects of modern society, including economy, healthcare, and education.',
+                                source: 'Journal of Technology and Society, 2023',
+                                url: 'https://example.com/ai-society'
+                            },
+                            {
+                                title: 'Machine Learning Approaches for Predictive Analytics',
+                                snippet: 'The paper discusses various machine learning techniques and their applications in predictive analytics across different industries.',
+                                source: 'International Journal of Data Science, 2023',
+                                url: 'https://example.com/ml-predictive'
+                            },
+                            {
+                                title: 'Ethical Considerations in AI Development',
+                                snippet: 'This research paper examines the ethical challenges and considerations in the development and deployment of artificial intelligence systems.',
+                                source: 'Ethics in AI Journal, 2023',
+                                url: 'https://example.com/ethics-ai'
+                            }
+                        ];
+                        resolve(results);
+                    }, 1000);
+                });
+            }
+
+            function displaySearchResults(results) {
+                searchResults.innerHTML = '';
+
+                if (results.length === 0) {
+                    searchResults.innerHTML = '<p>No results found.</p>';
+                    return;
+                }
+
+                results.forEach(result => {
+                    const resultElement = document.createElement('div');
+                    resultElement.className = 'search-result';
+
+                    resultElement.innerHTML = `
+                        <h3>${result.title}</h3>
+                        <p>${result.snippet}</p>
+                        <p class="source">${result.source}</p>
+                        <div class="actions">
+                            <button class="view-btn" data-url="${result.url}">View</button>
+                            <button class="cite-btn">Cite</button>
+                            <button class="add-btn">Add to Paper</button>
+                        </div>
+                    `;
+
+                    searchResults.appendChild(resultElement);
+                });
+
+                // Add event listeners to the new buttons
+                document.querySelectorAll('.view-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const url = this.getAttribute('data-url');
+                        window.open(url, '_blank');
+                    });
+                });
+
+                document.querySelectorAll('.cite-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const title = this.parentElement.parentElement.querySelector('h3').textContent;
+                        const source = this.parentElement.parentElement.querySelector('.source').textContent;
+                        const citation = generateCitation(title, source);
+                        insertCitation(citation);
+                    });
+                });
+
+                document.querySelectorAll('.add-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const title = this.parentElement.parentElement.querySelector('h3').textContent;
+                        const snippet = this.parentElement.parentElement.querySelector('p').textContent;
+                        const source = this.parentElement.parentElement.querySelector('.source').textContent;
+                        const content = `\n\n${title}\n${snippet}\nSource: ${source}\n`;
+                        insertContent(content);
+                    });
+                });
+            }
+
+            function generateCitation(title, source) {
+                // Simplified citation generation
+                return `${title}. ${source}.`;
+            }
+
+            function insertCitation(citation) {
+                const currentContent = editor.value;
+                editor.value = currentContent + '\n\n' + citation;
+                editor.focus();
+            }
+
+            function insertContent(content) {
+                const currentContent = editor.value;
+                editor.value = currentContent + content;
+                editor.focus();
+            }
+
+            // Advanced search functionality
+            const advancedSearchBtn = document.getElementById('advanced-search-btn');
+
+            advancedSearchBtn.addEventListener('click', function() {
+                alert('Advanced search functionality will be implemented here.');
+            });
+        });
+    </script>
+</body>
+</html>

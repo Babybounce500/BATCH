@@ -1,0 +1,202 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mistral AI Virtual Pet Sitter</title>
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .pet-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .pet {
+            width: 200px;
+            height: 200px;
+            background-color: #ffcccb;
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .pet::before {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 30px;
+            background-color: #ffcccb;
+            border-radius: 50%;
+            top: -15px;
+            left: 75px;
+        }
+        .pet::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background-color: #ffcccb;
+            border-radius: 50%;
+            top: 20px;
+            left: 30px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .editor-container {
+            display: flex;
+            gap: 20px;
+        }
+        .editor {
+            flex: 1;
+            height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="f2 lh-title mv3">Mistral AI Virtual Pet Sitter</h1>
+        <div class="pet-container">
+            <div class="pet" id="pet"></div>
+        </div>
+        <div class="controls">
+            <button class="button" id="feed">Feed</button>
+            <button class="button" id="play">Play</button>
+            <button class="button" id="train">Train</button>
+        </div>
+        <div class="editor-container">
+            <div class="editor" id="behaviorEditor"></div>
+            <div class="editor" id="responseEditor"></div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pet = document.getElementById('pet');
+            const feedButton = document.getElementById('feed');
+            const playButton = document.getElementById('play');
+            const trainButton = document.getElementById('train');
+            const behaviorEditor = CodeMirror(document.getElementById('behaviorEditor'), {
+                mode: 'javascript',
+                lineNumbers: true,
+                theme: 'default'
+            });
+            const responseEditor = CodeMirror(document.getElementById('responseEditor'), {
+                mode: 'javascript',
+                lineNumbers: true,
+                theme: 'default'
+            });
+
+            let petState = {
+                hunger: 50,
+                happiness: 50,
+                energy: 50,
+                position: { x: 0, y: 0 }
+            };
+
+            function updatePetState() {
+                petState.hunger = Math.max(0, Math.min(100, petState.hunger));
+                petState.happiness = Math.max(0, Math.min(100, petState.happiness));
+                petState.energy = Math.max(0, Math.min(100, petState.energy));
+
+                pet.style.transform = `translate(${petState.position.x}px, ${petState.position.y}px)`;
+                pet.style.backgroundColor = `hsl(${petState.happiness}, 100%, 80%)`;
+            }
+
+            function generateBehavior() {
+                const behaviors = [
+                    "The pet is playing fetch with a ball.",
+                    "The pet is sleeping on the couch.",
+                    "The pet is eating a treat.",
+                    "The pet is exploring a new room.",
+                    "The pet is barking at a stranger."
+                ];
+                const randomIndex = Math.floor(Math.random() * behaviors.length);
+                return behaviors[randomIndex];
+            }
+
+            function generateResponse() {
+                const responses = [
+                    "The pet seems happy with its treat.",
+                    "The pet is now well-rested after a nap.",
+                    "The pet is excited to play fetch.",
+                    "The pet is curious about the new room.",
+                    "The pet is nervous around strangers."
+                ];
+                const randomIndex = Math.floor(Math.random() * responses.length);
+                return responses[randomIndex];
+            }
+
+            feedButton.addEventListener('click', function() {
+                petState.hunger -= 20;
+                petState.happiness += 10;
+                updatePetState();
+                behaviorEditor.setValue(generateBehavior());
+                responseEditor.setValue(generateResponse());
+            });
+
+            playButton.addEventListener('click', function() {
+                petState.happiness += 20;
+                petState.energy -= 10;
+                petState.position.x += 20;
+                updatePetState();
+                behaviorEditor.setValue(generateBehavior());
+                responseEditor.setValue(generateResponse());
+            });
+
+            trainButton.addEventListener('click', function() {
+                petState.happiness += 10;
+                petState.energy -= 15;
+                updatePetState();
+                behaviorEditor.setValue(generateBehavior());
+                responseEditor.setValue(generateResponse());
+            });
+
+            setInterval(function() {
+                petState.hunger += 5;
+                petState.happiness -= 5;
+                petState.energy -= 5;
+                updatePetState();
+            }, 5000);
+
+            updatePetState();
+        });
+    </script>
+</body>
+</html>
+```

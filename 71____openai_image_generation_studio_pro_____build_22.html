@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OpenAI Image Generation Studio Pro - Professional image generation and editing tool">
+    <title>OpenAI Image Generation Studio Pro</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --dark-color: #202124;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #fff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: #3367d6;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .canvas-container {
+            position: relative;
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .tool-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-btn {
+            padding: 0.5rem;
+            background-color: #f1f1f1;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tool-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .tool-btn.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+        }
+
+        .color-input {
+            width: 30px;
+            height: 30px;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .slider-label {
+            margin-right: 1rem;
+            min-width: 50px;
+        }
+
+        .slider {
+            flex-grow: 1;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: 2;
+            }
+
+            .canvas-container {
+                order: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">OpenAI Image Studio Pro</div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h2>AI Generation</h2>
+                <div class="form-group">
+                    <label for="prompt">Prompt</label>
+                    <textarea id="prompt" placeholder="Describe the image you want to generate..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="style">Style</label>
+                    <select id="style">
+                        <option value="natural">Natural</option>
+                        <option value="digital">Digital</option>
+                        <option value="abstract">Abstract</option>
+                        <option value="sketch">Sketch</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="resolution">Resolution</label>
+                    <select id="resolution">
+                        <option value="256x256">256x256</option>
+                        <option value="512x512">512x512</option>
+                        <option value="1024x1024">1024x1024</option>
+                    </select>
+                </div>
+                <button id="generate-btn">Generate Image</button>
+            </div>
+
+            <div class="sidebar-section">
+                <h2>Image Tools</h2>
+                <div class="tool-panel">
+                    <button class="tool-btn" data-tool="select" title="Select"><i class="fas fa-mouse-pointer"></i></button>
+                    <button class="tool-btn" data-tool="brush" title="Brush"><i class="fas fa-paint-brush"></i></button>
+                    <button class="tool-btn" data-tool="text" title="Text"><i class="fas fa-font"></i></button>
+                    <button class="tool-btn" data-tool="eraser" title="Eraser"><i class="fas fa-eraser"></i></button>
+                    <button class="tool-btn" data-tool="line" title="Line"><i class="fas fa-slash"></i></button>
+                    <button class="tool-btn" data-tool="rect" title="Rectangle"><i class="far fa-square"></i></button>
+                    <button class="tool-btn" data-tool="circle" title="Circle"><i class="far fa-circle"></i></button>
+                </div>
+                <div class="form-group">
+                    <div class="color-picker">
+                        <label for="stroke-color">Stroke Color</label>
+                        <input type="color" id="stroke-color" value="#000000">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="color-picker">
+                        <label for="fill-color">Fill Color</label>
+                        <input type="color" id="fill-color" value="#ffffff">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="slider-container">
+                        <span class="slider-label">Stroke Width</span>
+                        <input type="range" id="stroke-width" min="1" max="50" value="5" class="slider">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="slider-container">
+                        <span class="slider-label">Opacity</span>
+                        <input type="range" id="opacity" min="0" max="100" value="100" class="slider">
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h2>Filters & Effects</h2>
+                <div class="form-group">
+                    <label for="filter">Filter</label>
+                    <select id="filter">
+                        <option value="none">None</option>
+                        <option value="grayscale">Grayscale</option>
+                        <option value="sepia">Sepia</option>
+                        <option value="invert">Invert</option>
+                        <option value="blur">Blur</option>
+                        <option value="sharpen">Sharpen</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="slider-container">
+                        <span class="slider-label">Filter Intensity</span>
+                        <input type="range" id="filter-intensity" min="0" max="100" value="50" class="slider">
+                    </div>
+                </div>
+                <button id="apply-filter">Apply Filter</button>
+            </div>
+
+            <div class="sidebar-section">
+                <h2>Style Transfer</h2>
+                <div class="form-group">
+                    <label for="style-image">Style Image</label>
+                    <input type="file" id="style-image" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <div class="slider-container">
+                        <span class="slider-label">Style Strength</span>
+                        <input type="range" id="style-strength" min="0" max="100" value="50" class="slider">
+                    </div>
+                </div>
+                <button id="apply-style-transfer">Apply Style Transfer</button>
+            </div>
+
+            <div class="sidebar-section">
+                <h2>Export</h2>
+                <div class="form-group">
+                    <label for="export-format">Format</label>
+                    <select id="export-format">
+                        <option value="png">PNG</option>
+                        <option value="jpeg">JPEG</option>
+                        <option value="svg">SVG</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="slider-container">
+                        <span class="slider-label">Quality</span>
+                        <input type="range" id="export-quality" min="0" max="100" value="80" class="slider">
+                    </div>
+                </div>
+                <button id="export-btn">Export Image</button>
+            </div>
+        </aside>
+
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 OpenAI Image Generation Studio Pro. All rights reserved.</p>
+    </footer>
+
+    <div class="loading" id="loading" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Fabric.js canvas
+            const canvas = new fabric.Canvas('canvas', {
+                isDrawingMode: false,
+                selection: true,
+                preserveObjectStacking: true
+            });
+
+            // Set canvas dimensions
+            function resizeCanvas() {
+                const container = document.querySelector('.canvas-container');
+                canvas.setWidth(container.clientWidth);
+                canvas.setHeight(container.clientHeight);
+                canvas.renderAll();
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            // Tool selection
+            const toolButtons = document.querySelectorAll('.tool-btn');
+            let activeTool = 'select';
+
+            toolButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    toolButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    activeTool = this.dataset.tool;
+
+                    switch(activeTool) {
+                        case 'select':
+                            canvas.isDrawingMode = false;
+                            break;
+                        case 'brush':
+                            canvas.isDrawingMode = true;
+                            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+                            break;
+                        case 'eraser':
+                            canvas.isDrawingMode = true;
+                            canvas.freeDrawingBrush = new fabric.EraserBrush(canvas);
+                            break;
+                        case 'text':
+                            addText();
+                            break;
+                        case 'line':
+                            addLine();
+                            break;
+                        case 'rect':
+                            addRectangle();
+                            break;
+                        case 'circle':
+                            addCircle();
+                            break;
+                    }
+                });
+            });
+
+            // Set initial tool
+            document.querySelector('.tool-btn[data-tool="select"]').classList.add('active');
+
+            // Color and width controls
+            const strokeColorInput = document.getElementById('stroke-color');
+            const fillColorInput = document.getElementById('fill-color');
+            const strokeWidthInput = document.getElementById('stroke-width');
+            const opacityInput = document.getElementById('opacity');
+
+            strokeColorInput.addEventListener('input', function() {
+                canvas.freeDrawingBrush.color = this.value;
+                if (canvas.getActiveObject()) {
+                    canvas.getActiveObject().set('stroke', this.value);
+                    canvas.renderAll();
+                }
+            });
+
+            fillColorInput.addEventListener('input', function() {
+                if (canvas.getActiveObject()) {
+                    canvas.getActiveObject().set('fill', this.value);
+                    canvas.renderAll();
+                }
+            });
+
+            strokeWidthInput.addEventListener('input', function() {
+                canvas.freeDrawingBrush.width = parseInt(this.value, 10);
+                if (canvas.getActiveObject()) {
+                    canvas.getActiveObject().set('strokeWidth', parseInt(this.value, 10));
+                    canvas.renderAll();
+                }
+            });
+
+            opacityInput.addEventListener('input', function() {
+                if (canvas.getActiveObject()) {
+                    canvas.getActiveObject().set('opacity', parseInt(this.value, 10) / 100);
+                    canvas.renderAll();
+                }
+            });
+
+            // Text tool
+            function addText() {
+                const text = new fabric.IText('Enter text', {
+                    left: 100,
+                    top: 100,
+                    fontFamily: 'Arial',
+                    fill: strokeColorInput.value,
+                    fontSize: 20,
+                    strokeWidth: parseInt(strokeWidthInput.value, 10),
+                    opacity: parseInt(opacityInput.value, 10) / 100
+                });
+                canvas.add(text);
+                canvas.setActiveObject(text);
+            }
+
+            // Line tool
+            function addLine() {
+                const line = new fabric.Line([100, 100, 200, 200], {
+                    left: 100,
+                    top: 100,
+                    stroke: strokeColorInput.value,
+                    strokeWidth: parseInt(strokeWidthInput.value, 10),
+                    opacity: parseInt(opacityInput.value, 10) / 100
+                });
+                canvas.add(line);
+                canvas.setActiveObject(line);
+            }
+
+            // Rectangle tool
+            function addRectangle() {
+                const rect = new fabric.Rect({
+                    left: 100,
+                    top: 100,
+                    width: 100,
+                    height: 100,
+                    fill: fillColorInput.value,
+                    stroke: strokeColorInput.value,
+                    strokeWidth: parseInt(strokeWidthInput.value, 10),
+                    opacity: parseInt(opacityInput.value, 10) / 100
+                });
+                canvas.add(rect);
+                canvas.setActiveObject(rect);
+            }
+
+            // Circle tool
+            function addCircle() {
+                const circle = new fabric.Circle({
+                    left: 100,
+                    top: 100,
+                    radius: 50,
+                    fill: fillColorInput.value,
+                    stroke: strokeColorInput.value,
+                    strokeWidth: parseInt(strokeWidthInput.value, 10),
+                    opacity: parseInt(opacityInput.value, 10) / 100
+                });
+                canvas.add(circle);
+                canvas.setActiveObject(circle);
+            }
+
+            // Filter controls
+            const filterSelect = document.getElementById('filter');
+            const filterIntensity = document.getElementById('filter-intensity');
+            const applyFilterBtn = document.getElementById('apply-filter');
+
+            applyFilterBtn.addEventListener('click', function() {
+                const filter = filterSelect.value;
+                const intensity = parseInt(filterIntensity.value, 10) / 100;
+
+                if (canvas.backgroundImage) {
+                    const img = canvas.backgroundImage;
+                    img.filters = [];
+
+                    switch(filter) {
+                        case 'grayscale':
+                            img.filters.push(new fabric.Image.filters.Grayscale({ intensity: intensity }));
+                            break;
+                        case 'sepia':
+                            img.filters.push(new fabric.Image.filters.Sepia({ intensity: intensity }));
+                            break;
+                        case 'invert':
+                            img.filters.push(new fabric.Image.filters.Invert({ intensity: intensity }));
+                            break;
+                        case 'blur':
+                            img.filters.push(new fabric.Image.filters.Blur({ blur: intensity * 10 }));
+                            break;
+                        case 'sharpen':
+                            img.filters.push(new fabric.Image.filters.Convolute({
+                                matrix: [ 0, -1,  0,
+                                         -1,  5, -1,
+                                          0, -1,  0 ]
+                            }));
+                            break;
+                    }
+
+                    img.applyFilters();
+                    canvas.renderAll();
+                }
+            });
+
+            // Style transfer
+            const styleImageInput = document.getElementById('style-image');
+            const styleStrength = document.getElementById('style-strength');
+            const applyStyleTransferBtn = document.getElementById('apply-style-transfer');
+
+            applyStyleTransferBtn.addEventListener('click', function() {
+                if (styleImageInput.files && styleImageInput.files[0]) {
+                    showLoading();
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const styleImg = new Image();
+                        styleImg.onload = function() {
+                            // In a real application, this would call the OpenAI API for style transfer
+                            // For this demo, we'll simulate the process
+                            setTimeout(() => {
+                                // Apply a simple style transfer effect
+                                if (canvas.backgroundImage) {
+                                    const img = canvas.backgroundImage;
+                                    img.filters = [];
+
+                                    // Simulate style transfer by adjusting colors
+                                    img.filters.push(new fabric.Image.filters.Sepia({
+                                        intensity: parseInt(styleStrength.value, 10) / 100
+                                    }));
+                                    img.filters.push(new fabric.Image.filters.Brightness({
+                                        brightness: parseInt(styleStrength.value, 10) / 50
+                                    }));
+
+                                    img.applyFilters();
+                                    canvas.renderAll();
+                                }
+
+                                hideLoading();
+                            }, 2000);
+                        };
+                        styleImg.src = e.target.result;
+                    };
+                    reader.readAsDataURL(styleImageInput.files[0]);
+                }
+            });
+
+            // Generate image with OpenAI DALL-E
+            const generateBtn = document.getElementById('generate-btn');
+            const promptInput = document.getElementById('prompt');
+            const styleSelect = document.getElementById('style');
+            const resolutionSelect = document.getElementById('resolution');
+
+            generateBtn.addEventListener('click', function() {
+                const prompt = promptInput.value.trim();
+                if (prompt) {
+                    showLoading();
+
+                    // In a real application, this would call the OpenAI DALL-E API
+                    // For this demo, we'll simulate the process
+                    setTimeout(() => {
+                        // Create a simulated image
+                        const simulatedImage = new Image();
+                        simulatedImage.onload = function() {
+                            const img = new fabric.Image(simulatedImage, {
+                                left: 0,
+                                top: 0,
+                                scaleX: canvas.width / simulatedImage.width,
+                                scaleY: canvas.height / simulatedImage.height
+                            });
+                            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+                        };
+
+                        // Generate a placeholder image based on the prompt
+                        const canvasTemp = document.createElement('canvas');
+                        const ctxTemp = canvasTemp.getContext('2d');
+                        canvasTemp.width = 512;
+                        canvasTemp.height = 512;
+
+                        // Simple simulation - in reality, you would use the OpenAI API response
+                        ctxTemp.fillStyle = '#f0f0f0';
+                        ctxTemp.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
+
+                        // Add some text to simulate the generated image
+                        ctxTemp.fillStyle = '#333';
+                        ctxTemp.font = '20px Arial';
+                        ctxTemp.textAlign = 'center';
+                        ctxTemp.fillText('Simulated DALL-E Image', canvasTemp.width/2, canvasTemp.height/2);
+                        ctxTemp.fillText(`Prompt: ${prompt}`, canvasTemp.width/2, canvasTemp.height/2 + 30);
+                        ctxTemp.fillText(`Style: ${styleSelect.value}`, canvasTemp.width/2, canvasTemp.height/2 + 60);
+                        ctxTemp.fillText(`Resolution: ${resolutionSelect.value}`, canvasTemp.width/2, canvasTemp.height/2 + 90);
+
+                        simulatedImage.src = canvasTemp.toDataURL();
+
+                        hideLoading();
+                    }, 3000);
+                }
+            });
+
+            // Export image
+            const exportBtn = document.getElementById('export-btn');
+            const exportFormat = document.getElementById('export-format');
+            const exportQuality = document.getElementById('export-quality');
+
+            exportBtn.addEventListener('click', function() {
+                const format = exportFormat.value;
+                const quality = parseInt(exportQuality.value, 10) / 100;
+
+                if (format === 'svg') {
+                    // Export as SVG
+                    const svg = canvas.toSVG();
+                    const blob = new Blob([svg], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'image.svg';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } else {
+                    // Export as PNG or JPEG
+                    const dataURL = canvas.toDataURL(`image/${format}`, quality);
+                    const a = document.createElement('a');
+                    a.href = dataURL;
+                    a.download = `image.${format}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            });
+
+            // Loading overlay functions
+            function showLoading() {
+                document.getElementById('loading').style.display = 'flex';
+            }
+
+            function hideLoading() {
+                document.getElementById('loading').style.display = 'none';
+            }
+
+            // Initialize with a blank canvas
+            canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+        });
+    </script>
+</body>
+</html>

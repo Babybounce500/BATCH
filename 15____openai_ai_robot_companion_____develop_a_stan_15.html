@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OpenAI AI Robot Companion - Create and interact with AI-powered robot companions">
+    <title>OpenAI AI Robot Companion</title>
+    <style>
+        :root {
+            --nes-primary: #009688;
+            --nes-secondary: #ff5722;
+            --nes-text: #333;
+            --nes-bg: #f5f5f5;
+            --nes-border: #ccc;
+            --nes-radius: 3px;
+            --nes-shadow: 0 2px 0 rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--nes-bg);
+            color: var(--nes-text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--nes-primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            background-color: white;
+            border: 2px solid var(--nes-border);
+            border-radius: var(--nes-radius);
+            padding: 20px;
+            box-shadow: var(--nes-shadow);
+        }
+
+        .main-content {
+            background-color: white;
+            border: 2px solid var(--nes-border);
+            border-radius: var(--nes-radius);
+            padding: 20px;
+            box-shadow: var(--nes-shadow);
+        }
+
+        .nes-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--nes-primary);
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: var(--nes-radius);
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nes-btn:hover {
+            background-color: var(--nes-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .nes-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 2px solid var(--nes-border);
+            border-radius: var(--nes-radius);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+        }
+
+        .robot-creation {
+            margin-bottom: 30px;
+        }
+
+        .robot-creation h2 {
+            color: var(--nes-primary);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .robot-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            background-color: #eee;
+            border: 2px solid var(--nes-border);
+            border-radius: var(--nes-radius);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .robot {
+            width: 100px;
+            height: 150px;
+            background-color: var(--nes-primary);
+            border-radius: 50% 50% 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .robot-head {
+            width: 60px;
+            height: 60px;
+            background-color: var(--nes-secondary);
+            border-radius: 50%;
+            position: absolute;
+            top: -30px;
+            left: 20px;
+        }
+
+        .robot-eyes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .robot-eye {
+            width: 10px;
+            height: 10px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 25px;
+        }
+
+        .robot-eye.left {
+            left: 15px;
+        }
+
+        .robot-eye.right {
+            right: 15px;
+        }
+
+        .robot-arm {
+            width: 20px;
+            height: 80px;
+            background-color: var(--nes-secondary);
+            position: absolute;
+            top: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .robot-arm.left {
+            left: -20px;
+        }
+
+        .robot-arm.right {
+            right: -20px;
+        }
+
+        .robot-leg {
+            width: 20px;
+            height: 80px;
+            background-color: var(--nes-primary);
+            position: absolute;
+            bottom: -80px;
+            transition: transform 0.3s ease;
+        }
+
+        .robot-leg.left {
+            left: 20px;
+        }
+
+        .robot-leg.right {
+            right: 20px;
+        }
+
+        .behavior-generation {
+            margin-bottom: 30px;
+        }
+
+        .behavior-generation h2 {
+            color: var(--nes-primary);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .behavior-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .behavior-output {
+            height: 150px;
+            overflow-y: auto;
+            border: 2px solid var(--nes-border);
+            border-radius: var(--nes-radius);
+            padding: 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+        }
+
+        .robot-interaction {
+            margin-bottom: 30px;
+        }
+
+        .robot-interaction h2 {
+            color: var(--nes-primary);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .interaction-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .interaction-output {
+            height: 200px;
+            overflow-y: auto;
+            border: 2px solid var(--nes-border);
+            border-radius: var(--nes-radius);
+            padding: 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+        }
+
+        .robot-simulation {
+            margin-bottom: 30px;
+        }
+
+        .robot-simulation h2 {
+            color: var(--nes-primary);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .simulation-display {
+            height: 300px;
+            background-color: #eee;
+            border: 2px solid var(--nes-border);
+            border-radius: var(--nes-radius);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .robot-control {
+            margin-bottom: 30px;
+        }
+
+        .robot-control h2 {
+            color: var(--nes-primary);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .control-group {
+            background-color: white;
+            border: 2px solid var(--nes-border);
+            border-radius: var(--nes-radius);
+            padding: 15px;
+        }
+
+        .control-group h3 {
+            color: var(--nes-primary);
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .control-item {
+            margin-bottom: 10px;
+        }
+
+        .control-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+        }
+
+        .control-item input[type="range"] {
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .nes-btn {
+                font-size: 0.7rem;
+            }
+
+            .nes-input {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>OpenAI AI Robot Companion</h1>
+    </header>
+
+    <div class="container" id="app">
+        <div class="sidebar">
+            <div class="robot-creation">
+                <h2>Robot Creation</h2>
+                <input type="text" class="nes-input" v-model="robotName" placeholder="Enter robot name">
+                <button class="nes-btn" @click="createRobot">Create Robot</button>
+                <div class="robot-display">
+                    <div class="robot" :style="{ backgroundColor: robotColor }">
+                        <div class="robot-head" :style="{ backgroundColor: headColor }">
+                            <div class="robot-eyes">
+                                <div class="robot-eye left"></div>
+                                <div class="robot-eye right"></div>
+                            </div>
+                        </div>
+                        <div class="robot-arm left" :style="{ transform: 'rotate(' + leftArmAngle + 'deg)' }"></div>
+                        <div class="robot-arm right" :style="{ transform: 'rotate(' + rightArmAngle + 'deg)' }"></div>
+                        <div class="robot-leg left" :style="{ transform: 'rotate(' + leftLegAngle + 'deg)' }"></div>
+                        <div class="robot-leg right" :style="{ transform: 'rotate(' + rightLegAngle + 'deg)' }"></div>
+                    </div>
+                </div>
+                <div class="color-pickers">
+                    <label>Robot Color:</label>
+                    <input type="color" v-model="robotColor">
+                    <label>Head Color:</label>
+                    <input type="color" v-model="headColor">
+                </div>
+            </div>
+
+            <div class="behavior-generation">
+                <h2>Behavior Generation</h2>
+                <textarea class="nes-input" v-model="behaviorPrompt" placeholder="Enter behavior prompt"></textarea>
+                <button class="nes-btn" @click="generateBehavior">Generate Behavior</button>
+                <div class="behavior-output" v-html="behaviorOutput"></div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="robot-interaction">
+                <h2>Robot Interaction</h2>
+                <div class="interaction-controls">
+                    <button class="nes-btn" @click="greetRobot">Greet</button>
+                    <button class="nes-btn" @click="askQuestion">Ask Question</button>
+                    <button class="nes-btn" @click="giveCommand">Give Command</button>
+                </div>
+                <div class="interaction-output" v-html="interactionOutput"></div>
+            </div>
+
+            <div class="robot-simulation">
+                <h2>Robotics Simulation</h2>
+                <div class="simulation-display" ref="simulationDisplay"></div>
+            </div>
+
+            <div class="robot-control">
+                <h2>Robot Control</h2>
+                <div class="control-panel">
+                    <div class="control-group">
+                        <h3>Movement</h3>
+                        <div class="control-item">
+                            <label for="speed">Speed:</label>
+                            <input type="range" id="speed" min="0" max="100" v-model="speed">
+                        </div>
+                        <div class="control-item">
+                            <label for="direction">Direction:</label>
+                            <input type="range" id="direction" min="0" max="360" v-model="direction">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <h3>Arm Control</h3>
+                        <div class="control-item">
+                            <label for="left-arm">Left Arm:</label>
+                            <input type="range" id="left-arm" min="-90" max="90" v-model="leftArmAngle">
+                        </div>
+                        <div class="control-item">
+                            <label for="right-arm">Right Arm:</label>
+                            <input type="range" id="right-arm" min="-90" max="90" v-model="rightArmAngle">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <h3>Leg Control</h3>
+                        <div class="control-item">
+                            <label for="left-leg">Left Leg:</label>
+                            <input type="range" id="left-leg" min="-90" max="90" v-model="leftLegAngle">
+                        </div>
+                        <div class="control-item">
+                            <label for="right-leg">Right Leg:</label>
+                            <input type="range" id="right-leg" min="-90" max="90" v-model="rightLegAngle">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <h3>Head Control</h3>
+                        <div class="control-item">
+                            <label for="head-tilt">Head Tilt:</label>
+                            <input type="range" id="head-tilt" min="-45" max="45" v-model="headTilt">
+                        </div>
+                        <div class="control-item">
+                            <label for="head-pan">Head Pan:</label>
+                            <input type="range" id="head-pan" min="-45" max="45" v-model="headPan">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.17.1/build/matter.min.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                robotName: '',
+                robotColor: '#009688',
+                headColor: '#ff5722',
+                leftArmAngle: 0,
+                rightArmAngle: 0,
+                leftLegAngle: 0,
+                rightLegAngle: 0,
+                headTilt: 0,
+                headPan: 0,
+                behaviorPrompt: '',
+                behaviorOutput: '',
+                interactionOutput: '',
+                speed: 0,
+                direction: 0,
+                engine: null,
+                render: null,
+                robotBody: null
+            },
+            mounted() {
+                this.initPhysics();
+            },
+            methods: {
+                createRobot() {
+                    if (this.robotName.trim() === '') {
+                        alert('Please enter a robot name');
+                        return;
+                    }
+
+                    this.interactionOutput += `<p><strong>${this.robotName}:</strong> Hello! I'm your new robot companion.</p>`;
+                    this.scrollToBottom('.interaction-output');
+                },
+                generateBehavior() {
+                    if (this.behaviorPrompt.trim() === '') {
+                        alert('Please enter a behavior prompt');
+                        return;
+                    }
+
+                    // Simulate API call to OpenAI
+                    setTimeout(() => {
+                        const response = `Based on your prompt: "${this.behaviorPrompt}", here's a generated behavior for ${this.robotName}:\n\n` +
+                                         `1. When you greet me, I will respond with a friendly "Hello there!"\n` +
+                                         `2. When you ask me a question, I will try to answer it to the best of my ability\n` +
+                                         `3. When you give me a command, I will attempt to follow it if it's within my capabilities`;
+
+                        this.behaviorOutput = response.replace(/\n/g, '<br>');
+                        this.scrollToBottom('.behavior-output');
+                    }, 1000);
+                },
+                greetRobot() {
+                    this.interactionOutput += `<p><strong>You:</strong> Hello ${this.robotName}!</p>`;
+                    this.interactionOutput += `<p><strong>${this.robotName}:</strong> Hello there!</p>`;
+                    this.scrollToBottom('.interaction-output');
+                },
+                askQuestion() {
+                    const questions = [
+                        "What can you do?",
+                        "How are you feeling today?",
+                        "What's your favorite color?",
+                        "Tell me a joke",
+                        "What's the weather like today?"
+                    ];
+
+                    const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+
+                    this.interactionOutput += `<p><strong>You:</strong> ${randomQuestion}</p>`;
+
+                    // Simulate API call to OpenAI
+                    setTimeout(() => {
+                        const responses = [
+                            "I can help with information, answer questions, and perform tasks you assign me.",
+                            "I'm functioning well, thank you for asking!",
+                            "I don't have personal preferences, but I think blue is a nice color.",
+                            "Why don't scientists trust atoms? Because they make up everything!",
+                            "I'm not connected to weather services, but you can check a weather website for that information."
+                        ];
+
+                        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
+                        this.interactionOutput += `<p><strong>${this.robotName}:</strong> ${randomResponse}</p>`;
+                        this.scrollToBottom('.interaction-output');
+                    }, 1000);
+                },
+                giveCommand() {
+                    const commands = [
+                        "Move forward",
+                        "Turn left",
+                        "Pick up the object",
+                        "Open the door",
+                        "Take a photo"
+                    ];
+
+                    const randomCommand = commands[Math.floor(Math.random() * commands.length)];
+
+                    this.interactionOutput += `<p><strong>You:</strong> ${randomCommand}</p>`;
+
+                    // Simulate command execution
+                    setTimeout(() => {
+                        this.interactionOutput += `<p><strong>${this.robotName}:</strong> Executing command: ${randomCommand}</p>`;
+                        this.scrollToBottom('.interaction-output');
+
+                        // Simulate movement
+                        if (randomCommand.includes("Move forward") || randomCommand.includes("Turn")) {
+                            this.moveRobot();
+                        }
+                    }, 1000);
+                },
+                moveRobot() {
+                    if (this.robotBody) {
+                        const speed = this.speed / 10;
+                        const angle = this.direction * (Math.PI / 180);
+
+                        Matter.Body.setVelocity(this.robotBody, {
+                            x: speed * Math.cos(angle),
+                            y: speed * Math.sin(angle)
+                        });
+
+                        // Animate arms and legs
+                        this.leftArmAngle = -this.speed;
+                        this.rightArmAngle = this.speed;
+                        this.leftLegAngle = -this.speed;
+                        this.rightLegAngle = this.speed;
+                    }
+                },
+                initPhysics() {
+                    // Create Matter.js engine
+                    this.engine = Matter.Engine.create();
+                    this.render = Matter.Render.create({
+                        element: this.$refs.simulationDisplay,
+                        engine: this.engine,
+                        options: {
+                            width: this.$refs.simulationDisplay.clientWidth,
+                            height: this.$refs.simulationDisplay.clientHeight,
+                            wireframes: false,
+                            background: '#eee'
+                        }
+                    });
+
+                    // Create ground
+                    const ground = Matter.Bodies.rectangle(
+                        this.$refs.simulationDisplay.clientWidth / 2,
+                        this.$refs.simulationDisplay.clientHeight - 10,
+                        this.$refs.simulationDisplay.clientWidth,
+                        20,
+                        { isStatic: true, render: { fillStyle: '#666' } }
+                    );
+
+                    // Create robot body
+                    this.robotBody = Matter.Bodies.rectangle(
+                        this.$refs.simulationDisplay.clientWidth / 2,
+                        this.$refs.simulationDisplay.clientHeight / 2,
+                        60,
+                        100,
+                        {
+                            render: {
+                                fillStyle: this.robotColor,
+                                strokeStyle: '#333',
+                                lineWidth: 2
+                            }
+                        }
+                    );
+
+                    // Add bodies to world
+                    Matter.World.add(this.engine.world, [ground, this.robotBody]);
+
+                    // Run the engine and renderer
+                    Matter.Engine.run(this.engine);
+                    Matter.Render.run(this.render);
+
+                    // Handle window resize
+                    window.addEventListener('resize', () => {
+                        this.render.canvas.width = this.$refs.simulationDisplay.clientWidth;
+                        this.render.canvas.height = this.$refs.simulationDisplay.clientHeight;
+                        Matter.Body.setPosition(ground, {
+                            x: this.$refs.simulationDisplay.clientWidth / 2,
+                            y: this.$refs.simulationDisplay.clientHeight - 10
+                        });
+                    });
+                },
+                scrollToBottom(selector) {
+                    this.$nextTick(() => {
+                        const element = document.querySelector(selector);
+                        element.scrollTop = element.scrollHeight;
+                    });
+                }
+            },
+            watch: {
+                speed: function() {
+                    this.moveRobot();
+                },
+                direction: function() {
+                    this.moveRobot();
+                },
+                robotColor: function(newColor) {
+                    if (this.robotBody) {
+                        Matter.Body.set(this.robotBody, 'render', {
+                            fillStyle: newColor,
+                            strokeStyle: '#333',
+                            lineWidth: 2
+                        });
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

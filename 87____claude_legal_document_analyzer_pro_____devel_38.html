@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Claude Legal Document Analyzer Pro - Comprehensive legal document analysis tool">
+    <title>Claude Legal Document Analyzer Pro</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1e40af;
+            --accent-color: #f59e0b;
+            --light-color: #f3f4f6;
+            --dark-color: #1f2937;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --text-color: #374151;
+            --text-light: #e5e7eb;
+            --border-radius: 0.5rem;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 1.5em;
+            height: 1.5em;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-icon {
+            width: 1.5em;
+            height: 1.5em;
+            color: var(--primary-color);
+        }
+
+        .upload-section {
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-section:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .upload-icon {
+            width: 3rem;
+            height: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .document-viewer {
+            border: 1px solid #e5e7eb;
+            border-radius: var(--border-radius);
+            height: 500px;
+            overflow: auto;
+            background-color: white;
+        }
+
+        .analysis-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .result-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1rem;
+            transition: var(--transition);
+        }
+
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px -3px rgba(0, 0, 0, 0.1), 0 3px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-title {
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .risk-low {
+            color: var(--success-color);
+        }
+
+        .risk-medium {
+            color: var(--accent-color);
+        }
+
+        .risk-high {
+            color: var(--error-color);
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #e5e7eb;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            height: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .analysis-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #047857;
+        }
+
+        .btn-error {
+            background-color: var(--error-color);
+        }
+
+        .btn-error:hover {
+            background-color: #b91c1c;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--box-shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .close-btn:hover {
+            color: var(--error-color);
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .analysis-results {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .analysis-results {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Claude Legal</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Analysis</a></li>
+                    <li><a href="#">History</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-title">
+                    <span>Document Upload</span>
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 15.4806 20.1956 16.8084 19 17.5M7 10C4.79086 10 3 11.7909 3 14C3 15.4806 3.8044 16.8084 5 17.5M7 10C7.43285 10 7.86068 10.0688 8.27479 10.1959M12 12V21M12 12L15 15M12 12L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="upload-section" id="uploadSection">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 15.4806 20.1956 16.8084 19 17.5M7 10C4.79086 10 3 11.7909 3 14C3 15.4806 3.8044 16.8084 5 17.5M7 10C7.43285 10 7.86068 10.0688 8.27479 10.1959M12 12V21M12 12L15 15M12 12L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p class="upload-text">Click to upload a legal document</p>
+                    <p>or drag and drop</p>
+                </div>
+                <input type="file" id="fileInput" accept=".pdf">
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span>Document Viewer</span>
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="document-viewer" id="documentViewer">
+                    <div class="loading-spinner hidden" id="viewerSpinner"></div>
+                    <div id="pdfViewer"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span>Analysis Progress</span>
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 8V12L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <p id="progressText">Ready to analyze</p>
+                <div class="analysis-actions">
+                    <button id="analyzeBtn" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;">
+                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 8V13L15 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Analyze Document
+                    </button>
+                    <button id="resetBtn" class="btn-outline" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;">
+                            <path d="M21 4H2.99998" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7.99998 4L10.99 6.66667" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 4L11 6.66667" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21.0001 16.0001H2.99994" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7.99994 16L10.99 13.3334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 16L11 13.3334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>Analysis Results</span>
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 8V12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12V8C22 5.79086 20.2091 4 18 4C15.7909 4 14 5.79086 14 8V12C14 14.2091 12.2091 16 10 16C7.79086 16 6 14.2091 6 12V8C6 5.79086 7.79086 4 10 4C12.2091 4 14 5.79086 14 8V12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2.05991 11.9353L7.9399 14.0649" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2.05991 16.0647L7.9399 13.9351" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="analysis-results" id="analysisResults">
+                <div class="loading-spinner hidden" id="resultsSpinner"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2023 Claude Legal Document Analyzer Pro. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" class="social-link">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1.5em; height: 1.5em;">
+                        <path d="M18 2H15C13.6739 2 12.4021 2.52678 11.4645 3.46447C10.5268 4.40215 10 5.67392 10 7V10H8.55556C7.82235 10 7.1385 10.2239 6.59442 10.6732C6.05033 11.1225 5.62747 11.652 5.32678 12.2279C5.02609 12.8038 4.90012 13.4278 4.90012 14.0556V17H7V14.36C7 13.1068 7.68629 12.0729 8.76953 11.3566C9.85278 10.6404 11.1762 10.4552 12 10.4444V14H14.6364C14.8754 14 15.0961 14.0667 15.2976 14.1922C15.5 14.3177 15.6667 14.5 15.7922 14.7078C15.9177 14.9156 16 15.1411 16 15.3636V17H18V14.0556C18 12.9206 17.3761 11.9206 16.2305 11.1732C15.0849 10.4259 13.6569 10 12 10H8V7C8 5.67392 8.52678 4.40215 9.46447 3.46447C10.4021 2.52678 11.6739 2 13 2H18Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+                <a href="#" class="social-link">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1.5em; height: 1.5em;">
+                        <path d="M16 8C17.6569 8 19 6.65685 19 5C19 3.34315 17.6569 2 16 2C14.3431 2 13 3.34315 13 5C13 6.65685 14.3431 8 16 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 19C9.65685 19 11 17.6569 11 16C11 14.3431 9.65685 13 8 13C6.34315 13 5 14.3431 5 16C5 17.6569 6.34315 19 8 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16.5 9.5L13.5 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8.5 14.5L11.5 11.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+                <a href="#" class="social-link">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1.5em; height: 1.5em;">
+                        <path d="M18 2H15C13.6739 2 12.4021 2.52678 11.4645 3.46447C10.5268 4.40215 10 5.67392 10 7V10H8.55556C7.82235 10 7.1385 10.2239 6.59442 10.6732C6.05033 11.1225 5.62747 11.652 5.32678 12.2279C5.02609 12.8038 4.90012 13.4278 4.90012 14.0556V17H7V14.36C7 13.1068 7.68629 12.0729 8.76953 11.3566C9.85278 10.6404 11.1762 10.4552 12 10.4444V14H14.6364C14.8754 14 15.0961 14.0667 15.2976 14.1922C15.5 14.3177 15.6667 14.5 15.7922 14.7078C15.9177 14.9156 16 15.1411 16 15.3636V17H18V14.0556C18 12.9206 17.3761 11.9206 16.2305 11.1732C15.0849 10.4259 13.6569 10 12 10H8V7C8 5.67392 8.52678 4.40215 9.46447 3.46447C10.4021 2.52678 11.6739 2 13 2H18Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal hidden" id="clauseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Clause Details</h2>
+                <button class="close-btn" id="closeClauseModal">&times;</button>
+            </div>
+            <div class="modal-body" id="clauseDetails">
+                <!-- Clause details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" id="closeClauseModalBtn">Close</button>
+                <button class="btn-success" id="negotiateClauseBtn">Negotiate</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="negotiationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Negotiate Clause</h2>
+                <button class="close-btn" id="closeNegotiationModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="negotiationForm">
+                    <div class="form-group">
+                        <label for="currentClause">Current Clause</label>
+                        <textarea id="currentClause" readonly></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="proposedClause">Proposed Clause</label>
+                        <textarea id="proposedClause" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="negotiationReason">Reason for Negotiation</label>
+                        <textarea id="negotiationReason" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" id="cancelNegotiationBtn">Cancel</button>
+                <button class="btn-success" id="submitNegotiationBtn">Submit Negotiation</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
+        // DOM elements
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        const documentViewer = document.getElementById('documentViewer');
+        const pdfViewer = document.getElementById('pdfViewer');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const analysisResults = document.getElementById('analysisResults');
+        const viewerSpinner = document.getElementById('viewerSpinner');
+        const resultsSpinner = document.getElementById('resultsSpinner');
+        const clauseModal = document.getElementById('clauseModal');
+        const negotiationModal = document.getElementById('negotiationModal');
+        const closeClauseModalBtn = document.getElementById('closeClauseModal');
+        const closeNegotiationModalBtn = document.getElementById('closeNegotiationModal');
+        const cancelNegotiationBtn = document.getElementById('cancelNegotiationBtn');
+        const negotiateClauseBtn = document.getElementById('negotiateClauseBtn');
+        const clauseDetails = document.getElementById('clauseDetails');
+        const currentClause = document.getElementById('currentClause');
+        const proposedClause = document.getElementById('proposedClause');
+        const negotiationReason = document.getElementById('negotiationReason');
+        const negotiationForm = document.getElementById('negotiationForm');
+        const submitNegotiationBtn = document.getElementById('submitNegotiationBtn');
+
+        // State variables
+        let pdfDocument = null;
+        let currentClauseData = null;
+
+        // Event listeners
+        uploadSection.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileUpload);
+        analyzeBtn.addEventListener('click', analyzeDocument);
+        resetBtn.addEventListener('click', resetAnalysis);
+        closeClauseModalBtn.addEventListener('click', closeClauseModal);
+        closeNegotiationModalBtn.addEventListener('click', closeNegotiationModal);
+        cancelNegotiationBtn.addEventListener('click', closeNegotiationModal);
+        negotiateClauseBtn.addEventListener('click', openNegotiationModal);
+        negotiationForm.addEventListener('submit', handleNegotiationSubmit);
+
+        // Drag and drop functionality
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('drag-over');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('drag-over');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileUpload();
+            }
+        });
+
+        // Functions
+        async function handleFileUpload() {
+            if (fileInput.files.length === 0) return;
+
+            const file = fileInput.files[0];
+            if (!file.type.includes('pdf')) {
+                alert('Please upload a PDF file');
+                return;
+            }
+
+            viewerSpinner.classList.remove('hidden');
+            documentViewer.innerHTML = '<div class="loading-spinner" id="viewerSpinner"></div>';
+
+            try {
+                const fileReader = new FileReader();
+                fileReader.onload = async function() {
+                    const typedArray = new Uint8Array(this.result);
+                    pdfDocument = await pdfjsLib.getDocument(typedArray).promise;
+                    renderPDF();
+                };
+                fileReader.readAsArrayBuffer(file);
+
+                analyzeBtn.disabled = false;
+                resetBtn.disabled = false;
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF. Please try again.');
+                viewerSpinner.classList.add('hidden');
+            }
+        }
+
+        async function renderPDF() {
+            pdfViewer.innerHTML = '';
+
+            for (let i = 1; i <= pdfDocument.numPages; i++) {
+                const page = await pdfDocument.getPage(i);
+                const viewport = page.getViewport({ scale: 1.5 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                canvas.style.display = 'block';
+                canvas.style.margin = '0 auto 1rem';
+
+                pdfViewer.appendChild(canvas);
+
+                await page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise;
+            }
+
+            viewerSpinner.classList.add('hidden');
+        }
+
+        async function analyzeDocument() {
+            if (!pdfDocument) return;
+
+            analyzeBtn.disabled = true;
+            resetBtn.disabled = true;
+            progressBar.style.width = '0%';
+            progressText.textContent = 'Analyzing document...';
+            resultsSpinner.classList.remove('hidden');
+            analysisResults.innerHTML = '<div class="loading-spinner" id="resultsSpinner"></div>';
+
+            // Simulate API calls with delays
+            try {
+                // Step 1: Extract text from PDF
+                await simulateAPICall(2000);
+                updateProgress(20, 'Extracting text from document...');
+
+                // Step 2: Identify clauses
+                await simulateAPICall(3000);
+                updateProgress(40, 'Identifying clauses...');
+
+                // Step 3: Analyze clauses
+                await simulateAPICall(4000);
+                updateProgress(60, 'Analyzing clauses...');
+
+                // Step 4: Assess risks
+                await simulateAPICall(3000);
+                updateProgress(80, 'Assessing risks...');
+
+                // Step 5: Check compliance
+                await simulateAPICall(2000);
+                updateProgress(100, 'Checking compliance...');
+
+                // Generate mock analysis results
+                generateAnalysisResults();
+
+                progressText.textContent = 'Analysis complete';
+            } catch (error) {
+                console.error('Error during analysis:', error);
+                alert('Error during analysis. Please try again.');
+                resetAnalysis();
+            } finally {
+                resultsSpinner.classList.add('hidden');
+            }
+        }
+
+        function simulateAPICall(delay) {
+            return new Promise(resolve => setTimeout(resolve, delay));
+        }
+
+        function updateProgress(percentage, message) {
+            progressBar.style.width = `${percentage}%`;
+            progressText.textContent = message;
+        }
+
+        function generateAnalysisResults() {
+            analysisResults.innerHTML = '';
+
+            // Mock data for analysis results
+            const mockResults = [
+                {
+                    title: 'Termination Clause',
+                    risk: 'medium',
+                    description: 'The termination clause allows either party to terminate the contract with 30 days notice.',
+                    details: 'This clause is standard but could be negotiated to include additional conditions or reduce the notice period.'
+                },
+                {
+                    title: 'Confidentiality Agreement',
+                    risk: 'low',
+                    description: 'The confidentiality agreement protects sensitive information shared during the contract.',
+                    details: 'This is a strong clause that protects your business interests. Consider reviewing the specific definitions of confidential information.'
+                },
+                {
+                    title: 'Payment Terms',
+                    risk: 'high',
+                    description: 'The payment terms specify net 30 payment with late fees of 1.5% per month.',
+                    details: 'This clause could be negotiated to offer early payment discounts or adjust the late fee structure.'
+                },
+                {
+                    title: 'Indemnification',
+                    risk: 'high',
+                    description: 'The indemnification clause requires the client to indemnify you for certain claims.',
+                    details: 'This is a critical clause that protects you from liability. Review the specific claims and limitations carefully.'
+                },
+                {
+                    title: 'Governing Law',
+                    risk: 'low',
+                    description: 'The governing law is specified as the laws of the state of California.',
+                    details: 'This clause is important for dispute resolution. Consider whether this is the most favorable jurisdiction for your needs.'
+                },
+                {
+                    title: 'Force Majeure',
+                    risk: 'medium',
+                    description: 'The force majeure clause excuses performance under certain extraordinary circumstances.',
+                    details: 'This is a standard clause that protects against unforeseen events. Review the specific events that qualify as force majeure.'
+                }
+            ];
+
+            // Display results
+            mockResults.forEach(result => {
+                const resultCard = document.createElement('div');
+                resultCard.className = 'result-card';
+                resultCard.innerHTML = `
+                    <h3 class="result-title">${result.title}</h3>
+                    <p class="risk-${result.risk}">Risk: ${result.risk.charAt(0).toUpperCase() + result.risk.slice(1)}</p>
+                    <p>${result.description}</p>
+                    <button class="btn-outline view-details-btn" data-title="${result.title}" data-risk="${result.risk}" data-description="${result.description}" data-details="${result.details}">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;">
+                            <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5C16.477 5 20.268 7.943 21.542 12C20.268 16.057 16.477 19 12 19C7.523 19 3.732 16.057 2.458 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        View Details
+                    </button>
+                `;
+                analysisResults.appendChild(resultCard);
+            });
+
+            // Add event listeners to detail buttons
+            document.querySelectorAll('.view-details-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentClauseData = {
+                        title: btn.dataset.title,
+                        risk: btn.dataset.risk,
+                        description: btn.dataset.description,
+                        details: btn.dataset.details
+                    };
+                    openClauseModal();
+                });
+            });
+        }
+
+        function resetAnalysis() {
+            pdfDocument = null;
+            documentViewer.innerHTML = '';
+            analysisResults.innerHTML = '';
+            progressBar.style.width = '0%';
+            progressText.textContent = 'Ready to analyze';
+            analyzeBtn.disabled = true;
+            resetBtn.disabled = true;
+            fileInput.value = '';
+        }
+
+        function openClauseModal() {
+            if (!currentClauseData) return;
+
+            clauseDetails.innerHTML = `
+                <h3>${currentClauseData.title}</h3>
+                <p class="risk-${currentClauseData.risk}">Risk: ${currentClauseData.risk.charAt(0).toUpperCase() + currentClauseData.risk.slice(1)}</p>
+                <p><strong>Description:</strong> ${currentClauseData.description}</p>
+                <p><strong>Details:</strong> ${currentClauseData.details}</p>
+            `;
+
+            clauseModal.classList.remove('hidden');
+        }
+
+        function closeClauseModal() {
+            clauseModal.classList.add('hidden');
+            currentClauseData = null;
+        }
+
+        function openNegotiationModal() {
+            if (!currentClauseData) return;
+
+            currentClause.value = currentClauseData.description;
+            proposedClause.value = '';
+            negotiationReason.value = '';
+
+            clauseModal.classList.add('hidden');
+            negotiationModal.classList.remove('hidden');
+        }
+
+        function closeNegotiationModal() {
+            negotiationModal.classList.add('hidden');
+            clauseModal.classList.remove('hidden');
+        }
+
+        async function handleNegotiationSubmit(e) {
+            e.preventDefault();
+
+            submitNegotiationBtn.disabled = true;
+            submitNegotiationBtn.textContent = 'Submitting...';
+
+            // Simulate API call for negotiation
+            try {
+                await simulateAPICall(2000);
+
+                // In a real application, you would send the negotiation data to your backend
+                console.log('Negotiation submitted:', {
+                    currentClause: currentClause.value,
+                    proposedClause: proposedClause.value,
+                    negotiationReason: negotiationReason.value
+                });
+
+                alert('Negotiation submitted successfully!');
+                closeNegotiationModal();
+                closeClauseModal();
+            } catch (error) {
+                console.error('Error submitting negotiation:', error);
+                alert('Error submitting negotiation. Please try again.');
+            } finally {
+                submitNegotiationBtn.disabled = false;
+                submitNegotiationBtn.textContent = 'Submit Negotiation';
+            }
+        }
+    </script>
+</body>
+</html>

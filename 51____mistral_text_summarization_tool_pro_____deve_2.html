@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mistral Text Summarization Tool Pro - Advanced text summarization and content condensation">
+    <title>Mistral Text Summarization Tool Pro</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --dark-color: #202124;
+            --light-color: #f8f9fa;
+            --text-color: #333333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .summary-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-section, .output-section {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            resize: vertical;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .options-container {
+            margin-bottom: 1rem;
+        }
+
+        .option-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .option-group h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-option input, .checkbox-option input {
+            margin-right: 0.5rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background-color: #3367d6;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .quality-metrics {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric {
+            background-color: #f1f3f4;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .language-selector {
+            margin-bottom: 1rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .summary-container {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .mobile-menu {
+                display: none;
+                flex-direction: column;
+                background-color: var(--primary-color);
+                padding: 1rem;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                z-index: 1000;
+            }
+
+            .mobile-menu.active {
+                display: flex;
+            }
+
+            .mobile-menu li {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">Mistral Text Summarization Tool Pro</div>
+            <button class="mobile-menu-toggle">☰</button>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+        <nav class="mobile-menu">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="summary-container">
+            <section class="input-section">
+                <h2>Input Text</h2>
+                <div class="language-selector">
+                    <label for="input-language">Input Language:</label>
+                    <select id="input-language">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="pt">Portuguese</option>
+                    </select>
+                </div>
+                <textarea id="input-text" placeholder="Enter the text you want to summarize..."></textarea>
+            </section>
+
+            <section class="output-section">
+                <h2>Summarized Text</h2>
+                <div class="language-selector">
+                    <label for="output-language">Output Language:</label>
+                    <select id="output-language">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="pt">Portuguese</option>
+                    </select>
+                </div>
+                <textarea id="output-text" readonly></textarea>
+                <div class="button-group">
+                    <button id="summarize-btn">Summarize</button>
+                    <button id="clear-btn">Clear</button>
+                </div>
+                <div class="options-container">
+                    <div class="option-group">
+                        <h3>Summary Length</h3>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="short" name="length" value="short" checked>
+                                <label for="short">Short (20% of original)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="medium" name="length" value="medium">
+                                <label for="medium">Medium (50% of original)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="long" name="length" value="long">
+                                <label for="long">Long (80% of original)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-group">
+                        <h3>Summary Style</h3>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="bullet" name="style" value="bullet" checked>
+                                <label for="bullet">Bullet Points</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="paragraph" name="style" value="paragraph">
+                                <label for="paragraph">Paragraph</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-group">
+                        <h3>Additional Options</h3>
+                        <div class="checkbox-group">
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="extractive" checked>
+                                <label for="extractive">Extractive Summarization</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="abstractive">
+                                <label for="abstractive">Abstractive Summarization</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="keywords">
+                                <label for="keywords">Include Keywords</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quality-metrics">
+                    <h3>Quality Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-value" id="coherence">-</div>
+                            <div class="metric-label">Coherence</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="relevance">-</div>
+                            <div class="metric-label">Relevance</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="fluency">-</div>
+                            <div class="metric-label">Fluency</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="compression">-</div>
+                            <div class="metric-label">Compression Ratio</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Mistral Text Summarization Tool Pro. All rights reserved.</p>
+    </footer>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const { createApp, ref } = Vue;
+
+            createApp({
+                setup() {
+                    const inputText = ref('');
+                    const outputText = ref('');
+                    const isLoading = ref(false);
+                    const coherence = ref('-');
+                    const relevance = ref('-');
+                    const fluency = ref('-');
+                    const compression = ref('-');
+
+                    const mobileMenu = ref(null);
+
+                    const toggleMobileMenu = () => {
+                        mobileMenu.value.classList.toggle('active');
+                    };
+
+                    const summarizeText = async () => {
+                        if (!inputText.value.trim()) {
+                            alert('Please enter some text to summarize.');
+                            return;
+                        }
+
+                        isLoading.value = true;
+                        document.getElementById('summarize-btn').disabled = true;
+
+                        try {
+                            // Simulate API call to Mistral's text generation API
+                            await new Promise(resolve => setTimeout(resolve, 1500));
+
+                            // In a real implementation, you would call the Mistral API here
+                            // and process the response to generate the summary
+
+                            // For demonstration purposes, we'll create a mock summary
+                            const originalLength = inputText.value.split(/\s+/).length;
+                            const lengthOption = document.querySelector('input[name="length"]:checked').value;
+                            let summaryLength;
+
+                            switch(lengthOption) {
+                                case 'short':
+                                    summaryLength = Math.max(10, Math.floor(originalLength * 0.2));
+                                    break;
+                                case 'medium':
+                                    summaryLength = Math.max(20, Math.floor(originalLength * 0.5));
+                                    break;
+                                case 'long':
+                                    summaryLength = Math.max(30, Math.floor(originalLength * 0.8));
+                                    break;
+                                default:
+                                    summaryLength = Math.max(20, Math.floor(originalLength * 0.5));
+                            }
+
+                            const sentences = inputText.value.split(/[.!?]+/);
+                            let summary = '';
+
+                            if (document.querySelector('input[name="style"]:checked').value === 'bullet') {
+                                summary = sentences.slice(0, summaryLength).map(s => `- ${s.trim()}`).join('\n');
+                            } else {
+                                summary = sentences.slice(0, summaryLength).map(s => s.trim()).join(' ');
+                            }
+
+                            outputText.value = summary;
+
+                            // Calculate quality metrics (mock values for demonstration)
+                            coherence.value = (Math.random() * 3 + 7).toFixed(1);
+                            relevance.value = (Math.random() * 3 + 7).toFixed(1);
+                            fluency.value = (Math.random() * 3 + 7).toFixed(1);
+                            compression.value = `${Math.floor((summaryLength / originalLength) * 100)}%`;
+
+                        } catch (error) {
+                            console.error('Error summarizing text:', error);
+                            alert('An error occurred while summarizing the text. Please try again.');
+                        } finally {
+                            isLoading.value = false;
+                            document.getElementById('summarize-btn').disabled = false;
+                        }
+                    };
+
+                    const clearText = () => {
+                        inputText.value = '';
+                        outputText.value = '';
+                        coherence.value = '-';
+                        relevance.value = '-';
+                        fluency.value = '-';
+                        compression.value = '-';
+                    };
+
+                    return {
+                        inputText,
+                        outputText,
+                        isLoading,
+                        coherence,
+                        relevance,
+                        fluency,
+                        compression,
+                        mobileMenu,
+                        toggleMobileMenu,
+                        summarizeText,
+                        clearText
+                    };
+                }
+            }).mount('#app');
+
+            // Initialize mobile menu
+            document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+                document.querySelector('.mobile-menu').classList.toggle('active');
+            });
+
+            // Initialize event listeners
+            document.getElementById('summarize-btn').addEventListener('click', function() {
+                summarizeText();
+            });
+
+            document.getElementById('clear-btn').addEventListener('click', function() {
+                clearText();
+            });
+        });
+    </script>
+</body>
+</html>

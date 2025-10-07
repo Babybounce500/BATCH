@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OpenAI Text-to-Speech Studio Pro - Professional text-to-speech synthesis tool">
+    <title>OpenAI Text-to-Speech Studio Pro</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f77f00;
+            --danger-color: #d90429;
+            --text-color: #212529;
+            --text-light: #f8f9fa;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .studio-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .text-input {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            resize: vertical;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+
+        .voice-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 500;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .audio-player {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .play-btn, .pause-btn, .stop-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .play-btn:hover, .pause-btn:hover, .stop-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .waveform {
+            margin-top: 1rem;
+            height: 100px;
+            background-color: #f1f1f1;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .waveform-inner {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .audio-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .audio-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .audio-actions button {
+            padding: 0.5rem 1rem;
+            background-color: var(--light-color);
+            color: var(--text-color);
+        }
+
+        .audio-actions button:hover {
+            background-color: #e9ecef;
+        }
+
+        .sidebar {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .language-selector, .voice-selector, .speed-control, .pitch-control {
+            margin-bottom: 1rem;
+        }
+
+        .optimization-tools {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .optimization-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .optimization-option input {
+            margin: 0;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-light);
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .studio-container {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+                cursor: pointer;
+            }
+
+            .mobile-menu.active .bar1 {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+
+            .mobile-menu.active .bar2 {
+                opacity: 0;
+            }
+
+            .mobile-menu.active .bar3 {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
+
+            .mobile-nav {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary-color);
+                padding: 1rem;
+                z-index: 100;
+            }
+
+            .mobile-nav.active {
+                display: block;
+            }
+
+            .mobile-nav ul {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .mobile-nav ul li {
+                margin: 0;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--text-light);
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .dark-theme {
+            --primary-color: #4895ef;
+            --secondary-color: #4361ee;
+            --light-color: #212529;
+            --dark-color: #f8f9fa;
+            --text-color: #f8f9fa;
+            --text-light: #212529;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1 class="logo">OpenAI TTS Studio Pro</h1>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+            <button class="theme-toggle">🌓</button>
+            <div class="mobile-menu">
+                <div class="bar1"></div>
+                <div class="bar2"></div>
+                <div class="bar3"></div>
+            </div>
+            <div class="mobile-nav">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="studio-container">
+            <div class="text-input">
+                <h2>Text Input</h2>
+                <textarea id="text-input" placeholder="Enter text to convert to speech..."></textarea>
+                <div class="button-group">
+                    <button id="synthesize-btn">Synthesize Speech</button>
+                    <button id="clear-btn">Clear Text</button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Voice Settings</h3>
+                    <div class="control-group language-selector">
+                        <label for="language-select">Language</label>
+                        <select id="language-select">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="it">Italian</option>
+                            <option value="pt">Portuguese</option>
+                            <option value="ru">Russian</option>
+                            <option value="ja">Japanese</option>
+                            <option value="zh">Chinese</option>
+                        </select>
+                    </div>
+                    <div class="control-group voice-selector">
+                        <label for="voice-select">Voice</label>
+                        <select id="voice-select">
+                            <option value="alloy">Alloy</option>
+                            <option value="echo">Echo</option>
+                            <option value="fable">Fable</option>
+                            <option value="onyx">Onyx</option>
+                            <option value="nova">Nova</option>
+                            <option value="shimmer">Shimmer</option>
+                        </select>
+                    </div>
+                    <div class="control-group speed-control">
+                        <label for="speed-slider">Speed</label>
+                        <input type="range" id="speed-slider" min="0.5" max="2" step="0.1" value="1">
+                        <div class="range-value">1.0x</div>
+                    </div>
+                    <div class="control-group pitch-control">
+                        <label for="pitch-slider">Pitch</label>
+                        <input type="range" id="pitch-slider" min="0.5" max="2" step="0.1" value="1">
+                        <div class="range-value">1.0</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Optimization Tools</h3>
+                    <div class="optimization-tools">
+                        <div class="optimization-option">
+                            <input type="checkbox" id="optimize-clear" checked>
+                            <label for="optimize-clear">Clear background noise</label>
+                        </div>
+                        <div class="optimization-option">
+                            <input type="checkbox" id="optimize-reverb" checked>
+                            <label for="optimize-reverb">Reduce reverb</label>
+                        </div>
+                        <div class="optimization-option">
+                            <input type="checkbox" id="optimize-echo" checked>
+                            <label for="optimize-echo">Remove echo</label>
+                        </div>
+                        <div class="optimization-option">
+                            <input type="checkbox" id="optimize-normalize" checked>
+                            <label for="optimize-normalize">Normalize audio</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="audio-player">
+            <h2>Audio Player</h2>
+            <div class="player-controls">
+                <div class="play-btn" id="play-btn">▶</div>
+                <div class="pause-btn" id="pause-btn">⏸</div>
+                <div class="stop-btn" id="stop-btn">⏹</div>
+                <div class="waveform">
+                    <div class="waveform-inner" id="waveform-inner"></div>
+                </div>
+            </div>
+            <div class="audio-info">
+                <span id="current-time">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <div class="audio-actions">
+                <button id="download-btn">Download Audio</button>
+                <button id="share-btn">Share Audio</button>
+                <button id="save-btn">Save Project</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2023 OpenAI Text-to-Speech Studio Pro. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle functionality
+            const themeToggle = document.querySelector('.theme-toggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-theme');
+                const icon = this.textContent === '🌓' ? '☀️' : '🌓';
+                this.textContent = icon;
+            });
+
+            // Mobile menu functionality
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileNav = document.querySelector('.mobile-nav');
+
+            mobileMenu.addEventListener('click', function() {
+                this.classList.toggle('active');
+                mobileNav.classList.toggle('active');
+            });
+
+            // Range slider value display
+            const speedSlider = document.getElementById('speed-slider');
+            const speedValue = document.querySelector('.speed-control .range-value');
+            const pitchSlider = document.getElementById('pitch-slider');
+            const pitchValue = document.querySelector('.pitch-control .range-value');
+
+            speedSlider.addEventListener('input', function() {
+                speedValue.textContent = this.value + 'x';
+            });
+
+            pitchSlider.addEventListener('input', function() {
+                pitchValue.textContent = this.value;
+            });
+
+            // Text input functionality
+            const textInput = document.getElementById('text-input');
+            const synthesizeBtn = document.getElementById('synthesize-btn');
+            const clearBtn = document.getElementById('clear-btn');
+
+            clearBtn.addEventListener('click', function() {
+                textInput.value = '';
+            });
+
+            // Audio player functionality
+            const playBtn = document.getElementById('play-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const waveformInner = document.getElementById('waveform-inner');
+            const currentTimeDisplay = document.getElementById('current-time');
+            const durationDisplay = document.getElementById('duration');
+
+            let audioContext;
+            let audioBuffer;
+            let sourceNode;
+            let isPlaying = false;
+            let startTime = 0;
+            let pauseTime = 0;
+
+            // Simulate audio synthesis
+            synthesizeBtn.addEventListener('click', async function() {
+                if (textInput.value.trim() === '') {
+                    alert('Please enter some text to synthesize.');
+                    return;
+                }
+
+                this.disabled = true;
+                this.innerHTML = 'Synthesizing <span class="loading"></span>';
+
+                try {
+                    // Simulate API call to OpenAI TTS
+                    await simulateTTSAPICall();
+
+                    // In a real implementation, you would use the actual audio data from the API
+                    // For this demo, we'll create a simple sine wave
+                    createDemoAudio();
+
+                    this.innerHTML = 'Synthesize Speech';
+                    this.disabled = false;
+                } catch (error) {
+                    console.error('Error synthesizing speech:', error);
+                    this.innerHTML = 'Synthesize Speech';
+                    this.disabled = false;
+                    alert('Error synthesizing speech. Please try again.');
+                }
+            });
+
+            function simulateTTSAPICall() {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, 2000);
+                });
+            }
+
+            function createDemoAudio() {
+                // This is a simplified demo - in a real implementation, you would use the actual audio data
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const sampleRate = audioContext.sampleRate;
+                const duration = 5; // seconds
+                const buffer = audioContext.createBuffer(1, sampleRate * duration, sampleRate);
+                const data = buffer.getChannelData(0);
+
+                // Create a simple sine wave
+                for (let i = 0; i < buffer.length; i++) {
+                    data[i] = Math.sin(i / (sampleRate / 440) * 2 * Math.PI);
+                }
+
+                audioBuffer = buffer;
+                durationDisplay.textContent = formatTime(duration);
+            }
+
+            playBtn.addEventListener('click', function() {
+                if (!audioBuffer) {
+                    alert('Please synthesize speech first.');
+                    return;
+                }
+
+                if (!isPlaying) {
+                    if (!audioContext) {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+
+                    sourceNode = audioContext.createBufferSource();
+                    sourceNode.buffer = audioBuffer;
+
+                    sourceNode.connect(audioContext.destination);
+                    sourceNode.start(0, pauseTime);
+                    startTime = audioContext.currentTime - pauseTime;
+                    isPlaying = true;
+
+                    // Update waveform
+                    updateWaveform();
+                }
+            });
+
+            pauseBtn.addEventListener('click', function() {
+                if (isPlaying) {
+                    sourceNode.stop();
+                    pauseTime = audioContext.currentTime - startTime;
+                    isPlaying = false;
+                }
+            });
+
+            stopBtn.addEventListener('click', function() {
+                if (isPlaying || pauseTime > 0) {
+                    sourceNode.stop();
+                    pauseTime = 0;
+                    isPlaying = false;
+                    waveformInner.style.width = '0%';
+                    currentTimeDisplay.textContent = '0:00';
+                }
+            });
+
+            function updateWaveform() {
+                if (!isPlaying) return;
+
+                const currentTime = audioContext.currentTime - startTime;
+                const duration = audioBuffer.duration;
+                const progress = (currentTime / duration) * 100;
+
+                waveformInner.style.width = progress + '%';
+                currentTimeDisplay.textContent = formatTime(currentTime);
+
+                if (currentTime >= duration) {
+                    isPlaying = false;
+                    pauseTime = 0;
+                } else {
+                    requestAnimationFrame(updateWaveform);
+                }
+            }
+
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return minutes + ':' + (secs < 10 ? '0' : '') + secs;
+            }
+
+            // Download functionality
+            const downloadBtn = document.getElementById('download-btn');
+
+            downloadBtn.addEventListener('click', function() {
+                if (!audioBuffer) {
+                    alert('Please synthesize speech first.');
+                    return;
+                }
+
+                // In a real implementation, you would download the actual audio file
+                alert('Audio download functionality would be implemented here.');
+            });
+
+            // Share functionality
+            const shareBtn = document.getElementById('share-btn');
+
+            shareBtn.addEventListener('click', function() {
+                if (!audioBuffer) {
+                    alert('Please synthesize speech first.');
+                    return;
+                }
+
+                // In a real implementation, you would provide sharing options
+                alert('Audio sharing functionality would be implemented here.');
+            });
+
+            // Save project functionality
+            const saveBtn = document.getElementById('save-btn');
+
+            saveBtn.addEventListener('click', function() {
+                if (textInput.value.trim() === '') {
+                    alert('Please enter some text to save.');
+                    return;
+                }
+
+                // In a real implementation, you would save the project data
+                alert('Project saving functionality would be implemented here.');
+            });
+        });
+    </script>
+</body>
+</html>

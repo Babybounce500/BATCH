@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OpenAI Image Generation Studio Pro - Professional image generation and editing using OpenAI's DALL-E API">
+    <title>OpenAI Image Generation Studio Pro</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --background-color: #f8f9fa;
+            --text-color: #202124;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: #e8eaed;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .main-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: #3367d6;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+        }
+
+        .tool-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-group-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tool-option {
+            padding: 0.5rem;
+            background-color: #f1f3f4;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tool-option:hover {
+            background-color: #e8eaed;
+        }
+
+        .tool-option.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .filter-slider {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .gallery-item {
+            aspect-ratio: 1;
+            background-color: #f1f3f4;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .theme-toggle {
+            background-color: transparent;
+            border: 1px solid white;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .mobile-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary-color);
+                padding: 1rem;
+                box-shadow: var(--box-shadow);
+            }
+
+            .mobile-menu.active {
+                display: block;
+            }
+
+            .mobile-menu ul {
+                display: flex;
+                flex-direction: column;
+                list-style: none;
+            }
+
+            .mobile-menu ul li {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">OpenAI Image Studio Pro</div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Gallery</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+            <button class="theme-toggle">Dark Mode</button>
+            <button class="mobile-menu-toggle">☰</button>
+            <div class="mobile-menu">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Gallery</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <main>
+        <aside class="sidebar">
+            <section class="tool-group">
+                <h3 class="tool-group-title">Image Generation</h3>
+                <div class="form-group">
+                    <label for="prompt">Prompt</label>
+                    <textarea id="prompt" placeholder="Describe the image you want to generate..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="style">Style</label>
+                    <select id="style">
+                        <option value="default">Default</option>
+                        <option value="realistic">Realistic</option>
+                        <option value="cartoon">Cartoon</option>
+                        <option value="abstract">Abstract</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="resolution">Resolution</label>
+                    <select id="resolution">
+                        <option value="256x256">256x256</option>
+                        <option value="512x512" selected>512x512</option>
+                        <option value="1024x1024">1024x1024</option>
+                    </select>
+                </div>
+                <button id="generate-btn">Generate Image</button>
+            </section>
+
+            <section class="tool-group">
+                <h3 class="tool-group-title">Image Editing</h3>
+                <div class="tool-options">
+                    <div class="tool-option active" data-tool="select">Select</div>
+                    <div class="tool-option" data-tool="draw">Draw</div>
+                    <div class="tool-option" data-tool="text">Text</div>
+                    <div class="tool-option" data-tool="crop">Crop</div>
+                    <div class="tool-option" data-tool="resize">Resize</div>
+                </div>
+            </section>
+
+            <section class="tool-group">
+                <h3 class="tool-group-title">Filters</h3>
+                <div class="form-group">
+                    <label for="brightness">Brightness</label>
+                    <input type="range" id="brightness" class="filter-slider" min="0" max="200" value="100">
+                </div>
+                <div class="form-group">
+                    <label for="contrast">Contrast</label>
+                    <input type="range" id="contrast" class="filter-slider" min="0" max="200" value="100">
+                </div>
+                <div class="form-group">
+                    <label for="saturation">Saturation</label>
+                    <input type="range" id="saturation" class="filter-slider" min="0" max="200" value="100">
+                </div>
+                <div class="form-group">
+                    <label for="blur">Blur</label>
+                    <input type="range" id="blur" class="filter-slider" min="0" max="10" value="0">
+                </div>
+            </section>
+
+            <section class="tool-group">
+                <h3 class="tool-group-title">Artistic Filters</h3>
+                <div class="tool-options">
+                    <div class="tool-option" data-filter="none">None</div>
+                    <div class="tool-option" data-filter="oil-paint">Oil Paint</div>
+                    <div class="tool-option" data-filter="watercolor">Watercolor</div>
+                    <div class="tool-option" data-filter="sketch">Sketch</div>
+                    <div class="tool-option" data-filter="vintage">Vintage</div>
+                </div>
+            </section>
+
+            <section class="tool-group">
+                <h3 class="tool-group-title">Style Transfer</h3>
+                <div class="form-group">
+                    <label for="style-image">Style Image</label>
+                    <input type="file" id="style-image" accept="image/*">
+                </div>
+                <button id="apply-style-transfer">Apply Style Transfer</button>
+            </section>
+
+            <section class="tool-group">
+                <h3 class="tool-group-title">Export</h3>
+                <div class="form-group">
+                    <label for="export-format">Format</label>
+                    <select id="export-format">
+                        <option value="png">PNG</option>
+                        <option value="jpeg">JPEG</option>
+                        <option value="webp">WebP</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="export-quality">Quality</label>
+                    <input type="range" id="export-quality" min="0" max="100" value="90">
+                </div>
+                <button id="export-btn">Export Image</button>
+            </section>
+        </aside>
+
+        <div class="main-content">
+            <h2 class="section-title">Canvas</h2>
+            <div class="canvas-container">
+                <canvas id="image-canvas"></canvas>
+                <div class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+
+            <section>
+                <h2 class="section-title">Recent Images</h2>
+                <div class="image-gallery">
+                    <!-- Gallery items will be added here dynamically -->
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2023 OpenAI Image Generation Studio Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Fabric.js canvas
+            const canvas = new fabric.Canvas('image-canvas', {
+                preserveObjectStacking: true
+            });
+
+            // Set canvas dimensions
+            function resizeCanvas() {
+                const container = document.querySelector('.canvas-container');
+                canvas.setWidth(container.clientWidth);
+                canvas.setHeight(container.clientHeight);
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            // Tool selection
+            const toolOptions = document.querySelectorAll('.tool-option');
+            let currentTool = 'select';
+
+            toolOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    toolOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTool = this.dataset.tool;
+
+                    // Set appropriate canvas mode
+                    switch(currentTool) {
+                        case 'select':
+                            canvas.isDrawingMode = false;
+                            break;
+                        case 'draw':
+                            canvas.isDrawingMode = true;
+                            canvas.freeDrawingBrush.width = 5;
+                            canvas.freeDrawingBrush.color = '#000000';
+                            break;
+                        case 'text':
+                            canvas.isDrawingMode = false;
+                            addText();
+                            break;
+                        case 'crop':
+                            // Implement crop functionality
+                            break;
+                        case 'resize':
+                            // Implement resize functionality
+                            break;
+                    }
+                });
+            });
+
+            // Add text to canvas
+            function addText() {
+                const text = new fabric.IText('Type here...', {
+                    left: 50,
+                    top: 50,
+                    fontFamily: 'Arial',
+                    fill: '#000000',
+                    fontSize: 20
+                });
+                canvas.add(text);
+                canvas.setActiveObject(text);
+                text.enterEditing();
+                text.selectAll();
+            }
+
+            // Filter sliders
+            const brightnessSlider = document.getElementById('brightness');
+            const contrastSlider = document.getElementById('contrast');
+            const saturationSlider = document.getElementById('saturation');
+            const blurSlider = document.getElementById('blur');
+
+            function applyFilters() {
+                const activeObject = canvas.getActiveObject();
+                if (activeObject && activeObject.type === 'image') {
+                    activeObject.filters = [];
+
+                    if (brightnessSlider.value !== '100') {
+                        activeObject.filters.push(new fabric.Image.filters.Brightness({
+                            brightness: parseInt(brightnessSlider.value) / 100
+                        }));
+                    }
+
+                    if (contrastSlider.value !== '100') {
+                        activeObject.filters.push(new fabric.Image.filters.Contrast({
+                            contrast: parseInt(contrastSlider.value) / 100
+                        }));
+                    }
+
+                    if (saturationSlider.value !== '100') {
+                        activeObject.filters.push(new fabric.Image.filters.Saturation({
+                            saturation: parseInt(saturationSlider.value) / 100
+                        }));
+                    }
+
+                    if (blurSlider.value !== '0') {
+                        activeObject.filters.push(new fabric.Image.filters.Blur({
+                            blur: parseInt(blurSlider.value) / 10
+                        }));
+                    }
+
+                    activeObject.applyFilters();
+                    canvas.renderAll();
+                }
+            }
+
+            brightnessSlider.addEventListener('input', applyFilters);
+            contrastSlider.addEventListener('input', applyFilters);
+            saturationSlider.addEventListener('input', applyFilters);
+            blurSlider.addEventListener('input', applyFilters);
+
+            // Artistic filters
+            const filterOptions = document.querySelectorAll('[data-filter]');
+            let currentFilter = 'none';
+
+            filterOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    filterOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+
+                    // Apply filter to active image
+                    const activeObject = canvas.getActiveObject();
+                    if (activeObject && activeObject.type === 'image') {
+                        activeObject.filters = [];
+
+                        switch(currentFilter) {
+                            case 'oil-paint':
+                                activeObject.filters.push(new fabric.Image.filters.OilPaint());
+                                break;
+                            case 'watercolor':
+                                activeObject.filters.push(new fabric.Image.filters.Watercolor());
+                                break;
+                            case 'sketch':
+                                activeObject.filters.push(new fabric.Image.filters.Sketch());
+                                break;
+                            case 'vintage':
+                                activeObject.filters.push(new fabric.Image.filters.Vintage());
+                                break;
+                        }
+
+                        activeObject.applyFilters();
+                        canvas.renderAll();
+                    }
+                });
+            });
+
+            // Generate image with DALL-E API
+            const generateBtn = document.getElementById('generate-btn');
+            const promptInput = document.getElementById('prompt');
+            const styleSelect = document.getElementById('style');
+            const resolutionSelect = document.getElementById('resolution');
+            const loadingElement = document.querySelector('.loading');
+
+            generateBtn.addEventListener('click', async function() {
+                const prompt = promptInput.value.trim();
+                if (!prompt) {
+                    alert('Please enter a prompt');
+                    return;
+                }
+
+                generateBtn.disabled = true;
+                loadingElement.style.display = 'flex';
+
+                try {
+                    // Simulate API call to OpenAI's DALL-E
+                    const imageUrl = await simulateDalleApiCall(prompt, styleSelect.value, resolutionSelect.value);
+
+                    // Add image to canvas
+                    fabric.Image.fromURL(imageUrl, function(img) {
+                        img.set({
+                            left: 0,
+                            top: 0,
+                            angle: 0,
+                            padding: 10,
+                            cornersize: 10
+                        });
+
+                        // Scale image to fit canvas
+                        const scale = Math.min(
+                            canvas.width / img.width,
+                            canvas.height / img.height
+                        );
+                        img.scale(scale * 0.8);
+
+                        canvas.add(img).setActiveObject(img);
+                        canvas.renderAll();
+
+                        // Add to gallery
+                        addToGallery(imageUrl);
+
+                        generateBtn.disabled = false;
+                        loadingElement.style.display = 'none';
+                    }, { crossOrigin: 'anonymous' });
+                } catch (error) {
+                    console.error('Error generating image:', error);
+                    alert('Error generating image. Please try again.');
+                    generateBtn.disabled = false;
+                    loadingElement.style.display = 'none';
+                }
+            });
+
+            // Simulate DALL-E API call
+            async function simulateDalleApiCall(prompt, style, resolution) {
+                // In a real implementation, this would call the OpenAI API
+                console.log(`Generating image with prompt: ${prompt}, style: ${style}, resolution: ${resolution}`);
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Return a placeholder image URL
+                return `https://via.placeholder.com/${resolution}?text=${encodeURIComponent(prompt)}`;
+            }
+
+            // Add image to gallery
+            function addToGallery(imageUrl) {
+                const gallery = document.querySelector('.image-gallery');
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+
+                const img = document.createElement('img');
+                img.className = 'gallery-image';
+                img.src = imageUrl;
+                img.alt = 'Generated image';
+
+                galleryItem.appendChild(img);
+                gallery.prepend(galleryItem);
+
+                // Add click event to load image into canvas
+                galleryItem.addEventListener('click', function() {
+                    fabric.Image.fromURL(imageUrl, function(img) {
+                        img.set({
+                            left: 0,
+                            top: 0,
+                            angle: 0,
+                            padding: 10,
+                            cornersize: 10
+                        });
+
+                        // Scale image to fit canvas
+                        const scale = Math.min(
+                            canvas.width / img.width,
+                            canvas.height / img.height
+                        );
+                        img.scale(scale * 0.8);
+
+                        canvas.add(img).setActiveObject(img);
+                        canvas.renderAll();
+                    }, { crossOrigin: 'anonymous' });
+                });
+            }
+
+            // Style transfer
+            const styleImageInput = document.getElementById('style-image');
+            const applyStyleTransferBtn = document.getElementById('apply-style-transfer');
+
+            applyStyleTransferBtn.addEventListener('click', function() {
+                if (!styleImageInput.files || styleImageInput.files.length === 0) {
+                    alert('Please select a style image');
+                    return;
+                }
+
+                const file = styleImageInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const activeObject = canvas.getActiveObject();
+                    if (activeObject && activeObject.type === 'image') {
+                        // In a real implementation, this would apply style transfer
+                        console.log('Applying style transfer with image:', e.target.result);
+
+                        // For demonstration, we'll just apply a filter
+                        activeObject.filters.push(new fabric.Image.filters.Sepia());
+                        activeObject.applyFilters();
+                        canvas.renderAll();
+                    } else {
+                        alert('Please select an image on the canvas first');
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            });
+
+            // Export image
+            const exportBtn = document.getElementById('export-btn');
+            const exportFormat = document.getElementById('export-format');
+            const exportQuality = document.getElementById('export-quality');
+
+            exportBtn.addEventListener('click', function() {
+                if (canvas.getObjects().length === 0) {
+                    alert('Canvas is empty. Please generate or upload an image first.');
+                    return;
+                }
+
+                const format = exportFormat.value;
+                const quality = exportQuality.value / 100;
+
+                // Create a temporary canvas to export
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+
+                // Draw white background
+                tempCtx.fillStyle = 'white';
+                tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+                // Draw canvas content
+                tempCtx.drawImage(canvas.lowerCanvasEl, 0, 0);
+
+                // Create download link
+                const link = document.createElement('a');
+                link.download = `image.${format}`;
+
+                if (format === 'png') {
+                    link.href = tempCanvas.toDataURL('image/png');
+                } else if (format === 'jpeg') {
+                    link.href = tempCanvas.toDataURL('image/jpeg', quality);
+                } else if (format === 'webp') {
+                    link.href = tempCanvas.toDataURL('image/webp', quality);
+                }
+
+                link.click();
+            });
+
+            // Theme toggle
+            const themeToggle = document.querySelector('.theme-toggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-theme');
+                if (document.body.classList.contains('dark-theme')) {
+                    themeToggle.textContent = 'Light Mode';
+                } else {
+                    themeToggle.textContent = 'Dark Mode';
+                }
+            });
+
+            // Mobile menu toggle
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+            const mobileMenu = document.querySelector('.mobile-menu');
+
+            mobileMenuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    mobileMenu.classList.remove('active');
+                }
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+</body>
+</html>

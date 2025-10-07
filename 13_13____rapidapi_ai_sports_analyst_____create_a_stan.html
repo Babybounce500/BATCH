@@ -1,0 +1,246 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sports Analyst</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #f4f4f4;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .map-container {
+            height: 400px;
+            margin-bottom: 1rem;
+        }
+        .chart-container {
+            margin-bottom: 1rem;
+        }
+        .prediction-results {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Sports Analyst</h1>
+        </div>
+        <div class="main-content">
+            <div class="sidebar">
+                <h2>Sports Data</h2>
+                <div>
+                    <label for="sport-select">Select Sport:</label>
+                    <select id="sport-select">
+                        <option value="football">Football</option>
+                        <option value="basketball">Basketball</option>
+                        <option value="tennis">Tennis</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="date-range">Date Range:</label>
+                    <input type="date" id="start-date">
+                    <input type="date" id="end-date">
+                </div>
+                <button id="fetch-data">Fetch Data</button>
+                <div id="data-filters">
+                    <h3>Filters</h3>
+                    <div>
+                        <label for="team-filter">Team:</label>
+                        <select id="team-filter">
+                            <option value="">All Teams</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="player-filter">Player:</label>
+                        <select id="player-filter">
+                            <option value="">All Players</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="map-container" id="map"></div>
+                <div class="chart-container">
+                    <canvas id="performance-chart"></canvas>
+                </div>
+                <div class="prediction-results">
+                    <h2>Event Predictions</h2>
+                    <div id="predictions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Leaflet map
+            const map = L.map('map').setView([51.505, -0.09], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Initialize Chart.js
+            const ctx = document.getElementById('performance-chart').getContext('2d');
+            const performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Player Performance',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Fetch data button event listener
+            document.getElementById('fetch-data').addEventListener('click', fetchSportsData);
+
+            // Fetch sports data from RapidAPI
+            function fetchSportsData() {
+                const sport = document.getElementById('sport-select').value;
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+
+                // In a real application, you would make an API call to RapidAPI here
+                // This is a mock implementation
+                console.log(`Fetching ${sport} data from ${startDate} to ${endDate}`);
+
+                // Mock data for demonstration
+                const mockData = {
+                    teams: ['Team A', 'Team B', 'Team C'],
+                    players: ['Player 1', 'Player 2', 'Player 3'],
+                    events: [
+                        { id: 1, team: 'Team A', player: 'Player 1', date: '2023-01-01', score: 85 },
+                        { id: 2, team: 'Team B', player: 'Player 2', date: '2023-01-02', score: 92 },
+                        { id: 3, team: 'Team C', player: 'Player 3', date: '2023-01-03', score: 78 }
+                    ]
+                };
+
+                updateFilters(mockData.teams, mockData.players);
+                updateMap(mockData.events);
+                updatePerformanceChart(mockData.events);
+                generatePredictions(mockData.events);
+            }
+
+            // Update team and player filters
+            function updateFilters(teams, players) {
+                const teamFilter = document.getElementById('team-filter');
+                const playerFilter = document.getElementById('player-filter');
+
+                // Clear existing options
+                teamFilter.innerHTML = '<option value="">All Teams</option>';
+                playerFilter.innerHTML = '<option value="">All Players</option>';
+
+                // Add new options
+                teams.forEach(team => {
+                    const option = document.createElement('option');
+                    option.value = team;
+                    option.textContent = team;
+                    teamFilter.appendChild(option);
+                });
+
+                players.forEach(player => {
+                    const option = document.createElement('option');
+                    option.value = player;
+                    option.textContent = player;
+                    playerFilter.appendChild(option);
+                });
+            }
+
+            // Update map with event locations
+            function updateMap(events) {
+                // Clear existing markers
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker) {
+                        map.removeLayer(layer);
+                    }
+                });
+
+                // Add new markers for each event
+                events.forEach(event => {
+                    // In a real application, you would use actual coordinates
+                    // This is a mock implementation
+                    const lat = 51.5 + (Math.random() - 0.5) * 0.1;
+                    const lng = -0.09 + (Math.random() - 0.5) * 0.1;
+
+                    L.marker([lat, lng]).addTo(map)
+                        .bindPopup(`<b>${event.team}</b><br>${event.player}<br>${event.date}`);
+                });
+            }
+
+            // Update performance chart
+            function updatePerformanceChart(events) {
+                const labels = events.map(event => event.date);
+                const data = events.map(event => event.score);
+
+                performanceChart.data.labels = labels;
+                performanceChart.data.datasets[0].data = data;
+                performanceChart.update();
+            }
+
+            // Generate predictions
+            function generatePredictions(events) {
+                const predictionsDiv = document.getElementById('predictions');
+                predictionsDiv.innerHTML = '';
+
+                // In a real application, you would use machine learning models
+                // This is a mock implementation
+                events.forEach(event => {
+                    const prediction = Math.random() > 0.5 ? 'Win' : 'Loss';
+                    const predictionElement = document.createElement('div');
+                    predictionElement.innerHTML = `
+                        <h3>${event.team} vs ${event.player}</h3>
+                        <p>Date: ${event.date}</p>
+                        <p>Predicted Outcome: ${prediction}</p>
+                    `;
+                    predictionsDiv.appendChild(predictionElement);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+```

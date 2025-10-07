@@ -1,0 +1,306 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EOD Crypto Market Oracle</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/css/uikit.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chartist@0.11.4/dist/chartist.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .ct-chart {
+            width: 100%;
+            height: 400px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .uk-card-body {
+            padding: 20px;
+        }
+        .uk-card-title {
+            margin-bottom: 15px;
+        }
+        .uk-input {
+            margin-bottom: 10px;
+        }
+        .uk-button {
+            margin-right: 10px;
+        }
+        .prediction-result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>EOD Crypto Market Oracle</h1>
+    </div>
+    <div class="container">
+        <div class="uk-grid-match uk-child-width-1-2@m" uk-grid>
+            <div>
+                <div class="uk-card uk-card-default">
+                    <div class="uk-card-header">
+                        <h3 class="uk-card-title">Market Data Visualization</h3>
+                    </div>
+                    <div class="uk-card-body">
+                        <div class="uk-margin">
+                            <select class="uk-select" id="crypto-select">
+                                <option value="BTC">Bitcoin (BTC)</option>
+                                <option value="ETH">Ethereum (ETH)</option>
+                                <option value="LTC">Litecoin (LTC)</option>
+                                <option value="XRP">Ripple (XRP)</option>
+                            </select>
+                        </div>
+                        <div class="uk-margin">
+                            <select class="uk-select" id="timeframe-select">
+                                <option value="1d">1 Day</option>
+                                <option value="1w">1 Week</option>
+                                <option value="1m">1 Month</option>
+                                <option value="3m">3 Months</option>
+                                <option value="1y">1 Year</option>
+                            </select>
+                        </div>
+                        <div id="price-chart" class="ct-chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="uk-card uk-card-default">
+                    <div class="uk-card-header">
+                        <h3 class="uk-card-title">Trend Prediction</h3>
+                    </div>
+                    <div class="uk-card-body">
+                        <div class="uk-margin">
+                            <select class="uk-select" id="prediction-crypto-select">
+                                <option value="BTC">Bitcoin (BTC)</option>
+                                <option value="ETH">Ethereum (ETH)</option>
+                                <option value="LTC">Litecoin (LTC)</option>
+                                <option value="XRP">Ripple (XRP)</option>
+                            </select>
+                        </div>
+                        <div class="uk-margin">
+                            <select class="uk-select" id="prediction-timeframe-select">
+                                <option value="1d">1 Day</option>
+                                <option value="1w">1 Week</option>
+                                <option value="1m">1 Month</option>
+                            </select>
+                        </div>
+                        <button class="uk-button uk-button-primary" id="predict-button">Predict</button>
+                        <div id="prediction-result" class="prediction-result">
+                            <p>Select a cryptocurrency and timeframe, then click "Predict" to see the trend prediction.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="uk-card uk-card-default">
+            <div class="uk-card-header">
+                <h3 class="uk-card-title">Blockchain Explorer</h3>
+            </div>
+            <div class="uk-card-body">
+                <div class="uk-margin">
+                    <input class="uk-input" type="text" id="tx-hash-input" placeholder="Enter transaction hash">
+                </div>
+                <button class="uk-button uk-button-primary" id="analyze-button">Analyze Transaction</button>
+                <div id="transaction-result" class="prediction-result">
+                    <p>Enter a transaction hash and click "Analyze Transaction" to see details.</p>
+                </div>
+            </div>
+        </div>
+        <div class="uk-card uk-card-default">
+            <div class="uk-card-header">
+                <h3 class="uk-card-title">Smart Contract Monitoring</h3>
+            </div>
+            <div class="uk-card-body">
+                <div class="uk-margin">
+                    <input class="uk-input" type="text" id="contract-address-input" placeholder="Enter contract address">
+                </div>
+                <button class="uk-button uk-button-primary" id="monitor-button">Monitor Contract</button>
+                <div id="contract-result" class="prediction-result">
+                    <p>Enter a contract address and click "Monitor Contract" to see alerts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/js/uikit-icons.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartist@0.11.4/dist/chartist.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const priceChart = new Chartist.Line('#price-chart', {
+                labels: [],
+                series: []
+            }, {
+                fullWidth: true,
+                chartPadding: {
+                    right: 40
+                }
+            });
+
+            const cryptoSelect = document.getElementById('crypto-select');
+            const timeframeSelect = document.getElementById('timeframe-select');
+            const predictButton = document.getElementById('predict-button');
+            const analyzeButton = document.getElementById('analyze-button');
+            const monitorButton = document.getElementById('monitor-button');
+            const predictionResult = document.getElementById('prediction-result');
+            const transactionResult = document.getElementById('transaction-result');
+            const contractResult = document.getElementById('contract-result');
+
+            function fetchMarketData() {
+                const crypto = cryptoSelect.value;
+                const timeframe = timeframeSelect.value;
+
+                // Simulate API call to EOD financial data
+                setTimeout(() => {
+                    const data = generateMockData(crypto, timeframe);
+                    updateChart(data);
+                }, 500);
+            }
+
+            function generateMockData(crypto, timeframe) {
+                const labels = [];
+                const prices = [];
+                const basePrice = Math.random() * 10000 + 1000;
+                const volatility = Math.random() * 100 + 10;
+
+                const timeframes = {
+                    '1d': { count: 24, interval: 'hour' },
+                    '1w': { count: 7, interval: 'day' },
+                    '1m': { count: 30, interval: 'day' },
+                    '3m': { count: 90, interval: 'day' },
+                    '1y': { count: 12, interval: 'month' }
+                };
+
+                const { count, interval } = timeframes[timeframe];
+
+                for (let i = 0; i < count; i++) {
+                    const date = new Date();
+                    if (interval === 'hour') {
+                        date.setHours(date.getHours() - (count - i - 1));
+                    } else if (interval === 'day') {
+                        date.setDate(date.getDate() - (count - i - 1));
+                    } else if (interval === 'month') {
+                        date.setMonth(date.getMonth() - (count - i - 1));
+                    }
+
+                    labels.push(date.toLocaleDateString());
+                    const price = basePrice + (Math.random() * 2 - 1) * volatility;
+                    prices.push(price.toFixed(2));
+                }
+
+                return { labels, prices };
+            }
+
+            function updateChart(data) {
+                priceChart.update({
+                    labels: data.l: [data.prices]
+                });
+            }
+
+            function predictTrend() {
+                const crypto.getElementById('prediction-crypto-select').value;
+                const timeframe = document.getElementById('prediction-timeframe-select').value;
+
+                // Simulate prediction
+                setTimeout(() => {
+                    const trends = ['Bullish', 'Bearish', 'Neutral'];
+                    const trend = trends[Math.floor(Math.random() * trends.length)];
+                    const confidence = (Math.random() * 50 + 50).toFixed(2);
+
+                    predictionResult.innerHTML = `
+                        <h4>Prediction for ${crypto} in ${timeframe}</h4>
+                        <p>Trend: <strong>${trend}</strong></p>
+                        <p>Confidence: <strong>${confidence}%</strong></p>
+                    `;
+                }, 500);
+            }
+
+            function analyzeTransaction() {
+                const txHash = document.getElementById('tx-hash-input').value;
+
+                if (!txHash) {
+                    transactionResult.innerHTML = '<p>Please enter a transaction hash.</p>';
+                    return;
+                }
+
+                // Simulate API call to blockchain explorer
+                setTimeout(() => {
+                    const mockData = {
+                        hash: txHash,
+                        from: '0x' + Math.random().toString(16).substr(2, 40),
+                        to: '0x' + Math.random().toString(16).substr(2, 40),
+                        value: (Math.random() * 10).toFixed(8),
+                        gasUsed: Math.floor(Math.random() * 100000),
+                        status: Math.random() > 0.5 ? 'Success' : 'Failed'
+                    };
+
+                    transactionResult.innerHTML = `
+                        <h4>Transaction Details</h4>
+                        <p><strong>Hash:</strong> ${mockData.hash}</p>
+                        <p><strong>From:</strong> ${mockData.from}</p>
+                        <p><strong>To:</strong> ${mockData.to}</p>
+                        <p><strong>Value:</strong> ${mockData.value} ETH</p>
+                        <p><strong>Gas Used:</strong> ${mockData.gasUsed}</p>
+                        <p><strong>Status:</strong> ${mockData.status}</p>
+                    `;
+                }, 500);
+            }
+
+            function monitorContract() {
+                const contractAddress = document.getElementById('contract-address-input').value;
+
+                if (!contractAddress) {
+                    contractResult.innerHTML = '<p>Please enter a contract address.</p>';
+                    return;
+                }
+
+                // Simulate monitoring
+                setTimeout(() => {
+                    const events = ['Transfer', 'Approval', 'Deposit', 'Withdrawal'];
+                    const event = events[Math.floor(Math.random() * events.length)];
+                    const timestamp = new Date().toLocaleString();
+
+                    contractResult.innerHTML = `
+                        <h4>Smart Contract Alert</h4>
+                        <p><strong>Contract:</strong> ${contractAddress}</p>
+                        <p><strong>Event:</strong> ${event}</p>
+                        <p><strong>Timestamp:</strong> ${timestamp}</p>
+                    `;
+                }, 500);
+            }
+
+            cryptoSelect.addEventListener('change', fetchMarketData);
+            timeframeSelect.addEventListener('change', fetchMarketData);
+            predictButton.addEventListener('click', predictTrend);
+            analyzeButton.addEventListener('click', analyzeTransaction);
+            monitorButton.addEventListener('click', monitorContract);
+
+            // Initial load
+            fetchMarketData();
+        });
+    </script>
+</body>
+</html>
+```

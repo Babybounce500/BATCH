@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mistral Code Review Assistant Pro - Professional code review and quality assessment tool">
+    <title>Mistral Code Review Assistant Pro</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --background-color: #f8f9fa;
+            --text-color: #202124;
+            --border-color: #dadce0;
+            --card-bg: #ffffff;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .editor-wrapper {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            height: 60vh;
+        }
+
+        #editor {
+            height: 100%;
+            width: 100%;
+        }
+
+        .review-panel {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .review-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .secondary-btn {
+            background-color: var(--secondary-color);
+        }
+
+        .accent-btn {
+            background-color: var(--accent-color);
+        }
+
+        .review-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .review-section {
+            background-color: rgba(66, 133, 244, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .review-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(66, 133, 244, 0.2);
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .item-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-description {
+            color: #5f6368;
+        }
+
+        .severity-high {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .severity-medium {
+            color: #fbbc05;
+            font-weight: 600;
+        }
+
+        .severity-low {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            color: #f1f1f1;
+        }
+
+        @media (min-width: 768px) {
+            .editor-container {
+                grid-template-columns: 2fr 1fr;
+            }
+
+            .review-panel {
+                height: 60vh;
+                overflow-y: auto;
+            }
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(66, 133, 244, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .suggestion {
+            background-color: rgba(52, 168, 83, 0.1);
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .suggestion-content {
+            color: #5f6368;
+        }
+
+        .error {
+            background-color: rgba(234, 67, 53, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .error-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .error-content {
+            color: #5f6368;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span>Mistral Code Review Pro</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Projects</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <div class="editor-container">
+            <div class="editor-wrapper">
+                <div id="editor"></div>
+            </div>
+            <div class="review-panel">
+                <div class="review-header">
+                    <h2 class="review-title">Code Review</h2>
+                    <div class="review-actions">
+                        <button id="analyze-btn">Analyze Code</button>
+                        <button id="save-btn" class="secondary-btn">Save Review</button>
+                        <button id="export-btn" class="accent-btn">Export</button>
+                    </div>
+                </div>
+                <div class="review-content" id="review-content">
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <span>Ready to analyze your code...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-content">
+            <p class="copyright">&copy; 2023 Mistral Code Review Assistant Pro. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" class="social-link">Twitter</a>
+                <a href="#" class="social-link">GitHub</a>
+                <a href="#" class="social-link">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Monaco Editor
+            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+            require(['vs/editor/editor.main'], function() {
+                const editor = monaco.editor.create(document.getElementById('editor'), {
+                    value: `// Start coding here...
+function greet(name) {
+    return \`Hello, \${name}!\`;
+}
+
+console.log(greet('World'));`,
+                    language: 'javascript',
+                    theme: 'vs-light',
+                    automaticLayout: true,
+                    minimap: {
+                        enabled: false
+                    }
+                });
+
+                // Analyze button click handler
+                document.getElementById('analyze-btn').addEventListener('click', async function() {
+                    const code = editor.getValue();
+                    const reviewContent = document.getElementById('review-content');
+                    const loading = document.getElementById('loading');
+
+                    // Show loading state
+                    reviewContent.innerHTML = '';
+                    loading.style.display = 'flex';
+
+                    try {
+                        // Simulate API call to Mistral's FIM API
+                        const review = await analyzeCode(code);
+
+                        // Hide loading state
+                        loading.style.display = 'none';
+
+                        // Display review results
+                        displayReview(review);
+                    } catch (error) {
+                        loading.style.display = 'none';
+                        reviewContent.innerHTML = `<div class="error">
+                            <h3 class="error-title">Error</h3>
+                            <p class="error-content">${error.message}</p>
+                        </div>`;
+                    }
+                });
+
+                // Save button click handler
+                document.getElementById('save-btn').addEventListener('click', function() {
+                    alert('Review saved successfully!');
+                });
+
+                // Export button click handler
+                document.getElementById('export-btn').addEventListener('click', function() {
+                    const code = editor.getValue();
+                    const reviewContent = document.getElementById('review-content').innerHTML;
+
+                    const exportContent = `
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Code Review Export</title>
+                            <style>
+                                body {
+                                    font-family: Arial, sans-serif;
+                                    line-height: 1.6;
+                                    color: #333;
+                                    max-width: 800px;
+                                    margin: 0 auto;
+                                    padding: 20px;
+                                }
+                                h1, h2, h3 {
+                                    color: #4285f4;
+                                }
+                                pre {
+                                    background-color: #f5f5f5;
+                                    padding: 15px;
+                                    border-radius: 5px;
+                                    overflow-x: auto;
+                                }
+                                .review-section {
+                                    margin-bottom: 20px;
+                                    padding-bottom: 20px;
+                                    border-bottom: 1px solid #eee;
+                                }
+                                .suggestion {
+                                    background-color: #e8f5e9;
+                                    border-left: 4px solid #34a853;
+                                    padding: 15px;
+                                    margin-bottom: 15px;
+                                    border-radius: 0 5px 5px 0;
+                                }
+                                .error {
+                                    background-color: #ffebee;
+                                    border-left: 4px solid #ea4335;
+                                    padding: 15px;
+                                    margin-bottom: 15px;
+                                    border-radius: 0 5px 5px 0;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <h1>Code Review Export</h1>
+                            <h2>Code</h2>
+                            <pre>${escapeHtml(code)}</pre>
+                            <h2>Review</h2>
+                            ${reviewContent}
+                        </body>
+                        </html>
+                    `;
+
+                    const blob = new Blob([exportContent], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'code-review-export.html';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            });
+
+            // Simulate code analysis with Mistral's FIM API
+            async function analyzeCode(code) {
+                // In a real implementation, this would be an actual API call to Mistral's FIM service
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        // Mock review data
+                        const review = {
+                            quality: {
+                                score: 85,
+                                suggestions: [
+                                    {
+                                        title: "Improve Function Naming",
+                                        description: "Consider using more descriptive function names that clearly indicate their purpose.",
+                                        severity: "medium"
+                                    },
+                                    {
+                                        title: "Add JSDoc Comments",
+                                        description: "Adding JSDoc comments will improve code documentation and make it easier for other developers to understand your code.",
+                                        severity: "low"
+                                    }
+                                ]
+                            },
+                            security: {
+                                vulnerabilities: [
+                                    {
+                                        title: "Potential XSS Vulnerability",
+                                        description: "The code appears to concatenate user input directly into HTML. This could lead to Cross-Site Scripting (XSS) vulnerabilities. Consider using proper escaping or a templating engine.",
+                                        severity: "high"
+                                    }
+                                ]
+                            },
+                            bestPractices: [
+                                {
+                                    title: "Use Strict Mode",
+                                    description: "Consider adding 'use strict' at the beginning of your script to catch common coding mistakes and 'unsafe' actions.",
+                                    severity: "medium"
+                                },
+                                {
+                                    title: "Error Handling",
+                                    description: "Add proper error handling to make your code more robust and user-friendly.",
+                                    severity: "medium"
+                                }
+                            ]
+                        };
+
+                        resolve(review);
+                    }, 1500);
+                });
+            }
+
+            // Display review results
+            function displayReview(review) {
+                const reviewContent = document.getElementById('review-content');
+                reviewContent.innerHTML = '';
+
+                // Quality section
+                const qualitySection = document.createElement('div');
+                qualitySection.className = 'review-section';
+                qualitySection.innerHTML = `
+                    <h3 class="section-title">Code Quality (${review.quality.score}/100)</h3>
+                    <div class="review-item">
+                        <h4 class="item-title">Suggestions</h4>
+                        ${review.quality.suggestions.map(suggestion => `
+                            <div class="suggestion">
+                                <h5 class="suggestion-title">${suggestion.title} <span class="severity-${suggestion.severity}">(${suggestion.severity})</span></h5>
+                                <p class="suggestion-content">${suggestion.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                reviewContent.appendChild(qualitySection);
+
+                // Security section
+                const securitySection = document.createElement('div');
+                securitySection.className = 'review-section';
+                securitySection.innerHTML = `
+                    <h3 class="section-title">Security</h3>
+                    <div class="review-item">
+                        <h4 class="item-title">Vulnerabilities</h4>
+                        ${review.security.vulnerabilities.map(vulnerability => `
+                            <div class="error">
+                                <h5 class="error-title">${vulnerability.title} <span class="severity-${vulnerability.severity}">(${vulnerability.severity})</span></h5>
+                                <p class="error-content">${vulnerability.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                reviewContent.appendChild(securitySection);
+
+                // Best Practices section
+                const bestPracticesSection = document.createElement('div');
+                bestPracticesSection.className = 'review-section';
+                bestPracticesSection.innerHTML = `
+                    <h3 class="section-title">Best Practices</h3>
+                    <div class="review-item">
+                        ${review.bestPractices.map(practice => `
+                            <div class="suggestion">
+                                <h5 class="suggestion-title">${practice.title} <span class="severity-${practice.severity}">(${practice.severity})</span></h5>
+                                <p class="suggestion-content">${practice.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                reviewContent.appendChild(bestPracticesSection);
+            }
+
+            // Helper function to escape HTML
+            function escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+        });
+    </script>
+</body>
+</html>

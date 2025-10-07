@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Claude AI Language Tutor - Interactive language learning platform">
+    <title>Claude AI Language Tutor</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc3f7;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .sidebar {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .language-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .language-selector select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .progress-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .lesson-list {
+            list-style: none;
+        }
+
+        .lesson-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .lesson-list li:last-child {
+            border-bottom: none;
+        }
+
+        .lesson-list a {
+            text-decoration: none;
+            color: var(--dark-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .lesson-list a:hover {
+            color: var(--primary-color);
+        }
+
+        .lesson-list .status {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .lesson-list .completed {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
+        }
+
+        .lesson-list .in-progress {
+            background-color: rgba(23, 162, 184, 0.2);
+            color: var(--info-color);
+        }
+
+        .lesson-list .not-started {
+            background-color: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+        }
+
+        .content-area {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .lesson-content h1 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content p {
+            margin-bottom: 1rem;
+        }
+
+        .exercise-container {
+            margin-top: 2rem;
+        }
+
+        .exercise-container h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .exercise {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .exercise h3 {
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .exercise p {
+            margin-bottom: 1rem;
+        }
+
+        .exercise-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .feedback.correct {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger-color);
+            display: block;
+        }
+
+        .translation-container {
+            margin-top: 2rem;
+        }
+
+        .translation-container h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .translation-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .translation-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .speech-recognition {
+            margin-top: 2rem;
+        }
+
+        .speech-recognition h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .speech-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .speech-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+                cursor: pointer;
+                font-size: 1.5rem;
+            }
+
+            .mobile-menu.active ~ .mobile-nav {
+                display: block;
+            }
+
+            .mobile-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary-color);
+                padding: 1rem 0;
+                z-index: 1000;
+            }
+
+            .mobile-nav ul {
+                display: block;
+                list-style: none;
+                padding: 0 1rem;
+            }
+
+            .mobile-nav ul li {
+                margin-bottom: 1rem;
+            }
+
+            .mobile-nav ul li a {
+                color: white;
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.3s ease;
+            }
+
+            .mobile-nav ul li a:hover {
+                color: var(--accent-color);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <div class="logo">Claude AI Language Tutor</div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Lessons</a></li>
+                    <li><a href="#">Progress</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </nav>
+            <div class="mobile-menu">☰</div>
+            <nav class="mobile-nav">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Lessons</a></li>
+                    <li><a href="#">Progress</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <aside class="sidebar">
+            <h2>Language Selection</h2>
+            <div class="language-selector">
+                <select id="language-select">
+                    <option value="spanish">Spanish</option>
+                    <option value="french">French</option>
+                    <option value="german">German</option>
+                    <option value="italian">Italian</option>
+                    <option value="portuguese">Portuguese</option>
+                </select>
+            </div>
+
+            <div class="progress-container">
+                <h3>Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar"></div>
+                </div>
+                <div class="progress-text" id="progress-text">0% Complete</div>
+            </div>
+
+            <div class="lesson-list-container">
+                <h3>Lessons</h3>
+                <ul class="lesson-list" id="lesson-list">
+                    <!-- Lessons will be loaded here -->
+                </ul>
+            </div>
+        </aside>
+
+        <section class="content-area">
+            <div class="lesson-content" id="lesson-content">
+                <!-- Lesson content will be loaded here -->
+            </div>
+
+            <div class="exercise-container" id="exercise-container">
+                <!-- Exercises will be loaded here -->
+            </div>
+
+            <div class="translation-container">
+                <h2>Translation</h2>
+                <input type="text" class="translation-input" id="translation-input" placeholder="Enter text to translate">
+                <button class="btn" id="translate-btn">Translate</button>
+                <div class="translation-result" id="translation-result"></div>
+            </div>
+
+            <div class="speech-recognition">
+                <h2>Pronunciation Evaluation</h2>
+                <input type="text" class="speech-input" id="speech-input" placeholder="Speak to evaluate pronunciation">
+                <button class="btn" id="speech-btn">Start Speech Recognition</button>
+                <div class="speech-result" id="speech-result"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Claude AI Language Tutor. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenu = document.querySelector('.mobile-menu');
+            mobileMenu.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+
+            // Language selection
+            const languageSelect = document.getElementById('language-select');
+            languageSelect.addEventListener('change', function() {
+                loadLessons(this.value);
+            });
+
+            // Load initial lessons
+            loadLessons(languageSelect.value);
+
+            // Translate button
+            const translateBtn = document.getElementById('translate-btn');
+            translateBtn.addEventListener('click', function() {
+                const input = document.getElementById('translation-input').value;
+                if (input.trim() !== '') {
+                    translateText(input, languageSelect.value);
+                }
+            });
+
+            // Speech recognition
+            const speechBtn = document.getElementById('speech-btn');
+            const speechInput = document.getElementById('speech-input');
+            const speechResult = document.getElementById('speech-result');
+
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = languageSelect.value;
+
+                speechBtn.addEventListener('click', function() {
+                    recognition.start();
+                    speechBtn.textContent = 'Listening...';
+                    speechBtn.disabled = true;
+                });
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    speechInput.value = transcript;
+                    evaluatePronunciation(transcript, languageSelect.value);
+                    speechBtn.textContent = 'Start Speech Recognition';
+                    speechBtn.disabled = false;
+                };
+
+                recognition.onerror = function(event) {
+                    speechResult.textContent = 'Error occurred in recognition: ' + event.error;
+                    speechBtn.textContent = 'Start Speech Recognition';
+                    speechBtn.disabled = false;
+                };
+            } else {
+                speechBtn.disabled = true;
+                speechResult.textContent = 'Speech recognition not supported in this browser.';
+            }
+
+            // Load lessons based on selected language
+            function loadLessons(language) {
+                // Simulate API call to get lessons
+                setTimeout(() => {
+                    const lessons = generateLessons(language);
+                    displayLessons(lessons);
+                    updateProgress(lessons);
+
+                    // Load first lesson by default
+                    if (lessons.length > 0) {
+                        loadLesson(lessons[0].id);
+                    }
+                }, 500);
+            }
+
+            // Generate sample lessons
+            function generateLessons(language) {
+                const lessonCount = 10;
+                const lessons = [];
+
+                for (let i = 1; i <= lessonCount; i++) {
+                    const status = i <= 3 ? 'completed' :
+                                  i === 4 ? 'in-progress' : 'not-started';
+
+                    lessons.push({
+                        id: `lesson-${i}`,
+                        title: `Lesson ${i}: ${getLessonTitle(language, i)}`,
+                        status: status
+                    });
+                }
+
+                return lessons;
+            }
+
+            // Get lesson title based on language and lesson number
+            function getLessonTitle(language, lessonNumber) {
+                const titles = {
+                    spanish: [
+                        "Introducción al español",
+                        "Saludos y presentaciones",
+                        "El alfabeto y la pronunciación",
+                        "Los verbos básicos",
+                        "Los sustantivos y artículos",
+                        "Los adjetivos y pronombres",
+                        "Los preposiciones y conjunciones",
+                        "Las frases y oraciones",
+                        "El tiempo presente",
+                        "El tiempo pasado"
+                    ],
+                    french: [
+                        "Introduction au français",
+                        "Salutations et présentations",
+                        "L'alphabet et la prononciation",
+                        "Les verbes de base",
+                        "Les noms et les articles",
+                        "Les adjectifs et les pronoms",
+                        "Les prépositions et les conjonctions",
+                        "Les phrases et les phrases",
+                        "Le temps présent",
+                        "Le temps passé"
+                    ],
+                    german: [
+                        "Einführung in das Deutsche",
+                        "Grüße und Vorstellungen",
+                        "Das Alphabet und die Aussprache",
+                        "Die Grundverben",
+                        "Die Substantive und Artikel",
+                        "Die Adjektive und Pronomen",
+                        "Die Präpositionen und Konjunktionen",
+                        "Die Sätze und Sätze",
+                        "Die Präsenszeit",
+                        "Die Vergangenheit"
+                    ],
+                    italian: [
+                        "Introduzione all'italiano",
+                        "Saluti e presentazioni",
+                        "L'alfabeto e la pronuncia",
+                        "I verbi base",
+                        "I nomi e gli articoli",
+                        "Gli aggettivi e i pronomi",
+                        "Le preposizioni e le congiunzioni",
+                        "Le frasi e le frasi",
+                        "Il tempo presente",
+                        "Il tempo passato"
+                    ],
+                    portuguese: [
+                        "Introdução ao português",
+                        "Saudações e apresentações",
+                        "O alfabeto e a pronúncia",
+                        "Os verbos básicos",
+                        "Os substantivos e artigos",
+                        "Os adjetivos e pronomes",
+                        "As preposições e conjunções",
+                        "As frases e frases",
+                        "O tempo presente",
+                        "O tempo passado"
+                    ]
+                };
+
+                return titles[language][lessonNumber - 1] || `Lesson ${lessonNumber}`;
+            }
+
+            // Display lessons in the sidebar
+            function displayLessons(lessons) {
+                const lessonList = document.getElementById('lesson-list');
+                lessonList.innerHTML = '';
+
+                lessons.forEach(lesson => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.textContent = lesson.title;
+                    a.dataset.lessonId = lesson.id;
+
+                    const statusSpan = document.createElement('span');
+                    statusSpan.className = `status ${lesson.status}`;
+                    statusSpan.textContent = lesson.status.replace('-', ' ');
+
+                    a.appendChild(statusSpan);
+                    li.appendChild(a);
+                    lessonList.appendChild(li);
+
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        loadLesson(this.dataset.lessonId);
+                    });
+                });
+            }
+
+            // Load lesson content
+            function loadLesson(lessonId) {
+                // Simulate API call to get lesson content
+                setTimeout(() => {
+                    const lessonContent = generateLessonContent(lessonId);
+                    displayLessonContent(lessonContent);
+
+                    // Load exercises for this lesson
+                    loadExercises(lessonId);
+                }, 500);
+            }
+
+            // Generate sample lesson content
+            function generateLessonContent(lessonId) {
+                const lessonNumber = parseInt(lessonId.split('-')[1]);
+
+                return {
+                    id: lessonId,
+                    title: `Lesson ${lessonNumber}: ${getLessonTitle(languageSelect.value, lessonNumber)}`,
+                    content: `
+                        <p>This is the content for ${getLessonTitle(languageSelect.value, lessonNumber)}.
+                        Here you will learn the basics of this language topic. The lesson includes vocabulary,
+                        grammar rules, and practical examples to help you understand and use the language effectively.</p>
+
+                        <p>After completing this lesson, you will be able to:</p>
+                        <ul>
+                            <li>Understand key vocabulary related to this topic</li>
+                            <li>Apply basic grammar rules in sentences</li>
+                            <li>Formulate simple sentences in this language</li>
+                            <li>Recognize and use common phrases in conversations</li>
+                        </ul>
+
+                        <p>Each lesson is designed to build upon the previous one, so make sure to complete them in order
+                        for the best learning experience.</p>
+                    `,
+                    exercises: generateExercises(lessonNumber)
+                };
+            }
+
+            // Display lesson content
+            function displayLessonContent(lessonContent) {
+                const lessonContentElement = document.getElementById('lesson-content');
+                lessonContentElement.innerHTML = `
+                    <h1>${lessonContent.title}</h1>
+                    ${lessonContent.content}
+                `;
+            }
+
+            // Load exercises for a lesson
+            function loadExercises(lessonId) {
+                // Simulate API call to get exercises
+                setTimeout(() => {
+                    const exercises = generateExercises(parseInt(lessonId.split('-')[1]));
+                    displayExercises(exercises);
+                }, 500);
+            }
+
+            // Generate sample exercises
+            function generateExercises(lessonNumber) {
+                const exercises = [];
+
+                // Generate different types of exercises based on lesson number
+                if (lessonNumber === 1) {
+                    exercises.push({
+                        id: 'exercise-1',
+                        type: 'multiple-choice',
+                        question: 'What is the correct greeting in Spanish?',
+                        options: ['Hello', 'Hola', 'Bonjour', 'Ciao'],
+                        correctAnswer: 'Hola'
+                    });
+                } else if (lessonNumber === 2) {
+                    exercises.push({
+                        id: 'exercise-2',
+                        type: 'fill-in-the-blank',
+                        question: 'Complete the sentence: ______ are you?',
+                        correctAnswer: 'How'
+                    });
+                } else if (lessonNumber === 3) {
+                    exercises.push({
+                        id: 'exercise-3',
+                        type: 'matching',
+                        question: 'Match the letters to their sounds',
+                        pairs: [
+                            { letter: 'A', sound: '/a/' },
+                            { letter: 'B', sound: '/be/' },
+                            { letter: 'C', sound: '/se/' }
+                        ]
+                    });
+                } else {
+                    // Default exercise for other lessons
+                    exercises.push({
+                        id: `exercise-${lessonNumber}`,
+                        type: 'translation',
+                        question: 'Translate the following sentence to English',
+                        textToTranslate: getTranslationExample(languageSelect.value, lessonNumber)
+                    });
+                }
+
+                return exercises;
+            }
+
+            // Get translation example based on language and lesson number
+            function getTranslationExample(language, lessonNumber) {
+                const examples = {
+                    spanish: [
+                        "Hola, ¿cómo estás?",
+                        "Mi nombre es Juan",
+                        "¿Dónde está el baño?",
+                        "Me gusta aprender español",
+                        "El clima está hermoso hoy",
+                        "¿Cuál es tu comida favorita?",
+                        "Estoy estudiando español",
+                        "¿Qué hora es?",
+                        "Voy al mercado mañana",
+                        "Me encanta viajar"
+                    ],
+                    french: [
+                        "Bonjour, comment ça va?",
+                        "Je m'appelle Jean",
+                        "Où est la salle de bain?",
+                        "J'aime apprendre le français",
+                        "Le temps est beau aujourd'hui",
+                        "Quel est votre plat préféré?",
+                        "J'étudie le français",
+                        "Quelle heure est-il?",
+                        "Je vais au marché demain",
+                        "J'adore voyager"
+                    ],
+                    german: [
+                        "Hallo, wie geht's?",
+                        "Ich heiße Hans",
+                        "Wo ist das Badezimmer?",
+                        "Ich lerne gerne Deutsch",
+                        "Das Wetter ist heute schön",
+                        "Was ist dein Lieblingsgericht?",
+                        "Ich studiere Deutsch",
+                        "Wie spät ist es?",
+                        "Ich gehe morgen zum Markt",
+                        "Ich liebe es zu reisen"
+                    ],
+                    italian: [
+                        "Ciao, come stai?",
+                        "Mi chiamo Marco",
+                        "Dov'è il bagno?",
+                        "Mi piace imparare l'italiano",
+                        "Il tempo è bello oggi",
+                        "Qual è il tuo piatto preferito?",
+                        "Studio l'italiano",
+                        "Che ore sono?",
+                        "Vado al mercato domani",
+                        "Mi piace molto viaggiare"
+                    ],
+                    portuguese: [
+                        "Olá, como você está?",
+                        "Meu nome é Pedro",
+                        "Onde está o banheiro?",
+                        "Gosto de aprender português",
+                        "O tempo está bom hoje",
+                        "Qual é o seu prato favorito?",
+                        "Estou estudando português",
+                        "Que horas são?",
+                        "Vou ao mercado amanhã",
+                        "Eu amo viajar"
+                    ]
+                };
+
+                return examples[language][lessonNumber - 1] || "Hello, how are you?";
+            }
+
+            // Display exercises
+            function displayExercises(exercises) {
+                const exerciseContainer = document.getElementById('exercise-container');
+                exerciseContainer.innerHTML = '<h2>Exercises</h2>';
+
+                exercises.forEach(exercise => {
+                    const exerciseDiv = document.createElement('div');
+                    exerciseDiv.className = 'exercise';
+                    exerciseDiv.id = exercise.id;
+
+                    let exerciseContent = `<h3>${exercise.question}</h3>`;
+
+                    if (exercise.type === 'multiple-choice') {
+                        exerciseContent += '<div class="options">';
+                        exercise.options.forEach(option => {
+                            exerciseContent += `
+                                <div class="option">
+                                    <input type="radio" name="${exercise.id}" id="${exercise.id}-${option}" value="${option}">
+                                    <label for="${exercise.id}-${option}">${option}</label>
+                                </div>
+                            `;
+                        });
+                        exerciseContent += '</div>';
+                    } else if (exercise.type === 'fill-in-the-blank') {
+                        exerciseContent += `
+                            <input type="text" class="exercise-input" id="${exercise.id}-input" placeholder="Your answer">
+                        `;
+                    } else if (exercise.type === 'matching') {
+                        exerciseContent += '<div class="matching-pairs">';
+                        exercise.pairs.forEach((pair, index) => {
+                            exerciseContent += `
+                                <div class="matching-pair">
+                                    <span class="letter">${pair.letter}</span>
+                                    <select class="sound-select" id="${exercise.id}-sound-${index}">
+                                        <option value="">Select sound</option>
+                                        ${exercise.pairs.map(p => `<option value="${p.sound}">${p.sound}</option>`).join('')}
+                                    </select>
+                                </div>
+                            `;
+                        });
+                        exerciseContent += '</div>';
+                    } else if (exercise.type === 'translation') {
+                        exerciseContent += `
+                            <p>${exercise.textToTranslate}</p>
+                            <input type="text" class="exercise-input" id="${exercise.id}-input" placeholder="Your translation">
+                        `;
+                    }
+
+                    exerciseContent += `
+                        <button class="btn check-answer-btn" data-exercise-id="${exercise.id}">Check Answer</button>
+                        <div class="feedback" id="${exercise.id}-feedback"></div>
+                    `;
+
+                    exerciseDiv.innerHTML = exerciseContent;
+                    exerciseContainer.appendChild(exerciseDiv);
+                });
+
+                // Add event listeners to check answer buttons
+                const checkAnswerBtns = document.querySelectorAll('.check-answer-btn');
+                checkAnswerBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        checkAnswer(this.dataset.exerciseId);
+                    });
+                });
+            }
+
+            // Check exercise answer
+            function checkAnswer(exerciseId) {
+                const exercise = document.getElementById(exerciseId);
+                const feedback = document.getElementById(`${exerciseId}-feedback`);
+                let isCorrect = false;
+
+                if (exercise.querySelector('.options')) {
+                    // Multiple choice exercise
+                    const selectedOption = exercise.querySelector('input[name="' + exerciseId + '"]:checked');
+                    if (selectedOption) {
+                        isCorrect = selectedOption.value === generateExercises(parseInt(exerciseId.split('-')[1]))[0].correctAnswer;
+                    }
+                } else if (exercise.querySelector('.exercise-input')) {
+                    // Fill in the blank or translation exercise
+                    const input = exercise.querySelector('.exercise-input');
+                    const correctAnswer = generateExercises(parseInt(exerciseId.split('-')[1]))[0].correctAnswer;
+                    isCorrect = input.value.trim().toLowerCase() === correctAnswer.toLowerCase();
+                } else if (exercise.querySelector('.matching-pairs')) {
+                    // Matching exercise
+                    const pairs = generateExercises(parseInt(exerciseId.split('-')[1]))[0].pairs;
+                    let allCorrect = true;
+
+                    pairs.forEach((pair, index) => {
+                        const select = document.getElementById(`${exerciseId}-sound-${index}`);
+                        if (select.value !== pair.sound) {
+                            allCorrect = false;
+                        }
+                    });
+
+                    isCorrect = allCorrect;
+                }
+
+                if (isCorrect) {
+                    feedback.textContent = 'Correct! Well done.';
+                    feedback.className = 'feedback correct';
+                } else {
+                    feedback.textContent = 'Incorrect. Please try again.';
+                    feedback.className = 'feedback incorrect';
+                }
+            }
+
+            // Update progress bar
+            function updateProgress(lessons) {
+                const completedLessons = lessons.filter(lesson => lesson.status === 'completed').length;
+                const totalLessons = lessons.length;
+                const progressPercentage = (completedLessons / totalLessons) * 100;
+
+                const progressBar = document.getElementById('progress-bar');
+                const progressText = document.getElementById('progress-text');
+
+                progressBar.style.width = `${progressPercentage}%`;
+                progressText.textContent = `${Math.round(progressPercentage)}% Complete`;
+            }
+
+            // Translate text
+            function translateText(text, targetLanguage) {
+                // Simulate API call to translation service
+                setTimeout(() => {
+                    const translation = simulateTranslation(text, targetLanguage);
+                    document.getElementById('translation-result').textContent = translation;
+                }, 500);
+            }
+
+            // Simulate translation (in a real app, this would call a translation API)
+            function simulateTranslation(text, targetLanguage) {
+                // This is a very basic simulation - a real translation service would be more sophisticated
+                const translations = {
+                    spanish: {
+                        "Hello": "Hola",
+                        "How are you?": "¿Cómo estás?",
+                        "Thank you": "Gracias",
+                        "Goodbye": "Adiós",
+                        "Please": "Por favor",
+                        "Yes": "Sí",
+                        "No": "No",
+                        "I love learning languages": "Me encanta aprender idiomas"
+                    },
+                    french: {
+                        "Hello": "Bonjour",
+                        "How are you?": "Comment ça va?",
+                        "Thank you": "Merci",
+                        "Goodbye": "Au revoir",
+                        "Please": "S'il vous plaît",
+                        "Yes": "Oui",
+                        "No": "Non",
+                        "I love learning languages": "J'adore apprendre les langues"
+                    },
+                    german: {
+                        "Hello": "Hallo",
+                        "How are you?": "Wie geht's?",
+                        "Thank you": "Danke",
+                        "Goodbye": "Auf Wiedersehen",
+                        "Please": "Bitte",
+                        "Yes": "Ja",
+                        "No": "Nein",
+                        "I love learning languages": "Ich liebe Sprachen zu lernen"
+                    },
+                    italian: {
+                        "Hello": "Ciao",
+                        "How are you?": "Come stai?",
+                        "Thank you": "Grazie",
+                        "Goodbye": "Arrivederci",
+                        "Please": "Per favore",
+                        "Yes": "Sì",
+                        "No": "No",
+                        "I love learning languages": "Mi piace molto imparare le lingue"
+                    },
+                    portuguese: {
+                        "Hello": "Olá",
+                        "How are you?": "Como você está?",
+                        "Thank you": "Obrigado",
+                        "Goodbye": "Adeus",
+                        "Please": "Por favor",
+                        "Yes": "Sim",
+                        "No": "Não",
+                        "I love learning languages": "Eu amo aprender idiomas"
+                    }
+                };
+
+                // Check if the text is in our translation dictionary
+                if (translations[targetLanguage] && translations[targetLanguage][text]) {
+                    return translations[targetLanguage][text];
+                }
+
+                // If not found, return a simulated translation
+                return `Simulated translation of "${text}" to ${targetLanguage}`;
+            }
+
+            // Evaluate pronunciation
+            function evaluatePronunciation(text, language) {
+                // Simulate API call to pronunciation evaluation service
+                setTimeout(() => {
+                    const evaluation = simulatePronunciationEvaluation(text, language);
+                    document.getElementById('speech-result').textContent = evaluation;
+                }, 500);
+            }
+
+            // Simulate pronunciation evaluation
+            function simulatePronunciationEvaluation(text, language) {
+                // This is a very basic simulation - a real pronunciation evaluation would be more sophisticated
+                const evaluations = {
+                    spanish: {
+                        "Hola": "Good pronunciation of 'Hola'",
+                        "¿Cómo estás?": "Good pronunciation of '¿Cómo estás?'",
+                        "Gracias": "Good pronunciation of 'Gracias'",
+                        "Adiós": "Good pronunciation of 'Adiós'"
+                    },
+                    french: {
+                        "Bonjour": "Good pronunciation of 'Bonjour'",
+                        "Comment ça va?": "Good pronunciation of 'Comment ça va?'",
+                        "Merci": "Good pronunciation of 'Merci'",
+                        "Au revoir": "Good pronunciation of 'Au revoir'"
+                    },
+                    german: {
+                        "Hallo": "Good pronunciation of 'Hallo'",
+                        "Wie geht's?": "Good pronunciation of 'Wie geht's?'",
+                        "Danke": "Good pronunciation of 'Danke'",
+                        "Auf Wiedersehen": "Good pronunciation of 'Auf Wiedersehen'"
+                    },
+                    italian: {
+                        "Ciao": "Good pronunciation of 'Ciao'",
+                        "Come stai?": "Good pronunciation of 'Come stai?'",
+                        "Grazie": "Good pronunciation of 'Grazie'",
+                        "Arrivederci": "Good pronunciation of 'Arrivederci'"
+                    },
+                    portuguese: {
+                        "Olá": "Good pronunciation of 'Olá'",
+                        "Como você está?": "Good pronunciation of 'Como você está?'",
+                        "Obrigado": "Good pronunciation of 'Obrigado'",
+                        "Adeus": "Good pronunciation of 'Adeus'"
+                    }
+                };
+
+                // Check if the text is in our evaluation dictionary
+                if (evaluations[language] && evaluations[language][text]) {
+                    return evaluations[language][text];
+                }
+
+                // If not found, return a simulated evaluation
+                return `Simulated pronunciation evaluation for "${text}" in ${language}`;
+            }
+        });
+    </script>
+</body>
+</html>

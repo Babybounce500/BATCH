@@ -1,0 +1,335 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude AI Dungeon Master</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            gap: 1px;
+            background-color: #333;
+            margin: 20px auto;
+            width: 80vh;
+            height: 80vh;
+        }
+        .tile {
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+        }
+        .player {
+            color: blue;
+        }
+        .monster {
+            color: red;
+        }
+        .treasure {
+            color: gold;
+        }
+        .empty {
+            color: transparent;
+        }
+        .character-card, .monster-card {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .character-card {
+            background-color: #e3f2fd;
+        }
+        .monster-card {
+            background-color: #ffebee;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav>
+            <div class="nav-wrapper">
+                <a href="#" class="brand-logo">Claude AI Dungeon Master</a>
+            </div>
+        </nav>
+        <main>
+            <div class="container">
+                <div class="row">
+                    <div class="col s12 m6">
+                        <h5>Game Board</h5>
+                        <div class="game-board" id="gameBoard"></div>
+                    </div>
+                    <div class="col s12 m6">
+                        <div class="row">
+                            <div class="col s12">
+                                <h5>Characters</h5>
+                                <div id="charactersList"></div>
+                            </div>
+                            <div class="col s12">
+                                <h5>Monsters</h5>
+                                <div id="monstersList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <div class="input-field">
+                            <textarea id="gameLog" class="materialize-textarea" readonly></textarea>
+                            <label for="gameLog">Game Log</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <div class="input-field">
+                            <input id="playerAction" type="text" class="validate">
+                            <label for="playerAction">Enter your action</label>
+                            <button class="btn waves-effect waves-light" @click="submitAction">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="page-footer">
+            <div class="footer-copyright">
+                <div class="container">
+                    © 2023 Claude AI Dungeon Master
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                gameState: {
+                    board: Array(10).fill().map(() => Array(10).fill('empty')),
+                    characters: [],
+                    monsters: [],
+                    gameLog: []
+                },
+                playerAction: ''
+            },
+            mounted() {
+                this.initializeGame();
+            },
+            methods: {
+                initializeGame() {
+                    this.generateMap();
+                    this.generateCharacters();
+                    this.generateMonsters();
+                    this.renderGameBoard();
+                    this.renderCharacters();
+                    this.renderMonsters();
+                },
+                generateMap() {
+                    // Simple procedural map generation
+                    for (let i = 0; i < 10; i++) {
+                        for (let j = 0; j < 10; j++) {
+                            if (Math.random() > 0.8) {
+                                this.gameState.board[i][j] = 'treasure';
+                            }
+                        }
+                    }
+                },
+                generateCharacters() {
+                    // Generate player character
+                    const player = {
+                        id: 1,
+                        name: 'Hero',
+                        type: 'player',
+                        position: { x: 0, y: 0 },
+                        health: 100,
+                        attack: 10,
+                        defense: 5
+                    };
+                    this.gameState.characters.push(player);
+                    this.gameState.board[0][0] = 'player';
+                },
+                generateMonsters() {
+                    // Generate some monsters
+                    for (let i = 0; i < 3; i++) {
+                        const monster = {
+                            id: i + 2,
+                            name: `Monster ${i + 1}`,
+                            type: 'monster',
+                            position: {
+                                x: Math.floor(Math.random() * 10),
+                                y: Math.floor(Math.random() * 10)
+                            },
+                            health: 50 + Math.floor(Math.random() * 50),
+                            attack: 5 + Math.floor(Math.random() * 10),
+                            defense: 2 + Math.floor(Math.random() * 5)
+                        };
+                        this.gameState.monsters.push(monster);
+                        this.gameState.board[monster.position.x][monster.position.y] = 'monster';
+                    }
+                },
+                renderGameBoard() {
+                    const gameBoard = document.getElementById('gameBoard');
+                    gameBoard.innerHTML = '';
+                    for (let i = 0; i < 10; i++) {
+                        for (let j = 0; j < 10; j++) {
+                            const tile = document.createElement('div');
+                            tile.className = `tile ${this.gameState.board[i][j]}`;
+                            tile.textContent = this.getTileContent(i, j);
+                            gameBoard.appendChild(tile);
+                        }
+                    }
+                },
+                getTileContent(x, y) {
+                    if (this.gameState.board[x][y] === 'player') {
+                        return 'P';
+                    } else if (this.gameState.board[x][y] === 'monster') {
+                        return 'M';
+                    } else if (this.gameState.board[x][y] === 'treasure') {
+                        return 'T';
+                    }
+                    return '';
+                },
+                renderCharacters() {
+                    const charactersList = document.getElementById('charactersList');
+                    charactersList.innerHTML = '';
+                    this.gameState.characters.forEach(character => {
+                        const card = document.createElement('div');
+                        card.className = 'character-card';
+                        card.innerHTML = `
+                            <h6>${character.name}</h6>
+                            <p>Health: ${character.health}</p>
+                            <p>Attack: ${character.attack}</p>
+                            <p>Defense: ${character.defense}</p>
+                        `;
+                        charactersList.appendChild(card);
+                    });
+                },
+                renderMonsters() {
+                    const monstersList = document.getElementById('monstersList');
+                    monstersList.innerHTML = '';
+                    this.gameState.monsters.forEach(monster => {
+                        const card = document.createElement('div');
+                        card.className = 'monster-card';
+                        card.innerHTML = `
+                            <h6>${monster.name}</h6>
+                            <p>Health: ${monster.health}</p>
+                            <p>Attack: ${monster.attack}</p>
+                            <p>Defense: ${monster.defense}</p>
+                        `;
+                        monstersList.appendChild(card);
+                    });
+                },
+                submitAction() {
+                    if (this.playerAction.trim() === '') return;
+
+                    this.gameState.gameLog.push(`Player: ${this.playerAction}`);
+                    this.updateGameLog();
+
+                    // Process player action (simplified)
+                    if (this.playerAction.toLowerCase().includes('move')) {
+                        this.movePlayer();
+                    } else if (this.playerAction.toLowerCase().includes('attack')) {
+                        this.attackMonster();
+                    }
+
+                    this.playerAction = '';
+                },
+                movePlayer() {
+                    const player = this.gameState.characters[0];
+                    const direction = this.playerAction.toLowerCase().replace('move', '').trim();
+
+                    let newX = player.position.x;
+                    let newY = player.position.y;
+
+                    switch (direction) {
+                        case 'up':
+                            newX = Math.max(0, player.position.x - 1);
+                            break;
+                        case 'down':
+                            newX = Math.min(9, player.position.x + 1);
+                            break;
+                        case 'left':
+                            newY = Math.max(0, player.position.y - 1);
+                            break;
+                        case 'right':
+                            newY = Math.min(9, player.position.y + 1);
+                            break;
+                    }
+
+                    if (this.gameState.board[newX][newY] === 'empty') {
+                        this.gameState.board[player.position.x][player.position.y] = 'empty';
+                        player.position.x = newX;
+                        player.position.y = newY;
+                        this.gameState.board[newX][newY] = 'player';
+                        this.gameState.gameLog.push(`Player moved to (${newX}, ${newY})`);
+                    } else if (this.gameState.board[newX][newY] === 'treasure') {
+                        this.gameState.gameLog.push('You found a treasure!');
+                        this.gameState.board[newX][newY] = 'empty';
+                    } else {
+                        this.gameState.gameLog.push('Cannot move there!');
+                    }
+
+                    this.renderGameBoard();
+                    this.updateGameLog();
+                },
+                attackMonster() {
+                    const player = this.gameState.characters[0];
+                    const monsterIndex = this.gameState.monsters.findIndex(m =>
+                        Math.abs(m.position.x - player.position.x) <= 1 &&
+                        Math.abs(m.position.y - player.position.y) <= 1
+                    );
+
+                    if (monsterIndex !== -1) {
+                        const monster = this.gameState.monsters[monsterIndex];
+                        const damage = Math.max(1, player.attack - monster.defense);
+                        monster.health -= damage;
+                        this.gameState.gameLog.push(`Player attacked ${monster.name} for ${damage} damage!`);
+
+                        if (monster.health <= 0) {
+                            this.gameState.gameLog.push(`${monster.name} has been defeated!`);
+                            this.gameState.board[monster.position.x][monster.position.y] = 'empty';
+                            this.gameState.monsters.splice(monsterIndex, 1);
+                            this.renderMonsters();
+                        } else {
+                            // Monster's turn to attack
+                            const playerDamage1, monster.attack - player.defense);
+                            player.health -= playerDamage;
+                            this.gameState.gameLog.push(`${monster.name} attacked Player for ${playerDamage} damage!`);
+                            this.renderCharacters();
+
+                            if (player.health <= 0) {
+                                this.gameState.gameLog.push('Player has been defeated! Game Over.');
+                            }
+                        }
+                    } else {
+                        this.gameState.gameLog.push('No monster in range to attack!');
+                    }
+
+GameLog();
+                },
+                updateGameLog() {
+                    const gameLog = document.getElementById('gameLog');
+                    gameLog.value = this.gameState.gameLog.join('\n');
+                    gameLog.scrollTop = gameLog.scrollHeight;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+```

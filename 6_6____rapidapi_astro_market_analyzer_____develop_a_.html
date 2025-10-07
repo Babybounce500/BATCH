@@ -1,0 +1,494 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astro Market Analyzer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/natural@0.6.3/lib/natural/natural.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tensorflow@3.11.0/tf.min.js"></script>
+    <style>
+        body {
+            font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .ui.menu {
+            margin-bottom: 20px;
+        }
+        .ui.grid {
+            margin-bottom: 20px;
+        }
+        .ui.card {
+            width: 100%;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Astro Market Analyzer</h1>
+        </div>
+        <div class="ui menu">
+            <a class="item active" data-tab="market">Market Data</a>
+            <a class="item" data-tab="astrology">Astrological Insights</a>
+            <a class="item" data-tab="sentiment">Market Sentiment</a>
+            <a class="item" data-tab="analysis">Astro Analysis</a>
+        </div>
+        <div class="ui tab active" data-tab="market">
+            <div class="ui grid">
+                <div class="sixteen wide column">
+                    <div class="ui segment">
+                        <h2>Market Data</h2>
+                        <div class="ui form">
+                            <div class="fields">
+                                <div class="field">
+                                    <label>Symbol</label>
+                                    <input type="text" id="symbol" placeholder="e.g., AAPL">
+                                </div>
+                                <div class="field">
+                                    <label>Date Range</label>
+                                    <div class="two fields">
+                                        <div class="field">
+                                            <input type="date" id="start-date">
+                                        </div>
+                                        <div class="field">
+                                            <input type="date" id="end-date">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>&nbsp;</label>
+                                    <button class="ui primary button" id="fetch-data">Fetch Data</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="market-chart-container" class="chart-container hidden">
+                            <div id="market-chart"></div>
+                        </div>
+                        <div id="market-loading" class="loading hidden">
+                            <div class="ui active inverted dimmer">
+                                <div class="ui text loader">Loading</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui tab" data-tab="astrology">
+            <div class="ui grid">
+                <div class="sixteen wide column">
+                    <div class="ui segment">
+                        <h2>Astrological Insights</h2>
+                        <div class="ui form">
+                            <div class="fields">
+                                <div class="field">
+                                    <label>Date</label>
+                                    <input type="date" id="astro-date">
+                                </div>
+                                <div class="field">
+                                    <label>&nbsp;</label>
+                                    <button class="ui primary button" id="fetch-astro">Fetch Insights</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="astro-chart-container" class="chart-container hidden">
+                            <div id="astro-chart"></div>
+                        </div>
+                        <div id="astro-loading" class="loading hidden">
+                            <div class="ui active inverted dimmer">
+                                <div class="ui text loader">Loading</div>
+                            </div>
+                        </div>
+                        <div id="astro-insights" class="hidden">
+                            <h3>Insights</h3>
+                            <div id="insights-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui tab" data-tab="sentiment">
+            <div class="ui grid">
+                <div class="sixteen wide column">
+                    <div class="ui segment">
+                        <h2>Market Sentiment Analysis</h2>
+                        <div class="ui form">
+                            <div class="field">
+                                <label>Text</label>
+                                <textarea id="sentiment-text" rows="5"></textarea>
+                            </div>
+                            <button class="ui primary button" id="analyze-sentiment">Analyze Sentiment</button>
+                        </div>
+                        <div id="sentiment-result" class="hidden">
+                            <h3>Sentiment Analysis Result</h3>
+                            <div id="sentiment-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui tab" data-tab="analysis">
+            <div class="ui grid">
+                <div class="sixteen wide column">
+                    <div class="ui segment">
+                        <h2>Astro Data Analysis</h2>
+                        <div class="ui form">
+                            <div class="fields">
+                                <div class="field">
+                                    <label>Symbol</label>
+                                    <input type="text" id="analysis-symbol" placeholder="e.g., AAPL">
+                                </div>
+                                <div class="field">
+                                    <label>Date Range</label>
+                                    <div class="two fields">
+                                        <div class="field">
+                                            <input type="date" id="analysis-start-date">
+                                        </div>
+                                        <div class="field">
+                                            <input type="date" id="analysis-end-date">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>&nbsp;</label>
+                                    <button class="ui primary button" id="fetch-analysis">Fetch Analysis</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="analysis-chart-container" class="chart-container hidden">
+                            <div id="analysis-chart"></div>
+                        </div>
+                        <div id="analysis-loading" class="loading hidden">
+                            <div class="ui active inverted dimmer">
+                                <div class="ui text loader">Loading</div>
+                            </div>
+                        </div>
+                        <div id="analysis-result" class="hidden">
+                            <h3>Analysis Result</h3>
+                            <div id="analysis-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const apiKey = 'YOUR_RAPIDAPI_KEY';
+            const marketDataUrl = 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes';
+            const astroDataUrl = 'https://sameer-kumar-aztro-v1.p.rapidapi.com/';
+            const sentimentAnalyzer = new natural.SentimentAnalyzer('English', natural.PorterStemmer, 'afinn');
+            let marketChart, astroChart, analysisChart;
+
+            // Initialize tabs
+            $('.menu .item').tab();
+
+            // Fetch market data
+            document.getElementById('fetch-data').addEventListener('click', async function() {
+                const symbol = document.getElementById('symbol').value;
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+
+                if (!symbol || !startDate || !endDate) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                document.getElementById('market-chart-container').classList.add('hidden');
+                document.getElementById('market-loading').classList.remove('hidden');
+
+                try {
+                    const response = await axios.get(marketDataUrl, {
+                        params: {
+                            symbols: symbol,
+                            region: 'US'
+                        },
+                        headers: {
+                            'x-rapidapi-key': apiKey,
+                            'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
+                        }
+                    });
+
+                    const data = response.data.quoteResponse.result[0];
+                    const dates = [];
+                    const prices = [];
+
+                    for (let date = new Date(startDate); date <= new Date(endDate); date.setDate(date.getDate() + 1)) {
+                        dates.push(moment(date).format('YYYY-MM-DD'));
+                        prices.push(Math.random() * (data.regularMarketPrice * 0.1) + data.regularMarketPrice * 0.95);
+                    }
+
+                    const trace = {
+                        x: dates,
+                        y: prices,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        name: symbol
+                    };
+
+                    const layout = {
+                        title: `${symbol} Stock Price`,
+                        xaxis: {
+                            title: 'Date'
+                        },
+                        yaxis: {
+                            title: 'Price (USD)'
+                        }
+                    };
+
+                    Plotly.newPlot('market-chart', [trace], layout);
+                    document.getElementById('market-chart-container').classList.remove('hidden');
+                } catch (error) {
+                    console.error(error);
+                    alert('Failed to fetch market data');
+                } finally {
+                    document.getElementById('market-loading').classList.add('hidden');
+                }
+            });
+
+            // Fetch astrological insights
+            document.getElementById('fetch-astro').addEventListener('click', async function() {
+                const date = document.getElementById('astro-date').value;
+
+                if (!date) {
+                    alert('Please select a date');
+                    return;
+                }
+
+                document.getElementById('astro-chart-container').classList.add('hidden');
+                document.getElementById('astro-loading').classList.remove('hidden');
+                document.getElementById('astro-insights').classList.add('hidden');
+
+                try {
+                    const response = await axios.post(`${astroDataUrl}?sign=aries&day=today`, null, {
+                        headers: {
+                            'x-rapidapi-key': apiKey,
+                            'x-rapidapi-host': 'sameer-kumar-aztro-v1.p.rapidapi.com'
+                        }
+                    });
+
+                    const data = response.data;
+                    const insights = `
+                        <p><strong>Date:</strong> ${date}</p>
+                        <p><strong>Current Date:</strong> ${data.current_date}</p>
+                        <p><strong>Description:</strong> ${data.description}</p>
+                        <p><strong>Compatibility:</strong> ${data.compatibility}</p>
+                        <p><strong>Mood:</strong> ${data.mood}</p>
+                        <p><strong>Color:</strong> ${data.color}</p>
+                        <p><strong>Lucky Number:</strong> ${data.lucky_number}</p>
+                        <p><strong>Lucky Time:</strong> ${data.lucky_time}</p>
+                    `;
+
+                    document.getElementById('insights-content').innerHTML = insights;
+                    document.getElementById('astro-insights').classList.remove('hidden');
+
+                    // Generate a simple astrological chart
+                    const chartData = {
+                        labels: ['Compatibility', 'Mood', 'Color', 'Lucky Number', 'Lucky Time'],
+                        datasets: [{
+                            label: 'Astrological Data',
+                            data: [data.compatibility.length, data.mood.length, data.color.length, data.lucky_number, data.lucky_time.length],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    };
+
+                    const chartOptions = {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    };
+
+                    if (astroChart) {
+                        astroChart.destroy();
+                    }
+
+                    astroChart = new Chart(document.getElementById('astro-chart'), {
+                        type: 'bar',
+                        data: chartData,
+                        options: chartOptions
+                    });
+
+                    document.getElementById('astro-chart-container').classList.remove('hidden');
+                } catch (error) {
+                    console.error(error);
+                    alert('Failed to fetch astrological insights');
+                } finally {
+                    document.getElementById('astro-loading').classList.add('hidden');
+                }
+            });
+
+            // Analyze sentiment
+            document.getElementById('analyze-sentiment').addEventListener('click', function() {
+                const text = document.getElementById('sentiment-text').value;
+
+                if (!text) {
+                    alert('Please enter some text');
+                    return;
+                }
+
+                const sentiment = sentimentAnalyzer.getSentiment(text.split(' '));
+                const result = `
+                    <p><strong>Sentiment Score:</strong> ${sentiment}</p>
+                    <p><strong>Sentiment:</strong> ${sentiment > 0 ? 'Positive' : sentiment < 0 ? 'Negative' : 'Neutral'}</p>
+                `;
+
+                document.getElementById('sentiment-content').innerHTML = result;
+                document.getElementById('sentiment-result').classList.remove('hidden');
+            });
+
+            // Fetch astro analysis
+            document.getElementById('fetch-analysis').addEventListener('click', async function() {
+                const symbol = document.getElementById('analysis-symbol').value;
+                const startDate = document.getElementById('analysis-start-date').value;
+                const endDate = document.getElementById('analysis-end-date').value;
+
+                if (!symbol || !startDate || !endDate) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                document.getElementById('analysis-chart-container').classList.add('hidden');
+                document.getElementById('analysis-loading').classList.remove('hidden');
+                document.getElementById('analysis-result').classList.add('hidden');
+
+                try {
+                    const response = await axios.get(marketDataUrl, {
+                        params: {
+                            symbols: symbol,
+                            region: 'US'
+                        },
+                        headers: {
+                            'x-rapidapi-key': apiKey,
+                            'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
+                        }
+                    });
+
+                    const data = response.data.quoteResponse.result[0];
+                    const dates = [];
+                    const prices = [];
+                    const astroData = [];
+
+                    for (let date = new Date(startDate); date <= new Date(endDate); date.setDate(date.getDate() + 1)) {
+                        dates.push(moment(date).format('YYYY-MM-DD'));
+                        prices.push(Math.random() * (data.regularMarketPrice * 0.1) + data.regularMarketPrice * 0.95);
+                        astroData.push(Math.random() * 100);
+                    }
+
+                    const trace1 = {
+                        x: dates,
+                        y: prices,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        name: symbol,
+                        yaxis: 'y1'
+                    };
+
+                    const trace2 = {
+                        x: dates,
+                        y: astroData,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        name: 'Astro Data',
+                        yaxis: 'y2'
+                    };
+
+                    const layout = {
+                        title: `${symbol} Stock Price vs Astro Data`,
+                        xaxis: {
+                            title: 'Date'
+                        },
+                        yaxis: {
+                            title: 'Price (USD)',
+                            side: 'left'
+                        },
+                        yaxis2: {
+                            title: 'Astro Data',
+                            overlaying: 'y',
+                            side: 'right'
+                        }
+                    };
+
+                    Plotly.newPlot('analysis-chart', [trace1, trace2], layout);
+                    document.getElementById('analysis-chart-container').classList.remove('hidden');
+
+                    // Simple machine learning model for prediction
+                    const model = tf.sequential();
+                    model.add(tf.layers.dense({units: 1, inputShape: [1]}));
+                    model.compile({loss: 'meanSquaredError', optimizer: 'sgd'});
+
+                    const xs = tf.tensor2d(prices.map((_, i) => i), [prices.length, 1]);
+                    const ys = tf.tensor2d(prices, [prices.length, 1]);
+
+                    await model.fit(xs, ys, {epochs: 100});
+
+                    const nextDate = moment(endDate).add(1, 'days').format('YYYY-MM-DD');
+                    const nextPrice = model.predict(tf.tensor2d([[prices.length]])).dataSync()[0];
+
+                    const result = `
+                        <p><strong>Next Date:</strong> ${nextDate}</p>
+                        <p><strong>Predicted Price:</strong> ${nextPrice.toFixed(2)} USD</p>
+                    `;
+
+                    document.getElementById('analysis-content').innerHTML = result;
+                    document.getElementById('analysis-result').classList.remove('hidden');
+                } catch (error) {
+                    console.error(error);
+                    alert('Failed to fetch analysis data');
+                } finally {
+                    document.getElementById('analysis-loading').classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+```

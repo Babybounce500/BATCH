@@ -1,0 +1,191 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width-scale=1.0">
+    <title>Mistral Neural Style Transfer Composer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .canvas-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .style-image {
+            max-width: 100%;
+            max-height: 200px;
+            margin-bottom: 10px;
+        }
+        .btn-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Mistral Neural Style Transfer Composer</h1>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Content Image</h2>
+                <div class="canvas-container">
+                    <canvas id="contentCanvas"></canvas>
+                </div>
+                <div class="btn-container">
+                    <input type="file" id="contentImageUpload" class="form-control mb-2" accept="image/*">
+                    <button id="applyContentImage" class="btn btn-primary">Apply Content Image</button>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h2>Style Image</h2>
+                <div class="canvas-container">
+                    <canvas id="styleCanvas"></canvas>
+                </div>
+                <div class="btn-container">
+                    <input type="file" id="styleImageUpload" class="form-control mb-2" accept="image/*">
+                    <button id="applyStyleImage" class="btn btn-primary">Apply Style Image</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h2>Style Transfer Options</h2>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="styleMixSlider" class="form-label">Style Mixing</label>
+                        <input type="range" class="form-range" id="styleMixSlider" min="0" max="1" step="0.01" value="0.5">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="styleIntensitySlider" class="form-label">Style Intensity</label>
+                        <input type="range" class="form-range" id="styleIntensitySlider" min="0" max="1" step="0.01" value="0.5">
+                    </div>
+                </div>
+                <button id="transferStyle" class="btn btn-success btn-lg">Transfer Style</button>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h2>Result</h2>
+                <div class="canvas-container">
+                    <canvas id="resultCanvas"></canvas>
+                </div>
+                <button id="downloadResult" class="btn btn-primary">Download Result</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const contentCanvas = new fabric.Canvas('contentCanvas');
+            const styleCanvas = new fabric.Canvas('styleCanvas');
+            const resultCanvas = new fabric.Canvas('resultCanvas');
+
+            const contentImageUpload = document.getElementById('contentImageUpload');
+            const styleImageUpload = document.getElementById('styleImageUpload');
+            const applyContentImage = document.getElementById('applyContentImage');
+            const applyStyleImage = document.getElementById('applyStyleImage');
+            const transferStyle = document.getElementById('transferStyle');
+            const downloadResult = document.getElementById('downloadResult');
+            const styleMixSlider = document.getElementById('styleMixSlider');
+            const styleIntensitySlider = document.getElementById('styleIntensitySlider');
+
+            function handleImageUpload(fileInput, canvas) {
+                const file = fileInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        fabric.Image.fromURL(e.target.result, function(img) {
+                            canvas.clear();
+                            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+                                scaleX: canvas.width / img.width,
+                                scaleY: canvas.height / img.height,
+                                originX: 'left',
+                                originY: 'top'
+                            });
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            contentImageUpload.addEventListener('change', function() {
+                handleImageUpload(this, contentCanvas);
+            });
+
+            styleImageUpload.addEventListener('change', function() {
+                handleImageUpload(this, styleCanvas);
+            });
+
+            applyContentImage.addEventListener('click', function() {
+                handleImageUpload(contentImageUpload, contentCanvas);
+            });
+
+            applyStyleImage.addEventListener('click', function() {
+                handleImageUpload(styleImageUpload, styleCanvas);
+            });
+
+            transferStyle.addEventListener('click', function() {
+                const contentImage = contentCanvas.toDataURL();
+                const styleImage = styleCanvas.toDataURL();
+                const styleMix = parseFloat(styleMixSlider.value);
+                const styleIntensity = parseFloat(styleIntensitySlider.value);
+
+                // In a real application, this would call the Mistral API
+                // For demonstration, we'll simulate the style transfer
+                simulateStyleTransfer(contentImage, styleImage, styleMix, styleIntensity, function(resultImage) {
+                    fabric.Image.fromURL(resultImage, function(img) {
+                        resultCanvas.clear();
+                        resultCanvas.setBackgroundImage(img, resultCanvas.renderAll.bind(resultCanvas), {
+                            scaleX: resultCanvas.width / img.width,
+                            scaleY: resultCanvas.height / img.height,
+                            originX: 'left',
+                            originY: 'top'
+                        });
+                    });
+                });
+            });
+
+            downloadResult.addEventListener('click', function() {
+                const dataURL = resultCanvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = 'styled-image.png';
+                link.href = dataURL;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            function simulateStyleTransfer(contentImage, styleImage, styleMix, styleIntensity, callback) {
+                // This is a placeholder for the actual API call
+                // In a real application, you would call the Mistral API here
+                setTimeout(function() {
+                    // For demonstration, we'll just return the content image
+                    callback(contentImage);
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
+```

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude AI Dungeon Master</title>
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --primary-dark: #303f9f;
+            --accent-color: #ff4081;
+            --text-color: #212121;
+            --light-text: #ffffff;
+            --background-color: #f5f5f5;
+            --card-color: #ffffff;
+            --border-radius: 4px;
+            --box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 20px 0;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: var(--light-text);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        main {
+            padding: 30px 0;
+        }
+
+        .section-title {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            gap: 2px;
+            background-color: #333;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .tile {
+            background-color: #666;
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .tile:hover {
+            background-color: #888;
+        }
+
+        .tile.player {
+            background-color: var(--primary-color);
+        }
+
+        .tile.monster {
+            background-color: var(--accent-color);
+        }
+
+        .tile.obstacle {
+            background-color: #444;
+        }
+
+        .tile.selected {
+            border: 2px solid var(--accent-color);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        .character-list, .monster-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .character-card, .monster-card {
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .character-card:hover, .monster-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .character-card.selected, .monster-card.selected {
+            border-color: var(--primary-color);
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+            }
+
+            nav ul {
+                margin-top: 15px;
+            }
+
+            nav ul li {
+                margin: 0 10px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="container header-content">
+                <h1 class="logo">Claude AI Dungeon Master</h1>
+                <nav>
+                    <ul>
+                        <li><a href="#game">Game</a></li>
+                        <li><a href="#characters">Characters</a></li>
+                        <li><a href="#monsters">Monsters</a></li>
+                        <li><a href="#content">Content</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container">
+            <section id="game">
+                <h2 class="section-title">Game Board</h2>
+                <div class="card">
+                    <div class="controls">
+                        <button class="btn" @click="generateMap" :disabled="isGenerating">Generate Map</button>
+                        <button class="btn" @click="startGame" :disabled="isGenerating || !mapGenerated">Start Game</button>
+                        <button class="btn" @click="endTurn" :disabled="!gameStarted || isPlayerTurn">End Turn</button>
+                    </div>
+                    <div class="game-board" v-if="mapGenerated">
+                        <div
+                            v-for="(tile, index) in gameBoard"
+                            :key="index"
+                            class="tile"
+                            :class="{
+                                'player': tile.type === 'player',
+                                'monster': tile.type === 'monster',
+                                'obstacle': tile.type === 'obstacle',
+                                'selected': selectedTile === index
+                            }"
+                            @click="selectTile(index)"
+                        >
+                            <span v-if="tile.type === 'player'">P</span>
+                            <span v-else-if="tile.type === 'monster'">M</span>
+                        </div>
+                    </div>
+                    <div v-else class="empty-board">
+                        <p>No map generated yet. Click "Generate Map" to create a new dungeon.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="characters">
+                <h2 class="section-title">Characters</h2>
+                <div class="card">
+                    <div class="controls">
+                        <button class="btn" @click="addCharacter">Add Character</button>
+                    </div>
+                    <div class="character-list">
+                        <div
+                            v-for="(character, index) in characters"
+                            :key="index"
+                            class="character-card"
+                            :class="{'selected': selectedCharacter === index}"
+                            @click="selectCharacter(index)"
+                        >
+                            <h3>{{ character.name }}</h3>
+                            <p>HP: {{ character.hp }}/{{ character.maxHp }}</p>
+                            <p>Attack: {{ character.attack }}</p>
+                            <p>Defense: {{ character.defense }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="monsters">
+                <h2 class="section-title">Monsters</h2>
+                <div class="card">
+                    <div class="controls">
+                        <button class="btn" @click="generateMonsters">Generate Monsters</button>
+                    </div>
+                    <div class="monster-list">
+                        <div
+                            v-for="(monster, index) in monsters"
+                            :key="index"
+                            class="monster-card"
+                            :class="{'selected': selectedMonster === index}"
+                            @click="selectMonster(index)"
+                        >
+                            <h3>{{ monster.name }}</h3>
+                            <p>HP: {{ monster.hp }}/{{ monster.maxHp }}</p>
+                            <p>Attack: {{ monster.attack }}</p>
+                            <p>Defense: {{ monster.defense }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="content">
+                <h2 class="section-title">Game Content</h2>
+                <div class="card">
+                    <textarea v-model="userInput" placeholder="Enter your command or question..."></textarea>
+                    <button class="btn" @click="generateContent" :disabled="!userInput.trim()">Generate Content</button>
+                    <div v-if="generatedContent" class="generated-content">
+                        <h3>Generated Content:</h3>
+                        <p>{{ generatedContent }}</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="container">
+                <p>&copy; 2023 Claude AI Dungeon Master. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Mock Claude API for demonstration purposes
+        const mockClaudeAPI = {
+            async generateContent(prompt) {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Mock responses based on different prompts
+                if (prompt.toLowerCase().includes('generate map')) {
+                    return "Generated a 10x10 dungeon with various rooms, corridors, and obstacles. The player starts in the center of the map.";
+                } else if (prompt.toLowerCase().includes('generate monsters')) {
+                    return "Generated 5 random monsters with varying stats. Each monster has a unique name, HP, attack, and defense values.";
+                } else if (prompt.toLowerCase().includes('attack')) {
+                    return "The player attacks the monster! The monster takes damage and its HP decreases.";
+                } else if (prompt.toLowerCase().includes('move')) {
+                    return "The player moves to the selected tile. The game board updates to reflect the new position.";
+                } else {
+                    return `This is a mock response to your prompt: "${prompt}". In a real implementation, this would be generated by the Claude API.`;
+                }
+            }
+        };
+
+        // Vue.js application
+        const app = Vue.createApp({
+            data() {
+                return {
+                    gameBoard: [],
+                    characters: [],
+                    monsters: [],
+                    selectedTile: null,
+                    selectedCharacter: null,
+                    selectedMonster: null,
+                    mapGenerated: false,
+                    gameStarted: false,
+                    isPlayerTurn: true,
+                    isGenerating: false,
+                    userInput: '',
+                    generatedContent: ''
+                };
+            },
+            methods: {
+                async generateMap() {
+                    this.isGenerating = true;
+                    try {
+                        const response = await mockClaudeAPI.generateContent('Generate a dungeon map');
+                        this.generatedContent = response;
+
+                        // Create a 10x10 grid
+                        this.gameBoard = Array(100).fill().map((_, index) => {
+                            // Place player in the center
+                            if (index === 45) {
+                                return { type: 'player', x: 5, y: 5 };
+                            }
+                            // Randomly place some obstacles
+                            else if (Math.random() < 0.1) {
+                                return { type: 'obstacle' };
+                            }
+                            return { type: 'empty' };
+                        });
+
+                        this.mapGenerated = true;
+                    } catch (error) {
+                        console.error('Error generating map:', error);
+                        this.generatedContent = 'Failed to generate map. Please try again.';
+                    } finally {
+                        this.isGenerating = false;
+                    }
+                },
+
+                startGame() {
+                    this.gameStarted = true;
+                    this.generatedContent = 'Game started! Player can now move and interact with the dungeon.';
+                },
+
+                selectTile(index) {
+                    if (!this.gameStarted) return;
+
+                    const tile = this.gameBoard[index];
+                    if (tile.type === 'empty' || tile.type === 'monster') {
+                        this.selectedTile = index;
+                    }
+                },
+
+                async movePlayer() {
+                    if (!this.selectedTile || !this.gameStarted || !this.isPlayerTurn) return;
+
+                    const playerIndex = this.gameBoard.findIndex(tile => tile.type === 'player');
+                    const newTile = this.gameBoard[this.selectedTile];
+
+                    if (newTile.type === 'empty') {
+                        // Move player to new position
+                        this.gameBoard[playerIndex].type = 'empty';
+                        this.gameBoard[this.selectedTile].type = 'player';
+
+                        // Update player position
+                        const x = this.selectedTile % 10;
+                        const y = Math.floor(this.selectedTile / 10);
+                        this.gameBoard[this.selectedTile].x = x;
+                        this.gameBoard[this.selectedTile].y = y;
+
+                        this.selectedTile = null;
+
+                        // Simulate AI turn
+                        this.isPlayerTurn = false;
+                        await this.monsterTurn();
+                        this.isPlayerTurn = true;
+                    } else if (newTile.type === 'monster') {
+                        // Attack monster
+                        await this.attackMonster(this.selectedTile);
+                    }
+                },
+
+                async attackMonster(tileIndex) {
+                    const response = await mockClaudeAPI.generateContent('Player attacks monster');
+                    this.generatedContent = response;
+
+                    // Simple combat logic
+                    const player = this.characters[0]; // Assuming first character is player
+                    const monsterIndex = this.monsters.findIndex(m => m.x === this.gameBoard[tileIndex].x && m.y === this.gameBoard[tileIndex].y);
+                    const monster = this.monsters[monsterIndex];
+
+                    if (player && monster) {
+                        // Calculate damage
+                        const damage = Math.max(1, player.attack - monster.defense);
+
+                        // Apply damage
+                        monster.hp = Math.max(0, monster.hp - damage);
+
+                        // Check if monster is defeated
+                        if (monster.hp <= 0) {
+                            // Remove monster from board and list
+                            this.gameBoard[tileIndex].type = 'empty';
+                            this.monsters.splice(monsterIndex, 1);
+                        }
+
+                        // Simulate AI turn
+                        this.isPlayerTurn = false;
+                        await this.monsterTurn();
+                        this.isPlayerTurn = true;
+                    }
+                },
+
+                async monsterTurn() {
+                    // Simple AI for monsters
+                    for (const monster of this.monsters) {
+                        // Find player position
+                        const playerTile = this.gameBoard.findIndex(tile => tile.type === 'player');
+                        const playerX = playerTile % 10;
+                        const playerY = Math.floor(playerTile / 10);
+
+                        // Simple pathfinding (move toward player)
+                        let newX = monster.x;
+                        let newY = monster.y;
+
+                        if (monster.x < playerX) newX++;
+                        else if (monster.x > playerX) newX--;
+
+                        if (monster.y < playerY) newY++;
+                        else if (monster.y > playerY) newY--;
+
+                        // Check if new position is valid
+                        const newIndex = newY * 10 + newX;
+                        const newTile = this.gameBoard[newIndex];
+
+                        if (newTile.type === 'empty') {
+                            // Move monster
+                            const oldIndex = monster.y * 10 + monster.x;
+                            this.gameBoard[oldIndex].type = 'empty';
+                            this.gameBoard[newIndex].type = 'monster';
+                            this.gameBoard[newIndex].x = newX;
+                            this.gameBoard[newIndex].y = newY;
+
+                            // Update monster position
+                            monster.x = newX;
+                            monster.y = newY;
+                        } else if (newTile.type === 'player') {
+                            // Attack player
+                            await this.attackPlayer(monster);
+                        }
+                    }
+                },
+
+                async attackPlayer(monster) {
+                    const response = await mockClaudeAPI.generateContent('Monster attacks player');
+                    this.generatedContent = response;
+
+                    // Simple combat logic
+                    const player = this.characters[0]; // Assuming first character is player
+
+                    if (player && monster) {
+                        // Calculate damage
+                        const damage = Math.max(1, monster.attack - player.defense);
+
+                        // Apply damage
+                        player.hp = Math.max(0, player.hp - damage);
+
+                        // Check if player is defeated
+                        if (player.hp <= 0) {
+                            this.generatedContent = 'Player has been defeated! Game over.';
+                            this.gameStarted = false;
+                        }
+                    }
+                },
+
+                endTurn() {
+                    if (!this.gameStarted || this.isPlayerTurn) return;
+
+                    this.isPlayerTurn = true;
+                    this.generatedContent = 'Player turn. Move or attack a monster.';
+                },
+
+                addCharacter() {
+                    const names = ['Hero', 'Warrior', 'Ranger', 'Mage', 'Rogue'];
+                    const randomName = names[Math.floor(Math.random() * names.length)];
+
+                    this.characters.push({
+                        name: randomName,
+                        hp: 20,
+                        maxHp: 20,
+                        attack: Math.floor(Math.random() * 5) + 5,
+                        defense: Math.floor(Math.random() * 3) + 2
+                    });
+                },
+
+                selectCharacter(index) {
+                    this.selectedCharacter = index;
+                },
+
+                async generateMonsters() {
+                    this.isGenerating = true;
+                    try {
+                        const response = await mockClaudeAPI.generateContent('Generate monsters');
+                        this.generatedContent = response;
+
+                        // Generate 5 random monsters
+                        const names = ['Goblin', 'Orc', 'Skeleton', 'Zombie', 'Troll'];
+                        const monsters = [];
+
+                        for (let i = 0; i < 5; i++) {
+                            const randomName = names[Math.floor(Math.random() * names.length)];
+
+                            // Find an empty tile for the monster
+                            let emptyTiles = [];
+                            this.gameBoard.forEach((tile, index) => {
+                                if (tile.type === 'empty') {
+                                    emptyTiles.push(index);
+                                }
+                            });
+
+                            if (emptyTiles.length > 0) {
+                                const randomIndex = Math.floor(Math.random() * emptyTiles.length);
+                                const tileIndex = emptyTiles[randomIndex];
+                                const x = tileIndex % 10;
+                                const y = Math.floor(tileIndex / 10);
+
+                                this.gameBoard[tileIndex].type = 'monster';
+                                this.gameBoard[tileIndex].x = x;
+                                this.gameBoard[tileIndex].y = y;
+
+                                monsters.push({
+                                    name: randomName,
+                                    hp: Math.floor(Math.random() * 10) + 10,
+                                    maxHp: Math.floor(Math.random() * 10) + 10,
+                                    attack: Math.floor(Math.random() * 5) + 3,
+                                    defense: Math.floor(Math.random() * 3) + 1,
+                                    x: x,
+                                    y: y
+                                });
+                            }
+                        }
+
+                        this.monsters = monsters;
+                    } catch (error) {
+                        console.error('Error generating monsters:', error);
+                        this.generatedContent = 'Failed to generate monsters. Please try again.';
+                    } finally {
+                        this.isGenerating = false;
+                    }
+                },
+
+                selectMonster(index) {
+                    this.selectedMonster = index;
+                },
+
+                async generateContent() {
+                    if (!this.userInput.trim()) return;
+
+                    this.isGenerating = true;
+                    try {
+                        const response = await mockClaudeAPI.generateContent(this.userInput);
+                        this.generatedContent = response;
+                        this.userInput = '';
+                    } catch (error) {
+                        console.error('Error generating content:', error);
+                        this.generatedContent = 'Failed to generate content. Please try again.';
+                    } finally {
+                        this.isGenerating = false;
+                    }
+                }
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>

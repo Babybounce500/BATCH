@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RapidAPI Business Intelligence Dashboard Pro - Comprehensive business intelligence and analysis tool">
+    <title>RapidAPI Business Intelligence Dashboard Pro</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --text-color: #333;
+            --text-light: #fff;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --border-radius: 4px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            color: var(--text-color);
+            background-color: #f5f7fa;
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--text-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th, .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background-color: var(--light-color);
+        }
+
+        .data-table tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .api-controls {
+            background-color: var(--text-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-family: var(--font-main);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            margin-top: 1rem;
+            display: none;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .dark-theme {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #1a252f;
+            --light-color: #2c3e50;
+            --text-color: #ecf0f1;
+            --text-light: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            nav ul li {
+                margin-left: 0;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">RapidAPI Business Intelligence Dashboard Pro</div>
+            <nav>
+                <ul>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#analytics">Analytics</a></li>
+                    <li><a href="#reports">Reports</a></li>
+                    <li><a href="#settings">Settings</a></li>
+                    <li><button class="theme-toggle" id="themeToggle">🌓</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="dashboard">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Sales Overview</h3>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" id="refreshSales">Refresh</button>
+                            <button class="btn btn-secondary" id="exportSales">Export</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                    <table class="data-table" id="salesTable">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Sales</th>
+                                <th>Growth</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Customer Acquisition</h3>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" id="refreshCustomers">Refresh</button>
+                            <button class="btn btn-secondary" id="exportCustomers">Export</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="customersChart"></canvas>
+                    </div>
+                    <table class="data-table" id="customersTable">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>New Customers</th>
+                                <th>Retention Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Market Trends</h3>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" id="refreshTrends">Refresh</button>
+                            <button class="btn btn-secondary" id="exportTrends">Export</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                    <table class="data-table" id="trendsTable">
+                        <thead>
+                            <tr>
+                                <th>Trend</th>
+                                <th>Value</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Predictive Analytics</h3>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" id="refreshPredictions">Refresh</button>
+                            <button class="btn btn-secondary" id="exportPredictions">Export</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="predictionsChart"></canvas>
+                    </div>
+                    <table class="data-table" id="predictionsTable">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Current</th>
+                                <th>Predicted</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="analytics" class="api-controls">
+            <h2>Analytics Controls</h2>
+            <form id="analyticsForm">
+                <div class="form-group">
+                    <label for="apiEndpoint">API Endpoint</label>
+                    <select id="apiEndpoint" required>
+                        <option value="">Select an endpoint</option>
+                        <option value="sales">Sales Data</option>
+                        <option value="customers">Customer Data</option>
+                        <option value="trends">Market Trends</option>
+                        <option value="predictions">Predictive Analytics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="timePeriod">Time Period</label>
+                    <select id="timePeriod" required>
+                        <option value="">Select a time period</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Fetch Data</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </div>
+            </form>
+            <div class="loading" id="loadingIndicator">
+                <div class="spinner"></div>
+                <p>Fetching data from RapidAPI...</p>
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 RapidAPI Business Intelligence Dashboard Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            const icon = document.body.classList.contains('dark-theme') ? '☀️' : '🌓';
+            themeToggle.textContent = icon;
+        });
+
+        // Chart.js initialization
+        const salesCtx = document.getElementById('salesChart').getContext('2d');
+        const customersCtx = document.getElementById('customersChart').getContext('2d');
+        const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+        const predictionsCtx = document.getElementById('predictionsChart').getContext('2d');
+
+        // Sample data - in a real application, this would come from RapidAPI
+        const sampleData = {
+            sales: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                data: [12000, 15000, 18000, 16000, 20000, 22000],
+                tableData: [
+                    { month: 'Jan', sales: 12000, growth: '10%' },
+                    { month: 'Feb', sales: 15000, growth: '25%' },
+                    { month: 'Mar', sales: 18000, growth: '20%' },
+                    { month: 'Apr', sales: 16000, growth: '-11%' },
+                    { month: 'May', sales: 20000, growth: '25%' },
+                    { month: 'Jun', sales: 22000, growth: '10%' }
+                ]
+            },
+            customers: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                newCustomers: [500, 600, 700, 650, 800, 900],
+                retentionRate: [85, 87, 88, 86, 89, 90],
+                tableData: [
+                    { month: 'Jan', newCustomers: 500, retentionRate: '85%' },
+                    { month: 'Feb', newCustomers: 600, retentionRate: '87%' },
+                    { month: 'Mar', newCustomers: 700, retentionRate: '88%' },
+                    { month: 'Apr', newCustomers: 650, retentionRate: '86%' },
+                    { month: 'May', newCustomers: 800, retentionRate: '89%' },
+                    { month: 'Jun', newCustomers: 900, retentionRate: '90%' }
+                ]
+            },
+            trends: {
+                labels: ['Economic', 'Technological', 'Social', 'Political', 'Environmental'],
+                data: [75, 80, 65, 70, 60],
+                tableData: [
+                    { trend: 'Economic', value: 75, impact: 'High' },
+                    { trend: 'Technological', value: 80, impact: 'Very High' },
+                    { trend: 'Social', value: 65, impact: 'Medium' },
+                    { trend: 'Political', value: 70, impact: 'High' },
+                    { trend: 'Environmental', value: 60, impact: 'Medium' }
+                ]
+            },
+            predictions: {
+                labels: ['Revenue', 'Profit', 'Customers', 'Market Share'],
+                current: [150000, 30000, 5000, 25],
+                predicted: [180000, 36000, 6000, 30],
+                confidence: [85, 80, 75, 70],
+                tableData: [
+                    { metric: 'Revenue', current: 150000, predicted: 180000, confidence: '85%' },
+                    { metric: 'Profit', current: 30000, predicted: 36000, confidence: '80%' },
+                    { metric: 'Customers', current: 5000, predicted: 6000, confidence: '75%' },
+                    { metric: 'Market Share', current: 25, predicted: 30, confidence: '70%' }
+                ]
+            }
+        };
+
+        // Initialize charts
+        const salesChart = new Chart(salesCtx, {
+            type: 'bar',
+            data: {
+                labels: sampleData.sales.labels,
+                datasets: [{
+                    label: 'Sales',
+                    data: sampleData.sales.data,
+                    backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const customersChart = new Chart(customersCtx, {
+            type: 'line',
+            data: {
+                labels: sampleData.customers.labels,
+                datasets: [
+                    {
+                        label: 'New Customers',
+                        data: sampleData.customers.newCustomers,
+                        backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        borderWidth: 2,
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Retention Rate',
+                        data: sampleData.customers.retentionRate,
+                        backgroundColor: 'rgba(243, 156, 18, 0.2)',
+                        borderColor: 'rgba(243, 156, 18, 1)',
+                        borderWidth: 2,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const trendsChart = new Chart(trendsCtx, {
+            type: 'radar',
+            data: {
+                labels: sampleData.trends.labels,
+                datasets: [{
+                    label: 'Market Trends',
+                    data: sampleData.trends.data,
+                    backgroundColor: 'rgba(155, 89, 182, 0.2)',
+                    borderColor: 'rgba(155, 89, 182, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(155, 89, 182, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                }
+            }
+        });
+
+        const predictionsChart = new Chart(predictionsCtx, {
+            type: 'bar',
+            data: {
+                labels: sampleData.predictions.labels,
+                datasets: [
+                    {
+                        label: 'Current',
+                        data: sampleData.predictions.current,
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Predicted',
+                        data: sampleData.predictions.predicted,
+                        backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Populate tables with sample data
+        function populateTable(tableId, data) {
+            const tableBody = document.querySelector(`#${tableId} tbody`);
+            tableBody.innerHTML = '';
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                for (const key in item) {
+                    const cell = document.createElement('td');
+                    cell.textContent = item[key];
+                    row.appendChild(cell);
+                }
+                tableBody.appendChild(row);
+            });
+        }
+
+        populateTable('salesTable', sampleData.sales.tableData);
+        populateTable('customersTable', sampleData.customers.tableData);
+        populateTable('trendsTable', sampleData.trends.tableData);
+        populateTable('predictionsTable', sampleData.predictions.tableData);
+
+        // Form submission and data fetching simulation
+        const analyticsForm = document.getElementById('analyticsForm');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorMessage = document.getElementById('errorMessage');
+
+        analyticsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Show loading indicator
+            loadingIndicator.style.display = 'block';
+            errorMessage.style.display = 'none';
+
+            // Simulate API call delay
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // In a real application, you would fetch data from RapidAPI here
+                // For this example, we'll just show a success message
+                alert('Data fetched successfully! In a real application, this would update the charts and tables with data from RapidAPI.');
+
+            } catch (error) {
+                errorMessage.textContent = 'Error fetching data. Please try again.';
+                errorMessage.style.display = 'block';
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+
+        // Refresh buttons functionality
+        document.getElementById('refreshSales').addEventListener('click', () => {
+            // In a real application, this would fetch updated sales data
+            alert('Sales data refreshed! In a real application, this would fetch updated data from RapidAPI.');
+        });
+
+        document.getElementById('refreshCustomers').addEventListener('click', () => {
+            // In a real application, this would fetch updated customer data
+            alert('Customer data refreshed! In a real application, this would fetch updated data from RapidAPI.');
+        });
+
+        document.getElementById('refreshTrends').addEventListener('click', () => {
+            // In a real application, this would fetch updated trend data
+            alert('Trend data refreshed! In a real application, this would fetch updated data from RapidAPI.');
+        });
+
+        document.getElementById('refreshPredictions').addEventListener('click', () => {
+            // In a real application, this would fetch updated prediction data
+            alert('Prediction data refreshed! In a real application, this would fetch updated data from RapidAPI.');
+        });
+
+        // Export buttons functionality
+        document.getElementById('exportSales').addEventListener('click', () => {
+            // In a real application, this would export sales data
+            alert('Sales data exported! In a real application, this would download the data as a CSV or other format.');
+        });
+
+        document.getElementById('exportCustomers').addEventListener('click', () => {
+            // In a real application, this would export customer data
+            alert('Customer data exported! In a real application, this would download the data as a CSV or other format.');
+        });
+
+        document.getElementById('exportTrends').addEventListener('click', () => {
+            // In a real application, this would export trend data
+            alert('Trend data exported! In a real application, this would download the data as a CSV or other format.');
+        });
+
+        document.getElementById('exportPredictions').addEventListener('click', () => {
+            // In a real application, this would export prediction data
+            alert('Prediction data exported! In a real application, this would download the data as a CSV or other format.');
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>

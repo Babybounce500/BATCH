@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Claude Document Summarization Tool Pro - Advanced document summarization and content condensation using Claude's API">
+    <title>Claude Document Summarization Tool Pro</title>
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #ff5e62;
+            --accent-color: #4bcffa;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #f8f9fa;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .upload-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-area:hover {
+            background-color: rgba(74, 107, 255, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .file-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: rgba(74, 107, 255, 0.1);
+            border-radius: var(--border-radius);
+            display: none;
+        }
+
+        .file-name {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-size {
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .options-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .option-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .option-group h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-option input, .checkbox-option input {
+            margin-right: 0.5rem;
+        }
+
+        .slider-container {
+            margin-bottom: 1rem;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background-color: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .summarize-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .summarize-btn:hover {
+            background-color: #3a5bef;
+            transform: translateY(-2px);
+        }
+
+        .summarize-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            display: none;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-title {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .copy-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .copy-btn:hover {
+            background-color: #3abff8;
+        }
+
+        .summary-content {
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .quality-assessment {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .quality-title {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .quality-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric {
+            background-color: rgba(74, 107, 255, 0.1);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .loading-spinner {
+            display: none;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">Claude Doc Pro</div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Click to upload PDF or drag and drop</div>
+                <input type="file" id="fileInput" accept=".pdf" style="display: none;">
+            </div>
+            <div class="file-info" id="fileInfo">
+                <div class="file-name" id="fileName"></div>
+                <div class="file-size" id="fileSize"></div>
+            </div>
+        </section>
+
+        <section class="options-section">
+            <h2>Summarization Options</h2>
+            <div class="options-grid">
+                <div class="option-group">
+                    <h3>Summary Length</h3>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="short" name="length" value="short" checked>
+                            <label for="short">Short (1-2 sentences)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="medium" name="length" value="medium">
+                            <label for="medium">Medium (3-5 sentences)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="long" name="length" value="long">
+                            <label for="long">Long (5-10 sentences)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <h3>Detail Level</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Concise</span>
+                            <span>Detailed</span>
+                        </div>
+                        <input type="range" id="detailLevel" class="slider" min="1" max="10" value="5">
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <h3>Language</h3>
+                    <select id="language" class="select-box">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="zh">Chinese</option>
+                        <option value="ja">Japanese</option>
+                    </select>
+                </div>
+
+                <div class="option-group">
+                    <h3>Additional Options</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="highlightKeyPoints" checked>
+                            <label for="highlightKeyPoints">Highlight key points</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="includeReferences">
+                            <label for="includeReferences">Include references</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="extractMainIdeas">
+                            <label for="extractMainIdeas">Extract main ideas</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="summarize-btn" id="summarizeBtn" disabled>Summarize Document</button>
+        </section>
+
+        <div class="loading-spinner" id="loadingSpinner"></div>
+
+        <section class="results-section" id="resultsSection">
+            <div class="results-header">
+                <h2 class="results-title">Summary Results</h2>
+                <button class="copy-btn" id="copyBtn">Copy Summary</button>
+            </div>
+            <div class="summary-content" id="summaryContent"></div>
+
+            <div class="quality-assessment">
+                <h3 class="quality-title">Quality Assessment</h3>
+                <div class="quality-metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="completeness">85%</div>
+                        <div class="metric-label">Completeness</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="accuracy">92%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="coherence">88%</div>
+                        <div class="metric-label">Coherence</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Claude Document Summarization Tool Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const summarizeBtn = document.getElementById('summarizeBtn');
+            const resultsSection = document.getElementById('resultsSection');
+            const summaryContent = document.getElementById('summaryContent');
+            const copyBtn = document.getElementById('copyBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            // PDF.js worker
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
+            // File upload handling
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#3a5bef';
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#4a6bff';
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#4a6bff';
+
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileUpload();
+                }
+            });
+
+            fileInput.addEventListener('change', handleFileUpload);
+
+            function handleFileUpload() {
+                if (fileInput.files.length) {
+                    const file = fileInput.files[0];
+
+                    // Validate file type
+                    if (file.type !== 'application/pdf') {
+                        alert('Please upload a PDF file.');
+                        return;
+                    }
+
+                    // Display file info
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+                    fileInfo.style.display = 'block';
+
+                    // Enable summarize button
+                    summarizeBtn.disabled = false;
+                }
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Summarize button click handler
+            summarizeBtn.addEventListener('click', async () => {
+                if (fileInput.files.length) {
+                    const file = fileInput.files[0];
+
+                    // Show loading spinner
+                    loadingSpinner.style.display = 'block';
+                    summarizeBtn.disabled = true;
+
+                    try {
+                        // Extract text from PDF
+                        const text = await extractTextFromPDF(file);
+
+                        // Get summarization options
+                        const options = getSummarizationOptions();
+
+                        // Simulate API call to Claude's API
+                        const summary = await simulateClaudeAPICall(text, options);
+
+                        // Display results
+                        displaySummaryResults(summary);
+
+                        // Hide loading spinner
+                        loadingSpinner.style.display = 'none';
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('An error occurred while processing the document.');
+
+                        // Hide loading spinner
+                        loadingSpinner.style.display = 'none';
+                        summarizeBtn.disabled = false;
+                    }
+                }
+            });
+
+            // Extract text from PDF using PDF.js
+            async function extractTextFromPDF(file) {
+                return new Promise((resolve, reject) => {
+                    const fileReader = new FileReader();
+
+                    fileReader.onload = function() {
+                        const typedArray = new Uint8Array(this.result);
+
+                        pdfjsLib.getDocument(typedArray).promise.then(function(pdf) {
+                            let text = '';
+
+                            const numPages = pdf.numPages;
+                            const pagePromises = [];
+
+                            for (let i = 1; i <= numPages; i++) {
+                                pagePromises.push(
+                                    pdf.getPage(i).then(function(page) {
+                                        return page.getTextContent().then(function(textContent) {
+                                            text += textContent.items.map(item => item.str).join(' ');
+                                        });
+                                    })
+                                );
+                            }
+
+                            Promise.all(pagePromises).then(function() {
+                                resolve(text);
+                            });
+                        }).catch(function(error) {
+                            reject(error);
+                        });
+                    };
+
+                    fileReader.onerror = function(error) {
+                        reject(error);
+                    };
+
+                    fileReader.readAsArrayBuffer(file);
+                });
+            }
+
+            // Get summarization options from UI
+            function getSummarizationOptions() {
+                return {
+                    length: document.querySelector('input[name="length"]:checked').value,
+                    detailLevel: document.getElementById('detailLevel').value,
+                    language: document.getElementById('language').value,
+                    highlightKeyPoints: document.getElementById('highlightKeyPoints').checked,
+                    includeReferences: document.getElementById('includeReferences').checked,
+                    extractMainIdeas: document.getElementById('extractMainIdeas').checked
+                };
+            }
+
+            // Simulate API call to Claude's API
+            async function simulateClaudeAPICall(text, options) {
+                // In a real implementation, this would be an actual API call to Claude's service
+                // For demonstration purposes, we'll simulate the API response
+
+                // Simulate processing delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Generate a mock summary based on the options
+                let summary = '';
+
+                switch (options.length) {
+                    case 'short':
+                        summary = generateShortSummary(text, options);
+                        break;
+                    case 'medium':
+                        summary = generateMediumSummary(text, options);
+                        break;
+                    case 'long':
+                        summary = generateLongSummary(text, options);
+                        break;
+                }
+
+                // Apply additional formatting based on options
+                if (options.highlightKeyPoints) {
+                    summary = highlightKeyPoints(summary);
+                }
+
+                if (options.language !== 'en') {
+                    // In a real implementation, this would be a translation API call
+                    summary = `This is a simulated translation to ${getLanguageName(options.language)}: ${summary}`;
+                }
+
+                return summary;
+            }
+
+            // Generate short summary
+            function generateShortSummary(text, options) {
+                // Simple implementation - in a real app, this would use NLP techniques
+                const sentences = text.split(/[.!?]+/);
+                const numSentences = Math.min(2, sentences.length);
+
+                let summary = sentences.slice(0, numSentences).join('. ') + '.';
+
+                if (options.extractMainIdeas) {
+                    summary = `Main idea: ${summary}`;
+                }
+
+                return summary;
+            }
+
+            // Generate medium summary
+            function generateMediumSummary(text, options) {
+                // Simple implementation - in a real app, this would use NLP techniques
+                const sentences = text.split(/[.!?]+/);
+                const numSentences = Math.min(5, sentences.length);
+
+                let summary = sentences.slice(0, numSentences).join('. ') + '.';
+
+                if (options.extractMainIdeas) {
+                    summary = `Main ideas: ${summary}`;
+                }
+
+                return summary;
+            }
+
+            // Generate long summary
+            function generateLongSummary(text, options) {
+                // Simple implementation - in a real app, this would use NLP techniques
+                const sentences = text.split(/[.!?]+/);
+                const numSentences = Math.min(10, sentences.length);
+
+                let summary = sentences.slice(0, numSentences).join('. ') + '.';
+
+                if (options.extractMainIdeas) {
+                    summary = `Main ideas and supporting details: ${summary}`;
+                }
+
+                return summary;
+            }
+
+            // Highlight key points in the summary
+            function highlightKeyPoints(summary) {
+                // Simple implementation - in a real app, this would use NLP to identify key points
+                const sentences = summary.split(/[.!?]+/);
+
+                // Mark the first few sentences as key points
+                const numKeyPoints = Math.min(3, sentences.length);
+                for (let i = 0; i < numKeyPoints; i++) {
+                    sentences[i] = `<strong>${sentences[i].trim()}.</strong>`;
+                }
+
+                return sentences.join(' ');
+            }
+
+            // Get language name from code
+            function getLanguageName(code) {
+                const languages = {
+                    'en': 'English',
+                    'es': 'Spanish',
+                    'fr': 'French',
+                    'de': 'German',
+                    'zh': 'Chinese',
+                    'ja': 'Japanese'
+                };
+
+                return languages[code] || 'Unknown';
+            }
+
+            // Display summary results
+            function displaySummaryResults(summary) {
+                summaryContent.innerHTML = summary;
+                resultsSection.style.display = 'block';
+
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+                // Generate random quality metrics for demonstration
+                document.getElementById('completeness').textContent = `${Math.floor(Math.random() * 21) + 80}%`;
+                document.getElementById('accuracy').textContent = `${Math.floor(Math.random() * 21) + 80}%`;
+                document.getElementById('coherence').textContent = `${Math.floor(Math.random() * 21) + 80}%`;
+            }
+
+            // Copy summary to clipboard
+            copyBtn.addEventListener('click', () => {
+                const range = document.createRange();
+                range.selectNode(summaryContent);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+
+                // Show feedback
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy Summary';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

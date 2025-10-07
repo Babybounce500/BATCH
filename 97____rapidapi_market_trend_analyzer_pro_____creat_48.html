@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RapidAPI Market Trend Analyzer Pro - Advanced financial market analysis tool">
+    <title>RapidAPI Market Trend Analyzer Pro</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --text-color: #333;
+            --light-text: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 2rem;
+        }
+
+        nav ul li a {
+            color: var(--light-text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .dashboard {
+            background-color: var(--light-color);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: var(--primary-color);
+        }
+
+        .date-range {
+            display: flex;
+            align-items: center;
+        }
+
+        .date-range label {
+            margin-right: 0.5rem;
+            font-weight: 500;
+        }
+
+        .date-range select {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-right: 1rem;
+        }
+
+        .chart-container {
+            height: 400px;
+            margin-bottom: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .analysis-tools {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .tool-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .tool-card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-btn {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .tool-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .predictive-modeling {
+            grid-column: 1 / -1;
+        }
+
+        .model-parameters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .parameter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .parameter-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .parameter-group input,
+        .parameter-group select {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .run-model-btn {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .run-model-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .results-container {
+            margin-top: 2rem;
+        }
+
+        .result-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .result-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .result-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric {
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #666;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links a {
+            color: var(--light-text);
+            text-decoration: none;
+            margin: 0 1rem;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+
+            .date-range {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .date-range select {
+                margin-bottom: 0.5rem;
+            }
+
+            .analysis-tools {
+                grid-template-columns: 1fr;
+            }
+
+            .predictive-modeling {
+                grid-column: 1;
+            }
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            color: var(--secondary-color);
+        }
+
+        .dark-theme {
+            --primary-color: #34495e;
+            --secondary-color: #2980b9;
+            --accent-color: #c0392b;
+            --light-color: #2c3e50;
+            --dark-color: #ecf0f1;
+            --text-color: #ecf0f1;
+            --light-text: #333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1 class="logo">RapidAPI Market Trend Analyzer Pro</h1>
+            <nav>
+                <ul>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#predictive-modeling">Predictive Modeling</a></li>
+                    <li><a href="#risk-assessment">Risk Assessment</a></li>
+                    <li><a href="#sentiment-analysis">Sentiment Analysis</a></li>
+                    <li><a href="#market-research">Market Research</a></li>
+                </ul>
+            </nav>
+            <button class="theme-toggle" id="themeToggle">🌓</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="main-container">
+            <section class="dashboard" id="dashboard">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">Market Overview</h2>
+                    <div class="date-range">
+                        <label for="timeframe">Timeframe:</label>
+                        <select id="timeframe">
+                            <option value="1d">1 Day</option>
+                            <option value="1w">1 Week</option>
+                            <option value="1m" selected>1 Month</option>
+                            <option value="3m">3 Months</option>
+                            <option value="1y">1 Year</option>
+                            <option value="5y">5 Years</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="marketChart"></canvas>
+                </div>
+
+                <div class="analysis-tools">
+                    <div class="tool-card" id="predictive-modeling">
+                        <h3>Predictive Modeling</h3>
+                        <p>Run advanced predictive models to forecast future market trends.</p>
+                        <a href="#predictive-modeling" class="tool-btn">Analyze Trends</a>
+                    </div>
+
+                    <div class="tool-card" id="risk-assessment">
+                        <h3>Risk Assessment</h3>
+                        <p>Evaluate potential risks and volatility in the market.</p>
+                        <a href="#risk-assessment" class="tool-btn">Assess Risks</a>
+                    </div>
+
+                    <div class="tool-card" id="sentiment-analysis">
+                        <h3>Sentiment Analysis</h3>
+                        <p>Analyze market sentiment from news and social media.</p>
+                        <a href="#sentiment-analysis" class="tool-btn">Analyze Sentiment</a>
+                    </div>
+
+                    <div class="tool-card" id="market-research">
+                        <h3>Market Research</h3>
+                        <p>Access comprehensive market research and reports.</p>
+                        <a href="#market-research" class="tool-btn">Research Market</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard" id="predictive-modeling-section">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">Predictive Modeling</h2>
+                </div>
+
+                <div class="model-parameters">
+                    <div class="parameter-group">
+                        <label for="model-type">Model Type</label>
+                        <select id="model-type">
+                            <option value="linear">Linear Regression</option>
+                            <option value="arima">ARIMA</option>
+                            <option value="lstm">LSTM Neural Network</option>
+                            <option value="prophet">Facebook Prophet</option>
+                        </select>
+                    </div>
+
+                    <div class="parameter-group">
+                        <label for="forecast-period">Forecast Period (days)</label>
+                        <input type="number" id="forecast-period" min="1" max="365" value="30">
+                    </div>
+
+                    <div class="parameter-group">
+                        <label for="confidence-interval">Confidence Interval (%)</label>
+                        <input type="number" id="confidence-interval" min="50" max="99" value="95">
+                    </div>
+
+                    <div class="parameter-group">
+                        <label for="data-source">Data Source</label>
+                        <select id="data-source">
+                            <option value="yahoo">Yahoo Finance</option>
+                            <option value="alpha">Alpha Vantage</option>
+                            <option value="iex">IEX Cloud</option>
+                            <option value="twelve">Twelve Data</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="run-model-btn" id="run-model">Run Predictive Model</button>
+
+                <div class="results-container" id="results-container">
+                    <!-- Results will be displayed here -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#dashboard">Dashboard</a>
+                <a href="#predictive-modeling">Predictive Modeling</a>
+                <a href="#risk-assessment">Risk Assessment</a>
+                <a href="#sentiment-analysis">Sentiment Analysis</a>
+                <a href="#market-research">Market Research</a>
+            </div>
+            <p class="copyright">© 2023 RapidAPI Market Trend Analyzer Pro. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-theme');
+                const icon = document.body.classList.contains('dark-theme') ? '☀️' : '🌓';
+                themeToggle.textContent = icon;
+            });
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Initialize Chart.js
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            let marketChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Market Price',
+                        data: [],
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        pointRadius: 0,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+
+            // Simulate fetching market data
+            async function fetchMarketData(timeframe) {
+                // In a real application, this would be an API call to RapidAPI
+                // For demonstration, we'll simulate it with random data
+                showLoading();
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Generate random data based on timeframe
+                const now = new Date();
+                const labels = [];
+                const data = [];
+
+                const days = {
+                    '1d': 24,
+                    '1w': 7,
+                    '1m': 30,
+                    '3m': 90,
+                    '1y': 365,
+                    '5y': 1825
+                }[timeframe];
+
+                const basePrice = 100 + Math.random() * 50;
+                let currentPrice = basePrice;
+
+                for (let i = days; i >= 0; i--) {
+                    const date = new Date(now);
+                    date.setDate(now.getDate() - i);
+                    labels.push(date.toLocaleDateString());
+
+                    // Simulate price movement
+                    const change = (Math.random() - 0.5) * 5;
+                    currentPrice += change;
+                    data.push(currentPrice.toFixed(2));
+                }
+
+                hideLoading();
+                return { labels, data };
+            }
+
+            // Update chart when timeframe changes
+            document.getElementById('timeframe').addEventListener('change', async function() {
+                const timeframe = this.value;
+                const { labels, data } = await fetchMarketData(timeframe);
+
+                marketChart.data.labels = labels;
+                marketChart.data.datasets[0].data = data;
+                marketChart.update();
+            });
+
+            // Initial chart load
+            document.getElementById('timeframe').dispatchEvent(new Event('change'));
+
+            // Predictive modeling functionality
+            document.getElementById('run-model').addEventListener('click', async function() {
+                showLoading();
+
+                // Simulate model running
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Generate random results
+                const forecastPeriod = parseInt(document.getElementById('forecast-period').value);
+                const confidenceInterval = parseInt(document.getElementById('confidence-interval').value);
+                const modelType = document.getElementById('model-type').value;
+                const dataSource = document.getElementById('data-source').value;
+
+                const resultsContainer = document.getElementById('results-container');
+                resultsContainer.innerHTML = '';
+
+                // Create results card
+                const resultCard = document.createElement('div');
+                resultCard.className = 'result-card';
+
+                // Add model information
+                const modelInfo = document.createElement('div');
+                modelInfo.innerHTML = `
+                    <h4>Model Results</h4>
+                    <p><strong>Model Type:</strong> ${modelType}</p>
+                    <p><strong>Data Source:</strong> ${dataSource}</p>
+                    <p><strong>Forecast Period:</strong> ${forecastPeriod} days</p>
+                    <p><strong>Confidence Interval:</strong> ${confidenceInterval}%</p>
+                `;
+                resultCard.appendChild(modelInfo);
+
+                // Add forecast chart
+                const forecastChartContainer = document.createElement('div');
+                forecastChartContainer.className = 'chart-container';
+                const forecastChart = document.createElement('canvas');
+                forecastChart.id = 'forecastChart';
+                forecastChartContainer.appendChild(forecastChart);
+                resultCard.appendChild(forecastChartContainer);
+
+                // Add metrics
+                const metricsContainer = document.createElement('div');
+                metricsContainer.className = 'result-metrics';
+
+                const metrics = [
+                    { label: 'Mean Absolute Error', value: (Math.random() * 2 + 1).toFixed(2) },
+                    { label: 'Root Mean Squared Error', value: (Math.random() * 3 + 2).toFixed(2) },
+                    { label: 'R-squared', value: (0.8 + Math.random() * 0.2).toFixed(3) },
+                    { label: 'Mean Absolute Percentage Error', value: (Math.random() * 10 + 5).toFixed(2) + '%' }
+                ];
+
+                metrics.forEach(metric => {
+                    const metricElement = document.createElement('div');
+                    metricElement.className = 'metric';
+                    metricElement.innerHTML = `
+                        <div class="metric-value">${metric.value}</div>
+                        <div class="metric-label">${metric.label}</div>
+                    `;
+                    metricsContainer.appendChild(metricElement);
+                });
+
+                resultCard.appendChild(metricsContainer);
+
+                // Add scenario analysis
+                const scenarioAnalysis = document.createElement('div');
+                scenarioAnalysis.innerHTML = `
+                    <h4>Scenario Analysis</h4>
+                    <p><strong>Best Case:</strong> +${(Math.random() * 5 + 3).toFixed(2)}% over ${forecastPeriod} days</p>
+                    <p><strong>Most Likely:</strong> +${(Math.random() * 3 + 1).toFixed(2)}% over ${forecastPeriod} days</p>
+                    <p><strong>Worst Case:</strong> -${(Math.random() * 3 + 1).toFixed(2)}% over ${forecastPeriod} days</p>
+                `;
+                resultCard.appendChild(scenarioAnalysis);
+
+                resultsContainer.appendChild(resultCard);
+
+                // Initialize forecast chart
+                const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+                const forecastData = marketChart.data.datasets[0].data;
+                const lastPrice = parseFloat(forecastData[forecastData.length - 1]);
+
+                // Generate forecast data
+                const forecastLabels = [];
+                const forecastValues = [];
+                const now = new Date();
+
+                for (let i = 1; i <= forecastPeriod; i++) {
+                    const date = new Date(now);
+                    date.setDate(now.getDate() + i);
+                    forecastLabels.push(date.toLocaleDateString());
+
+                    // Simulate forecast with some randomness
+                    const change = (Math.random() - 0.5) * 2;
+                    const newPrice = lastPrice + (i * 0.5) + change;
+                    forecastValues.push(newPrice.toFixed(2));
+                }
+
+                new Chart(forecastCtx, {
+                    type: 'line',
+                    data: {
+                        labels: forecastLabels,
+                        datasets: [{
+                            label: 'Forecasted Price',
+                            data: forecastValues,
+                            backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            borderWidth: 2,
+                            tension: 0.1,
+                            pointRadius: 0,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        interaction: {
+                            mode: 'nearest',
+                            axis: 'x',
+                            intersect: false
+                        }
+                    }
+                });
+
+                hideLoading();
+
+                // Scroll to results
+                resultCard.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Loading functions
+            function showLoading() {
+                document.getElementById('loading').style.display = 'flex';
+            }
+
+            function hideLoading() {
+                document.getElementById('loading').style.display = 'none';
+            }
+
+            // Simulate initial load
+            showLoading();
+            setTimeout(hideLoading, 1000);
+        });
+    </script>
+</body>
+</html>

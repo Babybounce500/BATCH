@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RapidAPI Market Trend Analyzer Pro - Advanced financial data analysis tool">
+    <title>RapidAPI Market Trend Analyzer Pro</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #2ecc71;
+            --text-color: #333;
+            --text-light: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .risk-meter {
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .risk-level {
+            height: 100%;
+            width: 0;
+            background-color: var(--warning-color);
+            transition: var(--transition);
+        }
+
+        .risk-low {
+            background-color: var(--success-color);
+        }
+
+        .risk-medium {
+            background-color: var(--warning-color);
+        }
+
+        .risk-high {
+            background-color: var(--danger-color);
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger {
+                display: block;
+                cursor: pointer;
+            }
+
+            .hamburger div {
+                width: 25px;
+                height: 3px;
+                background-color: var(--text-light);
+                margin: 5px;
+                transition: var(--transition);
+            }
+
+            .nav-active .hamburger div:nth-child(1) {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+
+            .nav-active .hamburger div:nth-child(2) {
+                opacity: 0;
+            }
+
+            .nav-active .hamburger div:nth-child(3) {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
+
+            .nav-active .nav-links {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: var(--dark-color);
+                padding: 1rem 0;
+            }
+
+            .nav-active .nav-links li {
+                margin: 0;
+                padding: 0.5rem 0;
+                text-align: center;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">RapidAPI Market Trend Analyzer Pro</div>
+                <ul class="nav-links">
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Predictive Modeling</a></li>
+                    <li><a href="#">Scenario Analysis</a></li>
+                    <li><a href="#">Risk Assessment</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+                <div class="hamburger">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="dashboard">
+            <div class="card">
+                <h3 class="card-title">Market Overview</h3>
+                <div class="chart-container">
+                    <canvas id="marketChart"></canvas>
+                </div>
+                <div class="form-group">
+                    <label for="market-select">Select Market</label>
+                    <select id="market-select">
+                        <option value="S&P 500">S&P 500</option>
+                        <option value="NASDAQ">NASDAQ</option>
+                        <option value="Dow Jones">Dow Jones</option>
+                        <option value="FTSE 100">FTSE 100</option>
+                    </select>
+                </div>
+                <button id="update-market">Update Chart</button>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Predictive Modeling</h3>
+                <div class="chart-container">
+                    <canvas id="predictionChart"></canvas>
+                </div>
+                <div class="form-group">
+                    <label for="prediction-days">Days to Predict</label>
+                    <input type="number" id="prediction-days" min="1" max="30" value="7">
+                </div>
+                <button id="run-prediction" class="btn-secondary">Run Prediction</button>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Scenario Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="scenarioChart"></canvas>
+                </div>
+                <div class="form-group">
+                    <label for="scenario-select">Select Scenario</label>
+                    <select id="scenario-select">
+                        <option value="bull-market">Bull Market</option>
+                        <option value="bear-market">Bear Market</option>
+                        <option value="stagnation">Stagnation</option>
+                    </select>
+                </div>
+                <button id="analyze-scenario" class="btn-secondary">Analyze Scenario</button>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Risk Assessment</h3>
+                <div class="chart-container">
+                    <canvas id="riskChart"></canvas>
+                </div>
+                <div class="risk-meter">
+                    <div class="risk-level" id="risk-level"></div>
+                </div>
+                <p>Current Risk Level: <span id="risk-text">Medium</span></p>
+                <button id="assess-risk" class="btn-danger">Assess Risk</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 RapidAPI Market Trend Analyzer Pro. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const hamburger = document.querySelector('.hamburger');
+            const navLinks = document.querySelector('.nav-links');
+
+            hamburger.addEventListener('click', function() {
+                document.querySelector('header').classList.toggle('nav-active');
+            });
+
+            // Initialize charts
+            const marketCtx = document.getElementById('marketChart').getContext('2d');
+            const predictionCtx = document.getElementById('predictionChart').getContext('2d');
+            const scenarioCtx = document.getElementById('scenarioChart').getContext('2d');
+            const riskCtx = document.getElementById('riskChart').getContext('2d');
+
+            // Generate random data for demonstration
+            function generateRandomData(count, min, max) {
+                return Array.from({length: count}, () => Math.floor(Math.random() * (max - min + 1)) + min);
+            }
+
+            // Market Chart
+            const marketChart = new Chart(marketCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Market Performance',
+                        data: generateRandomData(7, 100, 500),
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+
+            // Prediction Chart
+            const predictionChart = new Chart(predictionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+                    datasets: [{
+                        label: 'Predicted Market Value',
+                        data: generateRandomData(7, 200, 400),
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+
+            // Scenario Chart
+            const scenarioChart = new Chart(scenarioCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Scenario Analysis',
+                        data: generateRandomData(7, 100, 500),
+                        borderColor: 'rgba(243, 156, 18, 1)',
+                        backgroundColor: 'rgba(243, 156, 18, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+
+            // Risk Chart
+            const riskChart = new Chart(riskCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Volatility', 'Liquidity', 'Correlation', 'Dividend Yield'],
+                    datasets: [{
+                        label: 'Risk Factors',
+                        data: generateRandomData(4, 1, 10),
+                        backgroundColor: [
+                            'rgba(231, 76, 60, 0.7)',
+                            'rgba(243, 156, 18, 0.7)',
+                            'rgba(230, 126, 34, 0.7)',
+                            'rgba(46, 204, 113, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(231, 76, 60, 1)',
+                            'rgba(243, 156, 18, 1)',
+                            'rgba(230, 126, 34, 1)',
+                            'rgba(46, 204, 113, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    }
+                }
+            });
+
+            // Update Market Chart
+            document.getElementById('update-market').addEventListener('click', function() {
+                const marketSelect = document.getElementById('market-select');
+                const selectedMarket = marketSelect.options[marketSelect.selectedIndex].text;
+
+                marketChart.data.datasets[0].data = generateRandomData(7, 100, 500);
+                marketChart.data.datasets[0].label = `${selectedMarket} Performance`;
+                marketChart.update();
+            });
+
+            // Run Prediction
+            document.getElementById('run-prediction').addEventListener('click', function() {
+                const days = parseInt(document.getElementById('prediction-days').value);
+                const labels = Array.from({length: days}, (_, i) => `Day ${i + 1}`);
+
+                predictionChart.data.labels = labels;
+                predictionChart.data.datasets[0].data = generateRandomData(days, 200, 400);
+                predictionChart.update();
+            });
+
+            // Analyze Scenario
+            document.getElementById('analyze-scenario').addEventListener('click', function() {
+                const scenarioSelect = document.getElementById('scenario-select');
+                const selectedScenario = scenarioSelect.options[scenarioSelect.selectedIndex].text;
+
+                scenarioChart.data.datasets[0].data = generateRandomData(7, 100, 500);
+                scenarioChart.data.datasets[0].label = `${selectedScenario} Scenario`;
+                scenarioChart.update();
+            });
+
+            // Assess Risk
+            document.getElementById('assess-risk').addEventListener('click', function() {
+                const riskLevel = Math.floor(Math.random() * 3); // 0: low, 1: medium, 2: high
+                const riskText = ['Low', 'Medium', 'High'][riskLevel];
+                const riskColors = ['#2ecc71', '#f39c12', '#e74c3c'];
+                const riskWidths = ['33%', '66%', '100%'];
+
+                const riskLevelElement = document.getElementById('risk-level');
+                const riskTextElement = document.getElementById('risk-text');
+
+                riskLevelElement.style.width = riskWidths[riskLevel];
+                riskLevelElement.style.backgroundColor = riskColors[riskLevel];
+                riskTextElement.textContent = riskText;
+
+                riskChart.data.datasets[0].data = generateRandomData(4, 1, 10);
+                riskChart.update();
+            });
+
+            // Simulate API calls for demonstration
+            async function fetchMarketData(market) {
+                // In a real application, this would be an actual API call to RapidAPI
+                console.log(`Fetching data for ${market}...`);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                return generateRandomData(7, 100, 500);
+            }
+
+            async function runPrediction(days) {
+                console.log(`Running prediction for ${days} days...`);
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                return generateRandomData(days, 200, 400);
+            }
+
+            async function analyzeScenario(scenario) {
+                console.log(`Analyzing ${scenario} scenario...`);
+                await new Promise(resolve => setTimeout(resolve, 1200));
+                return generateRandomData(7, 100, 500);
+            }
+
+            async function assessRisk() {
+                console.log('Assessing risk...');
+                await new Promise(resolve => setTimeout(resolve, 800));
+                return Math.floor(Math.random() * 3);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini AI Writing Coach Pro - Professional AI-assisted writing and editing tool">
+    <title>Gemini AI Writing Coach Pro</title>
+    <style>
+        :root {
+            --primary-color: #6200ee;
+            --primary-dark: #3700b3;
+            --secondary-color: #03dac6;
+            --error-color: #b00020;
+            --background-color: #f5f5f5;
+            --text-color: #333333;
+            --light-text: #ffffff;
+            --card-bg: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--light-text);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .editor-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .editor-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .suggestions-list {
+            list-style: none;
+        }
+
+        .suggestion-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-text {
+            font-size: 0.9rem;
+        }
+
+        .language-selector {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: var(--light-text);
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .mobile-menu {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary-color);
+                padding: 1rem;
+            }
+
+            .mobile-menu.active {
+                display: block;
+            }
+
+            .mobile-menu ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .mobile-menu ul li {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="header-container">
+                <div class="logo">Gemini AI Writing Coach Pro</div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Documents</a></li>
+                        <li><a href="#">Settings</a></li>
+                        <li><a href="#">Logout</a></li>
+                    </ul>
+                </nav>
+                <button class="mobile-menu-toggle" @click="toggleMobileMenu">☰</button>
+                <div class="mobile-menu" :class="{ active: isMobileMenuOpen }">
+                    <ul>
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Documents</a></li>
+                        <li><a href="#">Settings</a></li>
+                        <li><a href="#">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="editor-container">
+                <div class="editor-header">
+                    <div class="editor-title">Document Editor</div>
+                    <div class="editor-actions">
+                        <button @click="generateText">Generate Text</button>
+                        <button @click="checkGrammar">Check Grammar</button>
+                        <button @click="checkPlagiarism">Check Plagiarism</button>
+                        <select class="language-selector" v-model="selectedLanguage" @change="changeLanguage">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                        </select>
+                    </div>
+                </div>
+                <textarea v-model="documentContent" placeholder="Start writing your document here..."></textarea>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-title">AI Suggestions</div>
+                    <ul class="suggestions-list">
+                        <li v-for="(suggestion, index) in suggestions" :key="index" class="suggestion-item">
+                            <div class="suggestion-text">{{ suggestion }}</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Document Stats</div>
+                    <div class="stats">
+                        <p>Words: {{ wordCount }}</p>
+                        <p>Characters: {{ characterCount }}</p>
+                        <p>Read Time: {{ readTime }} minutes</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2023 Gemini AI Writing Coach Pro. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp, ref, computed, watch } = Vue;
+
+        createApp({
+            setup() {
+                const documentContent = ref('');
+                const selectedLanguage = ref('en');
+                const suggestions = ref([]);
+                const isMobileMenuOpen = ref(false);
+
+                const wordCount = computed(() => {
+                    return documentContent.value.trim() === '' ? 0 : documentContent.value.trim().split(/\s+/).length;
+                });
+
+                const characterCount = computed(() => {
+                    return documentContent.value.length;
+                });
+
+                const readTime = computed(() => {
+                    const wordsPerMinute = 200;
+                    return Math.ceil(wordCount.value / wordsPerMinute);
+                });
+
+                const toggleMobileMenu = () => {
+                    isMobileMenuOpen.value = !isMobileMenuOpen.value;
+                };
+
+                const generateText = async () => {
+                    // Simulate API call to generate text
+                    suggestions.value = [];
+                    suggestions.value.push('Generating text suggestions...');
+
+                    try {
+                        // In a real app, this would be an actual API call to Gemini's text generation API
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                        suggestions.value = [
+                            'Consider adding a more engaging introduction.',
+                            'Your conclusion could be more impactful.',
+                            'Try using more varied sentence structures.',
+                            'Check for consistent use of terminology.'
+                        ];
+                    } catch (error) {
+                        suggestions.value = ['Error generating suggestions. Please try again.'];
+                    }
+                };
+
+                const checkGrammar = async () => {
+                    // Simulate API call to check grammar
+                    suggestions.value = [];
+                    suggestions.value.push('Checking grammar...');
+
+                    try {
+                        // In a real app, this would be an actual API call to a grammar checking service
+                        await new Promise(resolve => setTimeout(resolve, 800));
+
+                        suggestions.value = [
+                            'Possible typo: "teh" should be "the".',
+                            'Consider using "who" instead of "that" for people.',
+                            'Your sentence structure could be improved here.',
+                            'Check for subject-verb agreement.'
+                        ];
+                    } catch (error) {
+                        suggestions.value = ['Error checking grammar. Please try again.'];
+                    }
+                };
+
+                const checkPlagiarism = async () => {
+                    // Simulate API call to check plagiarism
+                    suggestions.value = [];
+                    suggestions.value.push('Checking for plagiarism...');
+
+                    try {
+                        // In a real app, this would be an actual API call to a plagiarism detection service
+                        await new Promise(resolve => setTimeout(resolve, 1200));
+
+                        suggestions.value = [
+                            'Your document has 92% original content.',
+                            'Consider paraphrasing the following sections:',
+                            'Section 2: 20% similarity with source material',
+                            'Section 4: 15% similarity with source material'
+                        ];
+                    } catch (error) {
+                        suggestions.value = ['Error checking plagiarism. Please try again.'];
+                    }
+                };
+
+                const changeLanguage = () => {
+                    // In a real app, this would trigger language-specific suggestions
+                    suggestions.value = [`Language changed to ${selectedLanguage.value}. Generating language-specific suggestions...`];
+                };
+
+                watch(documentContent, (newContent) => {
+                    // Update stats when content changes
+                    // This is handled by the computed properties
+                });
+
+                return {
+                    documentContent,
+                    selectedLanguage,
+                    suggestions,
+                    isMobileMenuOpen,
+                    wordCount,
+                    characterCount,
+                    readTime,
+                    toggleMobileMenu,
+                    generateText,
+                    checkGrammar,
+                    checkPlagiarism,
+                    changeLanguage
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

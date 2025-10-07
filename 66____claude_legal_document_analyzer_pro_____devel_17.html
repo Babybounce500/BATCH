@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Claude Legal Document Analyzer Pro - Comprehensive legal document analysis tool">
+    <title>Claude Legal Document Analyzer Pro</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --text-color: #333;
+            --text-light: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .document-upload {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .document-upload h2 {
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .upload-area p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: rgba(52, 152, 219, 0.1);
+            border-radius: 4px;
+            display: none;
+        }
+
+        .file-info p {
+            margin-bottom: 0.5rem;
+        }
+
+        .analysis-results {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .analysis-results h2 {
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .result-section {
+            margin-bottom: 2rem;
+        }
+
+        .result-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .clause-list {
+            list-style: none;
+        }
+
+        .clause-item {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .risk-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .risk-low {
+            background-color: var(--secondary-color);
+        }
+
+        .risk-medium {
+            background-color: var(--warning-color);
+        }
+
+        .risk-high {
+            background-color: var(--danger-color);
+        }
+
+        .risk-text {
+            font-weight: 500;
+        }
+
+        .compliance-status {
+            font-weight: 500;
+        }
+
+        .compliant {
+            color: var(--secondary-color);
+        }
+
+        .non-compliant {
+            color: var(--danger-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: var(--dark-color);
+            font-size: 1.5rem;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            margin-bottom: 1rem;
+        }
+
+        .clause-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .clause-details h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .clause-text {
+            background-color: rgba(52, 152, 219, 0.05);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .risk-assessment {
+            margin-bottom: 1.5rem;
+        }
+
+        .risk-assessment h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .risk-score {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .risk-factors {
+            margin-bottom: 1rem;
+        }
+
+        .risk-factors h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-factors ul {
+            list-style: none;
+        }
+
+        .risk-factors li {
+            padding: 0.5rem;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendations {
+            margin-bottom: 1.5rem;
+        }
+
+        .recommendations h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .recommendations ul {
+            list-style: none;
+        }
+
+        .recommendations li {
+            padding: 0.5rem;
+            background-color: rgba(46, 204, 113, 0.1);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .compliance-check {
+            margin-bottom: 1.5rem;
+        }
+
+        .compliance-check h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .compliance-status {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .compliance-issues {
+            margin-bottom: 1rem;
+        }
+
+        .compliance-issues h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .compliance-issues ul {
+            list-style: none;
+        }
+
+        .compliance-issues li {
+            padding: 0.5rem;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .negotiation-suggestions {
+            margin-bottom: 1.5rem;
+        }
+
+        .negotiation-suggestions h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .negotiation-suggestions ul {
+            list-style: none;
+        }
+
+        .negotiation-suggestions li {
+            padding: 0.5rem;
+            background-color: rgba(46, 204, 113, 0.1);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 1rem;
+            }
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">Claude Legal Document Analyzer Pro</div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#analysis">Analysis</a></li>
+                    <li><a href="#tools">Tools</a></li>
+                    <li><a href="#reports">Reports</a></li>
+                    <li><a href="#settings">Settings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard">
+            <div class="card">
+                <h3>Document Upload</h3>
+                <p>Upload legal documents for comprehensive analysis</p>
+                <button class="btn" id="upload-btn">Upload Document</button>
+            </div>
+            <div class="card">
+                <h3>Clause Identification</h3>
+                <p>Automatically identify and categorize clauses</p>
+                <button class="btn btn-secondary" id="clause-btn">View Clauses</button>
+            </div>
+            <div class="card">
+                <h3>Risk Assessment</h3>
+                <p>Evaluate potential risks and liabilities</p>
+                <button class="btn btn-secondary" id="risk-btn">Assess Risks</button>
+            </div>
+            <div class="card">
+                <h3>Compliance Check</h3>
+                <p>Verify document compliance with legal standards</p>
+                <button class="btn btn-secondary" id="compliance-btn">Check Compliance</button>
+            </div>
+            <div class="card">
+                <h3>Contract Negotiation</h3>
+                <p>Get suggestions for contract negotiation</p>
+                <button class="btn btn-secondary" id="negotiation-btn">Negotiate</button>
+            </div>
+        </div>
+
+        <div class="document-upload">
+            <h2>Document Upload</h2>
+            <div class="upload-area" id="upload-area">
+                <p>Drag and drop your legal document here or click to browse</p>
+                <input type="file" id="file-input" class="file-input" accept=".pdf">
+                <div class="file-info" id="file-info">
+                    <p id="file-name"></p>
+                    <p id="file-size"></p>
+                </div>
+            </div>
+            <button class="btn" id="analyze-btn" style="display: none;">Analyze Document</button>
+        </div>
+
+        <div class="analysis-results" id="analysis-results" style="display: none;">
+            <h2>Analysis Results</h2>
+
+            <div class="result-section" id="clause-section">
+                <h3>Identified Clauses</h3>
+                <ul class="clause-list" id="clause-list"></ul>
+            </div>
+
+            <div class="result-section" id="risk-section">
+                <h3>Risk Assessment</h3>
+                <div class="risk-score" id="risk-score"></div>
+                <div class="risk-factors" id="risk-factors"></div>
+            </div>
+
+            <div class="result-section" id="compliance-section">
+                <h3>Compliance Check</h3>
+                <div class="compliance-status" id="compliance-status"></div>
+                <div class="compliance-issues" id="compliance-issues"></div>
+            </div>
+
+            <div class="result-section" id="negotiation-section">
+                <h3>Negotiation Suggestions</h3>
+                <div class="negotiation-suggestions" id="negotiation-suggestions"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="clause-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <div class="modal-header">
+                <h2>Clause Details</h2>
+            </div>
+            <div class="modal-body">
+                <div class="pdf-viewer" id="pdf-viewer"></div>
+                <div class="clause-details">
+                    <h3>Clause Text</h3>
+                    <div class="clause-text" id="modal-clause-text"></div>
+                </div>
+                <div class="risk-assessment">
+                    <h3>Risk Assessment</h3>
+                    <div class="risk-score" id="modal-risk-score"></div>
+                    <div class="risk-factors" id="modal-risk-factors"></div>
+                </div>
+                <div class="compliance-check">
+                    <h3>Compliance Check</h3>
+                    <div class="compliance-status" id="modal-compliance-status"></div>
+                    <div class="compliance-issues" id="modal-compliance-issues"></div>
+                </div>
+                <div class="negotiation-suggestions">
+                    <h3>Negotiation Suggestions</h3>
+                    <div class="negotiation-suggestions" id="modal-negotiation-suggestions"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="risk-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <div class="modal-header">
+                <h2>Risk Assessment</h2>
+            </div>
+            <div class="modal-body">
+                <div class="risk-assessment">
+                    <h3>Overall Risk Score</h3>
+                    <div class="risk-score" id="modal-overall-risk-score"></div>
+                    <div class="risk-factors" id="modal-overall-risk-factors"></div>
+                </div>
+                <div class="risk-assessment">
+                    <h3>Risk by Clause</h3>
+                    <ul class="clause-list" id="modal-clause-risk-list"></ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="close-risk-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="compliance-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <div class="modal-header">
+                <h2>Compliance Check</h2>
+            </div>
+            <div class="modal-body">
+                <div class="compliance-check">
+                    <h3>Overall Compliance Status</h3>
+                    <div class="compliance-status" id="modal-overall-compliance-status"></div>
+                </div>
+                <div class="compliance-check">
+                    <h3>Compliance by Clause</h3>
+                    <ul class="clause-list" id="modal-clause-compliance-list"></ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="close-compliance-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="negotiation-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <div class="modal-header">
+                <h2>Negotiation Suggestions</h2>
+            </div>
+            <div class="modal-body">
+                <div class="negotiation-suggestions">
+                    <h3>Overall Negotiation Suggestions</h3>
+                    <div class="negotiation-suggestions" id="modal-overall-negotiation-suggestions"></div>
+                </div>
+                <div class="negotiation-suggestions">
+                    <h3>Negotiation Suggestions by Clause</h3>
+                    <ul class="clause-list" id="modal-clause-negotiation-list"></ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="close-negotiation-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Claude Legal Document Analyzer Pro. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // PDF.js worker setup
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
+            // DOM elements
+            const uploadBtn = document.getElementById('upload-btn');
+            const clauseBtn = document.getElementById('clause-btn');
+            const riskBtn = document.getElementById('risk-btn');
+            const complianceBtn = document.getElementById('compliance-btn');
+            const negotiationBtn = document.getElementById('negotiation-btn');
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            const fileInfo = document.getElementById('file-info');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const analysisResults = document.getElementById('analysis-results');
+            const clauseList = document.getElementById('clause-list');
+            const riskScore = document.getElementById('risk-score');
+            const riskFactors = document.getElementById('risk-factors');
+            const complianceStatus = document.getElementById('compliance-status');
+            const complianceIssues = document.getElementById('compliance-issues');
+            const negotiationSuggestions = document.getElementById('negotiation-suggestions');
+            const clauseModal = document.getElementById('clause-modal');
+            const riskModal = document.getElementById('risk-modal');
+            const complianceModal = document.getElementById('compliance-modal');
+            const negotiationModal = document.getElementById('negotiation-modal');
+            const closeModal = document.getElementById('close-modal');
+            const closeRiskModal = document.getElementById('close-risk-modal');
+            const closeComplianceModal = document.getElementById('close-compliance-modal');
+            const closeNegotiationModal = document.getElementById('close-negotiation-modal');
+            const modalClauseText = document.getElementById('modal-clause-text');
+            const modalRiskScore = document.getElementById('modal-risk-score');
+            const modalRiskFactors = document.getElementById('modal-risk-factors');
+            const modalComplianceStatus = document.getElementById('modal-compliance-status');
+            const modalComplianceIssues = document.getElementById('modal-compliance-issues');
+            const modalNegotiationSuggestions = document.getElementById('modal-negotiation-suggestions');
+            const modalOverallRiskScore = document.getElementById('modal-overall-risk-score');
+            const modalOverallRiskFactors = document.getElementById('modal-overall-risk-factors');
+            const modalClauseRiskList = document.getElementById('modal-clause-risk-list');
+            const modalOverallComplianceStatus = document.getElementById('modal-overall-compliance-status');
+            const modalClauseComplianceList = document.getElementById('modal-clause-compliance-list');
+            const modalOverallNegotiationSuggestions = document.getElementById('modal-overall-negotiation-suggestions');
+            const modalClauseNegotiationList = document.getElementById('modal-clause-negotiation-list');
+            const loading = document.getElementById('loading');
+
+            // Sample data - in a real application, this would come from the Claude API
+            let documentData = {
+                clauses: [],
+                riskScore: 0,
+                riskFactors: [],
+                complianceStatus: 'Compliant',
+                complianceIssues: [],
+                negotiationSuggestions: []
+            };
+
+            // Event listeners
+            uploadBtn.addEventListener('click', () => fileInput.click());
+            clauseBtn.addEventListener('click', showClauseModal);
+            riskBtn.addEventListener('click', showRiskModal);
+            complianceBtn.addEventListener('click', showComplianceModal);
+            negotiationBtn.addEventListener('click', showNegotiationModal);
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#3498db';
+            });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#ccc';
+            });
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#ccc';
+                handleFileUpload(e.dataTransfer.files[0]);
+            });
+            fileInput.addEventListener('change', (e) => handleFileUpload(e.target.files[0]));
+            analyzeBtn.addEventListener('click', analyzeDocument);
+            closeModal.addEventListener('click', () => clauseModal.style.display = 'none');
+            closeRiskModal.addEventListener('click', () => riskModal.style.display = 'none');
+            closeComplianceModal.addEventListener('click', () => complianceModal.style.display = 'none');
+            closeNegotiationModal.addEventListener('click', () => negotiationModal.style.display = 'none');
+
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === clauseModal) clauseModal.style.display = 'none';
+                if (e.target === riskModal) riskModal.style.display = 'none';
+                if (e.target === complianceModal) complianceModal.style.display = 'none';
+                if (e.target === negotiationModal) negotiationModal.style.display = 'none';
+            });
+
+            // Functions
+            function handleFileUpload(file) {
+                if (!file || file.type !== 'application/pdf') {
+                    alert('Please select a valid PDF file.');
+                    return;
+                }
+
+                fileInfo.style.display = 'block';
+                fileName.textContent = `File: ${file.name}`;
+                fileSize.textContent = `Size: ${formatFileSize(file.size)}`;
+                analyzeBtn.style.display = 'inline-block';
+
+                // Read and display the PDF
+                const fileReader = new FileReader();
+                fileReader.onload = function() {
+                    const typedarray = new Uint8Array(this.result);
+                    pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                        pdf.getPage(1).then(function(page) {
+                            const scale = 1.5;
+                            const viewport = page.getViewport({ scale: scale });
+                            const canvas = document.createElement('canvas');
+                            const context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            const renderContext = {
+                                canvasContext: context,
+                                viewport: viewport
+                            };
+
+                            page.render(renderContext).promise.then(function() {
+                                const pdfViewer = document.getElementById('pdf-viewer');
+                                pdfViewer.innerHTML = '';
+                                pdfViewer.appendChild(canvas);
+                            });
+                        });
+                    });
+                };
+                fileReader.readAsArrayBuffer(file);
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            async function analyzeDocument() {
+                loading.style.display = 'flex';
+
+                // Simulate API call to Claude
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Generate sample data
+                documentData = generateSampleData();
+
+                // Display results
+                displayAnalysisResults();
+
+                loading.style.display = 'none';
+                analysisResults.style.display = 'block';
+            }
+
+            function generateSampleData() {
+                const clauseTypes = [
+                    'General Provisions',
+                    'Confidentiality',
+                    'Intellectual Property',
+                    'Termination',
+                    'Liability',
+                    'Governing Law',
+                    'Miscellaneous'
+                ];
+
+                const clauses = [];
+                const numClauses = Math.floor(Math.random() * 10) + 5;
+
+                for (let i = 0; i < numClauses; i++) {
+                    const clauseType = clauseTypes[Math.floor(Math.random() * clauseTypes.length)];
+                    const riskLevel = Math.floor(Math.random() * 3); // 0: low, 1: medium, 2: high
+                    const isCompliant = Math.random() > 0.3;
+
+                    clauses.push({
+                        id: i + 1,
+                        type: clauseType,
+                        text: `This is a sample clause text for ${clauseType}. It contains important legal information that needs to be carefully reviewed.`,
+                        riskLevel: riskLevel,
+                        riskFactors: generateRiskFactors(riskLevel),
+                        isCompliant: isCompliant,
+                        complianceIssues: isCompliant ? [] : generateComplianceIssues(),
+                        negotiationSuggestions: generateNegotiationSuggestions()
+                    });
+                }
+
+                const overallRiskScore = calculateOverallRiskScore(clauses);
+                const overallComplianceStatus = clauses.every(clause => clause.isCompliant) ? 'Compliant' : 'Non-Compliant';
+
+                return {
+                    clauses: clauses,
+                    riskScore: overallRiskScore,
+                    riskFactors: generateOverallRiskFactors(clauses),
+                    complianceStatus: overallComplianceStatus,
+                    complianceIssues: clauses.flatMap(clause => clause.complianceIssues),
+                    negotiationSuggestions: clauses.flatMap(clause => clause.negotiationSuggestions)
+                };
+            }
+
+            function generateRiskFactors(riskLevel) {
+                const riskFactors = [];
+                const numFactors = riskLevel + 1;
+
+                for (let i = 0; i < numFactors; i++) {
+                    riskFactors.push(`Risk factor ${i + 1} for this clause`);
+                }
+
+                return riskFactors;
+            }
+
+            function generateComplianceIssues() {
+                const issues = [];
+                const numIssues = Math.floor(Math.random() * 3) + 1;
+
+                for (let i = 0; i < numIssues; i++) {
+                    issues.push(`Compliance issue ${i + 1} for this clause`);
+                }
+
+                return issues;
+            }
+
+            function generateNegotiationSuggestions() {
+                const suggestions = [];
+                const numSuggestions = Math.floor(Math.random() * 3) + 1;
+
+                for (let i = 0; i < numSuggestions; i++) {
+                    suggestions.push(`Negotiation suggestion ${i + 1} for this clause`);
+                }
+
+                return suggestions;
+            }
+
+            function calculateOverallRiskScore(clauses) {
+                let totalRisk = 0;
+                clauses.forEach(clause => {
+                    totalRisk += clause.riskLevel;
+                });
+                return Math.min(100, Math.round((totalRisk / clauses.length) * 33.33));
+            }
+
+            function generateOverallRiskFactors(clauses) {
+                const riskFactors = [];
+                const riskLevels = [0, 0, 0]; // low, medium, high
+
+                clauses.forEach(clause => {
+                    riskLevels[clause.riskLevel]++;
+                });
+
+                if (riskLevels[2] > 0) {
+                    riskFactors.push(`High risk clauses: ${riskLevels[2]}`);
+                }
+                if (riskLevels[1] > 0) {
+                    riskFactors.push(`Medium risk clauses: ${riskLevels[1]}`);
+                }
+                if (riskLevels[0] > 0) {
+                    riskFactors.push(`Low risk clauses: ${riskLevels[0]}`);
+                }
+
+                return riskFactors;
+            }
+
+            function displayAnalysisResults() {
+                // Display clauses
+                clauseList.innerHTML = '';
+                documentData.clauses.forEach(clause => {
+                    const clauseItem = document.createElement('li');
+                    clauseItem.className = 'clause-item';
+                    clauseItem.innerHTML = `
+                        <div>
+                            <span class="risk-indicator risk-${clause.riskLevel === 0 ? 'low' : clause.riskLevel === 1 ? 'medium' : 'high'}"></span>
+                            <span>${clause.type}</span>
+                        </div>
+                        <div>
+                            <span class="compliance-status ${clause.isCompliant ? 'compliant' : 'non-compliant'}">
+                                ${clause.isCompliant ? 'Compliant' : 'Non-Compliant'}
+                            </span>
+                            <button class="btn btn-secondary view-clause-btn" data-clause-id="${clause.id}">View</button>
+                        </div>
+                    `;
+                    clauseList.appendChild(clauseItem);
+                });
+
+                // Add event listeners to view buttons
+                document.querySelectorAll('.view-clause-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const clauseId = parseInt(e.target.getAttribute('data-clause-id'));
+                        const clause = documentData.clauses.find(c => c.id === clauseId);
+                        showClauseDetails(clause);
+                    });
+                });
+
+                // Display risk assessment
+                riskScore.textContent = `Overall Risk Score: ${documentData.riskScore}/100`;
+                riskScore.style.color = documentData.riskScore < 40 ? '#2ecc71' : documentData.riskScore < 70 ? '#f39c12' : '#e74c3c';
+
+                riskFactors.innerHTML = '<h4>Risk Factors:</h4><ul>';
+                documentData.riskFactors.forEach(factor => {
+                    riskFactors.innerHTML += `<li>${factor}</li>`;
+                });
+                riskFactors.innerHTML += '</ul>';
+
+                // Display compliance check
+                complianceStatus.textContent = `Overall Compliance Status: ${documentData.complianceStatus}`;
+                complianceStatus.style.color = documentData.complianceStatus === 'Compliant' ? '#2ecc71' : '#e74c3c';
+
+                if (documentData.complianceIssues.length > 0) {
+                    complianceIssues.innerHTML = '<h4>Compliance Issues:</h4><ul>';
+                    documentData.complianceIssues.forEach(issue => {
+                        complianceIssues.innerHTML += `<li>${issue}</li>`;
+                    });
+                    complianceIssues.innerHTML += '</ul>';
+                } else {
+                    complianceIssues.innerHTML = '<p>No compliance issues found.</p>';
+                }
+
+                // Display negotiation suggestions
+                if (documentData.negotiationSuggestions.length > 0) {
+                    negotiationSuggestions.innerHTML = '<ul>';
+                    documentData.negotiationSuggestions.forEach(suggestion => {
+                        negotiationSuggestions.innerHTML += `<li>${suggestion}</li>`;
+                    });
+                    negotiationSuggestions.innerHTML += '</ul>';
+                } else {
+                    negotiationSuggestions.innerHTML = '<p>No negotiation suggestions available.</p>';
+                }
+            }
+
+            function showClauseDetails(clause) {
+                modalClauseText.textContent = clause.text;
+
+                // Display risk assessment
+                modalRiskScore.textContent = `Risk Level: ${clause.riskLevel === 0 ? 'Low' : clause.riskLevel === 1 ? 'Medium' : 'High'}`;
+                modalRiskScore.style.color = clause.riskLevel === 0 ? '#2ecc71' : clause.riskLevel === 1 ? '#f39c12' : '#e74c3c';
+
+                modalRiskFactors.innerHTML = '<h4>Risk Factors:</h4><ul>';
+                clause.riskFactors.forEach(factor => {
+                    modalRiskFactors.innerHTML += `<li>${factor}</li>`;
+                });
+                modalRiskFactors.innerHTML += '</ul>';
+
+                // Display compliance check
+                modalComplianceStatus.textContent = `Compliance Status: ${clause.isCompliant ? 'Compliant' : 'Non-Compliant'}`;
+                modalComplianceStatus.style.color = clause.isCompliant ? '#2ecc71' : '#e74c3c';
+
+                if (clause.complianceIssues.length > 0) {
+                    modalComplianceIssues.innerHTML = '<h4>Compliance Issues:</h4><ul>';
+                    clause.complianceIssues.forEach(issue => {
+                        modalComplianceIssues.innerHTML += `<li>${issue}</li>`;
+                    });
+                    modalComplianceIssues.innerHTML += '</ul>';
+                } else {
+                    modalComplianceIssues.innerHTML = '<p>No compliance issues found.</p>';
+                }
+
+                // Display negotiation suggestions
+                if (clause.negotiationSuggestions.length > 0) {
+                    modalNegotiationSuggestions.innerHTML = '<ul>';
+                    clause.negotiationSuggestions.forEach(suggestion => {
+                        modalNegotiationSuggestions.innerHTML += `<li>${suggestion}</li>`;
+                    });
+                    modalNegotiationSuggestions.innerHTML += '</ul>';
+                } else {
+                    modalNegotiationSuggestions.innerHTML = '<p>No negotiation suggestions available.</p>';
+                }
+
+                clauseModal.style.display = 'flex';
+            }
+
+            function showClauseModal() {
+                if (!documentData.clauses.length) {
+                    alert('Please upload and analyze a document first.');
+                    return;
+                }
+
+                clauseModal.style.display = 'flex';
+                showClauseDetails(documentData.clauses[0]);
+            }
+
+            function showRiskModal() {
+                if (!documentData.clauses.length) {
+                    alert('Please upload and analyze a document first.');
+                    return;
+                }
+
+                modalOverallRiskScore.textContent = `Overall Risk Score: ${documentData.riskScore}/100`;
+                modalOverallRiskScore.style.color = documentData.riskScore < 40 ? '#2ecc71' : documentData.riskScore < 70 ? '#f39c12' : '#e74c3c';
+
+                modalOverallRiskFactors.innerHTML = '<h4>Overall Risk Factors:</h4><ul>';
+                documentData.riskFactors.forEach(factor => {
+                    modalOverallRiskFactors.innerHTML += `<li>${factor}</li>`;
+                });
+                modalOverallRiskFactors.innerHTML += '</ul>';
+
+                modalClauseRiskList.innerHTML = '';
+                documentData.clauses.forEach(clause => {
+                    const clauseItem = document.createElement('li');
+                    clauseItem.className = 'clause-item';
+                    clauseItem.innerHTML = `
+                        <div>
+                            <span class="risk-indicator risk-${clause.riskLevel === 0 ? 'low' : clause.riskLevel === 1 ? 'medium' : 'high'}"></span>
+                            <span>${clause.type}</span>
+                        </div>
+                        <div>
+                            <span class="risk-text">${clause.riskLevel === 0 ? 'Low' : clause.riskLevel === 1 ? 'Medium' : 'High'} Risk</span>
+                        </div>
+                    `;
+                    modalClauseRiskList.appendChild(clauseItem);
+                });
+
+                riskModal.style.display = 'flex';
+            }
+
+            function showComplianceModal() {
+                if (!documentData.clauses.length) {
+                    alert('Please upload and analyze a document first.');
+                    return;
+                }
+
+                modalOverallComplianceStatus.textContent = `Overall Compliance Status: ${documentData.complianceStatus}`;
+                modalOverallComplianceStatus.style.color = documentData.complianceStatus === 'Compliant' ? '#2ecc71' : '#e74c3c';
+
+                modalClauseComplianceList.innerHTML = '';
+                documentData.clauses.forEach(clause => {
+                    const clauseItem = document.createElement('li');
+                    clauseItem.className = 'clause-item';
+                    clauseItem.innerHTML = `
+                        <div>
+                            <span>${clause.type}</span>
+                        </div>
+                        <div>
+                            <span class="compliance-status ${clause.isCompliant ? 'compliant' : 'non-compliant'}">
+                                ${clause.isCompliant ? 'Compliant' : 'Non-Compliant'}
+                            </span>
+                        </div>
+                    `;
+                    modalClauseComplianceList.appendChild(clauseItem);
+                });
+
+                complianceModal.style.display = 'flex';
+            }
+
+            function showNegotiationModal() {
+                if (!documentData.clauses.length) {
+                    alert('Please upload and analyze a document first.');
+                    return;
+                }
+
+                if (documentData.negotiationSuggestions.length > 0) {
+                    modalOverallNegotiationSuggestions.innerHTML = '<ul>';
+                    documentData.negotiationSuggestions.forEach(suggestion => {
+                        modalOverallNegotiationSuggestions.innerHTML += `<li>${suggestion}</li>`;
+                    });
+                    modalOverallNegotiationSuggestions.innerHTML += '</ul>';
+                } else {
+                    modalOverallNegotiationSuggestions.innerHTML = '<p>No negotiation suggestions available.</p>';
+                }
+
+                modalClauseNegotiationList.innerHTML = '';
+                documentData.clauses.forEach(clause => {
+                    if (clause.negotiationSuggestions.length > 0) {
+                        const clauseItem = document.createElement('li');
+                        clauseItem.className = 'clause-item';
+                        clauseItem.innerHTML = `
+                            <div>
+                                <span>${clause.type}</span>
+                            </div>
+                            <div>
+                                <ul>
+                                    ${clause.negotiationSuggestions.map(suggestion => `<li>${suggestion}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                        modalClauseNegotiationList.appendChild(clauseItem);
+                    }
+                });
+
+                negotiationModal.style.display = 'flex';
+            }
+        });
+    </script>
+</body>
+</html>

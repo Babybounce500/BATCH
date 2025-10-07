@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mistral Text Summarization Tool Pro - Advanced text summarization and content condensation">
+    <title>Mistral Text Summarization Tool Pro</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --background-color: #f8f9fa;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition-speed);
+        }
+
+        nav ul li a:hover {
+            color: var(--secondary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .tool-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .input-section, .output-section {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-group {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 1rem;
+        }
+
+        .option-group h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color var(--transition-speed), transform var(--transition-speed);
+        }
+
+        button:hover {
+            background-color: #3367d6;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+
+        .output-content {
+            min-height: 300px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: white;
+            white-space: pre-wrap;
+        }
+
+        .quality-metrics {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f1f3f4;
+            border-radius: 4px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric {
+            padding: 0.5rem;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px var(--shadow-color);
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .tool-container {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .logo {
+                margin-bottom: 1rem;
+            }
+        }
+
+        .theme-toggle {
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-theme {
+            --primary-color: #8ab4f8;
+            --secondary-color: #81c995;
+            --accent-color: #f28b82;
+            --background-color: #202124;
+            --text-color: #e8eaed;
+            --card-bg: #303134;
+            --border-color: #5f6368;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme header {
+            background-color: var(--primary-color);
+        }
+
+        .dark-theme .input-section, .dark-theme .output-section {
+            background-color: var(--card-bg);
+        }
+
+        .dark-theme textarea, .dark-theme select, .dark-theme input[type="range"] {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        .dark-theme .output-content {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        .dark-theme .quality-metrics {
+            background-color: #3c4043;
+        }
+
+        .dark-theme .metric {
+            background-color: var(--card-bg);
+        }
+
+        .dark-theme footer {
+            background-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="header-container">
+                <h1 class="logo">Mistral Text Summarization Tool Pro</h1>
+                <nav>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </nav>
+                <button class="theme-toggle" @click="toggleTheme">Toggle Theme</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="tool-container">
+                <section class="input-section">
+                    <h2>Input Text</h2>
+                    <textarea v-model="inputText" placeholder="Enter text to summarize..."></textarea>
+                    <div class="options-container">
+                        <div class="option-group">
+                            <h3>Language</h3>
+                            <select v-model="language">
+                                <option value="en">English</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                                <option value="it">Italian</option>
+                                <option value="pt">Portuguese</option>
+                            </select>
+                        </div>
+                        <div class="option-group">
+                            <h3>Summary Length</h3>
+                            <input type="range" min="10" max="100" v-model="summaryLength">
+                            <span>{{ summaryLength }}%</span>
+                        </div>
+                        <div class="option-group">
+                            <h3>Document Structure</h3>
+                            <select v-model="documentStructure">
+                                <option value="paragraph">Paragraph</option>
+                                <option value="sentence">Sentence</option>
+                                <option value="bullet">Bullet Points</option>
+                            </select>
+                        </div>
+                        <div class="option-group">
+                            <h3>Content Optimization</h3>
+                            <select v-model="contentOptimization">
+                                <option value="none">None</option>
+                                <option value="seo">SEO Optimization</option>
+                                <option value="readability">Readability</option>
+                                <option value="clarity">Clarity</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button @click="summarizeText">Summarize</button>
+                        <button @click="clearText">Clear</button>
+                    </div>
+                </section>
+
+                <section class="output-section">
+                    <h2>Summary</h2>
+                    <div class="output-content" v-html="outputText"></div>
+                    <div class="quality-metrics" v-if="showMetrics">
+                        <h3>Quality Metrics</h3>
+                        <div class="metrics-grid">
+                            <div class="metric">
+                                <div class="metric-value">{{ compressionRatio }}%</div>
+                                <div>Compression Ratio</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">{{ readabilityScore }}/100</div>
+                                <div>Readability Score</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">{{ relevanceScore }}%</div>
+                                <div>Relevance Score</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">{{ coherenceScore }}%</div>
+                                <div>Coherence Score</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="loading" v-if="isLoading">
+                <div class="loading-spinner"></div>
+                <p>Generating summary...</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2023 Mistral Text Summarization Tool Pro. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                const inputText = ref('');
+                const outputText = ref('');
+                const language = ref('en');
+                const summaryLength = ref(50);
+                const documentStructure = ref('paragraph');
+                const contentOptimization = ref('none');
+                const isLoading = ref(false);
+                const showMetrics = ref(false);
+                const compressionRatio = ref(0);
+                const readabilityScore = ref(0);
+                const relevanceScore = ref(0);
+                const coherenceScore = ref(0);
+                const isDarkTheme = ref(false);
+
+                const toggleTheme = () => {
+                    isDarkTheme.value = !isDarkTheme.value;
+                    document.body.classList.toggle('dark-theme', isDarkTheme.value);
+                };
+
+                const clearText = () => {
+                    inputText.value = '';
+                    outputText.value = '';
+                    showMetrics.value = false;
+                };
+
+                const summarizeText = async () => {
+                    if (!inputText.value.trim()) {
+                        alert('Please enter some text to summarize.');
+                        return;
+                    }
+
+                    isLoading.value = true;
+                    showMetrics.value = false;
+
+                    // Simulate API call to Mistral's text generation API
+                    try {
+                        // In a real application, you would make an actual API call here
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+
+                        // Generate a mock summary based on input and options
+                        const words = inputText.value.split(/\s+/);
+                        const wordCount = words.length;
+                        const targetWordCount = Math.max(10, Math.floor(wordCount * (summaryLength.value / 100)));
+
+                        let summary = words.slice(0, targetWordCount).join(' ');
+
+                        // Apply document structure formatting
+                        if (documentStructure.value === 'sentence') {
+                            summary = summary.replace(/\. /g, '.<br><br>');
+                        } else if (documentStructure.value === 'bullet') {
+                            summary = summary.split('. ').filter(s => s.trim()).map(s => `- ${s.trim()}`).join('<br>');
+                        }
+
+                        // Apply content optimization
+                        if (contentOptimization.value === 'seo') {
+                            // Simple SEO optimization: add keywords to the beginning
+                            const keywords = extractKeywords(inputText.value);
+                            if (keywords.length > 0) {
+                                summary = `${keywords.join(', ')}. ${summary}`;
+                            }
+                        } else if (contentOptimization.value === 'readability') {
+                            // Simple readability improvement: shorten sentences
+                            summary = summary.replace(/([^.]+\.)([^.]+)/g, '$1 $2');
+                        }
+
+                        outputText.value = summary;
+
+                        // Calculate quality metrics
+                        compressionRatio.value = Math.round((1 - (targetWordCount / wordCount)) * 100);
+                        readabilityScore.value = Math.min(100, Math.floor(50 + (wordCount / 10)));
+                        relevanceScore.value = Math.min(100, Math.floor(70 + (Math.random() * 20)));
+                        coherenceScore.value = Math.min(100, Math.floor(60 + (Math.random() * 30)));
+
+                        showMetrics.value = true;
+                    } catch (error) {
+                        console.error('Error generating summary:', error);
+                        outputText.value = 'An error occurred while generating the summary. Please try again.';
+                    } finally {
+                        isLoading.value = false;
+                    }
+                };
+
+                const extractKeywords = (text) => {
+                    // Simple keyword extraction - in a real app, you'd use a proper NLP library
+                    const words = text.toLowerCase().split(/\s+/);
+                    const wordFrequency = {};
+
+                    words.forEach(word => {
+                        const cleanedWord = word.replace(/[^a-z]/g, '');
+                        if (cleanedWord.length > 3) {
+                            wordFrequency[cleanedWord] = (wordFrequency[cleanedWord] || 0) + 1;
+                        }
+                    });
+
+                    const sortedWords = Object.keys(wordFrequency).sort((a, b) => wordFrequency[b] - wordFrequency[a]);
+                    return sortedWords.slice(0, 5);
+                };
+
+                return {
+                    inputText,
+                    outputText,
+                    language,
+                    summaryLength,
+                    documentStructure,
+                    contentOptimization,
+                    isLoading,
+                    showMetrics,
+                    compressionRatio,
+                    readabilityScore,
+                    relevanceScore,
+                    coherenceScore,
+                    isDarkTheme,
+                    toggleTheme,
+                    clearText,
+                    summarizeText
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

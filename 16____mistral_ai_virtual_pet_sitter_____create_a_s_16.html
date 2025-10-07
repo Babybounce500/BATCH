@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mistral AI Virtual Pet Sitter - Care for and train your digital pet with AI-powered behavior and response generation.">
+    <title>Mistral AI Virtual Pet Sitter</title>
+    <style>
+        :root {
+            --primary-color: #6200ea;
+            --secondary-color: #03dac6;
+            --background-color: #f5f5f5;
+            --text-color: #333;
+            --card-bg: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--secondary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .pet-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .pet-display {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .pet-image {
+            width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+
+        .pet-info {
+            margin-bottom: 1rem;
+        }
+
+        .pet-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .pet-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .control-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .control-btn:hover {
+            background-color: #3700b3;
+        }
+
+        .action-log {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .log-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .log-message {
+            margin-top: 0.25rem;
+        }
+
+        .training-section {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .training-commands {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .command-btn {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .command-btn:hover {
+            background-color: #018786;
+            color: white;
+        }
+
+        .training-results {
+            margin-top: 1rem;
+        }
+
+        .exploration-section {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .exploration-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .location {
+            background-color: #f0f0f0;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .location:hover {
+            background-color: #e0e0e0;
+        }
+
+        .location.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .location-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .location-name {
+            font-weight: bold;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .theme-toggle {
+            background-color: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .dark-mode {
+            --primary-color: #bb86fc;
+            --secondary-color: #03dac6;
+            --background-color: #121212;
+            --text-color: #e0e0e0;
+            --card-bg: #1e1e1e;
+        }
+
+        @media (max-width: 768px) {
+            .pet-container {
+                grid-template-columns: 1fr;
+            }
+
+            .training-commands {
+                grid-template-columns: 1fr;
+            }
+
+            .exploration-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .exploration-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                flex-direction: column;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin-left: 0;
+                margin-right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1 class="logo">Mistral AI Virtual Pet Sitter</h1>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#training">Training</a></li>
+                    <li><a href="#exploration">Exploration</a></li>
+                    <li><button class="theme-toggle" id="themeToggle">🌓</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="pet-container">
+            <div class="pet-display">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICA8cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2ZmZiIgLz4KICA8Y2lyY2xlIGN4PSIxMjUiIGN5PSIxMjUiIHI9IjEwMCIgZmlsbD0iIzYyMDAwYSIvPgogIDxwYXRoIGQ9Ik0xMjUgMjUgQzEyNSAyNSAyNSAyNSAyNSAyNSIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNMTI1IDUwIEMxMjUgNTAgMTUwIDUwIDE1MCA1MCIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNMTI1IDc1IEMxMjUgNzUgMTUwIDc1IDE1MCA3NSIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+Cg==" alt="Virtual Pet" class="pet-image" id="petImage">
+                <div class="pet-info">
+                    <div class="pet-name" id="petName">Fluffy</div>
+                    <div class="pet-stats">
+                        <div class="stat">
+                            <div class="stat-label">Happiness</div>
+                            <div class="stat-value" id="happiness">75</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Hunger</div>
+                            <div class="stat-value" id="hunger">30</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Energy</div>
+                            <div class="stat-value" id="energy">60</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="control-btn" id="feedBtn">Feed</button>
+                    <button class="control-btn" id="playBtn">Play</button>
+                    <button class="control-btn" id="sleepBtn">Sleep</button>
+                    <button class="control-btn" id="cleanBtn">Clean</button>
+                </div>
+                <div class="action-log" id="actionLog">
+                    <div class="log-entry">
+                        <div class="log-time">12:00 PM</div>
+                        <div class="log-message">Fluffy is ready for adventure!</div>
+                    </div>
+                </div>
+            </div>
+            <div class="training-section" id="training">
+                <h2 class="section-title">Training</h2>
+                <div class="training-commands">
+                    <button class="command-btn" data-command="sit">Teach Sit</button>
+                    <button class="command-btn" data-command="stay">Teach Stay</button>
+                    <button class="command-btn" data-command="roll">Teach Roll</button>
+                    <button class="command-btn" data-command="shake">Teach Shake</button>
+                    <button class="command-btn" data-command="fetch">Teach Fetch</button>
+                    <button class="command-btn" data-command="spin">Teach Spin</button>
+                </div>
+                <div class="training-results" id="trainingResults">
+                    <p>Train your pet to perform new tricks!</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="exploration-section" id="exploration">
+            <h2 class="section-title">Exploration</h2>
+            <div class="exploration-grid">
+                <div class="location" data-location="park">
+                    <div class="location-icon">🌳</div>
+                    <div class="location-name">Park</div>
+                </div>
+                <div class="location" data-location="beach">
+                    <div class="location-icon">🏖️</div>
+                    <div class="location-name">Beach</div>
+                </div>
+                <div class="location" data-location="forest">
+                    <div class="location-icon">🌲</div>
+                    <div class="location-name">Forest</div>
+                </div>
+                <div class="location" data-location="mountain">
+                    <div class="location-icon">⛰️</div>
+                    <div class="location-name">Mountain</div>
+                </div>
+                <div class="location" data-location="city">
+                    <div class="location-icon">🏙️</div>
+                    <div class="location-name">City</div>
+                </div>
+                <div class="location" data-location="space">
+                    <div class="location-icon">🚀</div>
+                    <div class="location-name">Space</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Mistral AI Virtual Pet Sitter. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const icon = document.body.classList.contains('dark-mode') ? '☀️' : '🌓';
+                themeToggle.textContent = icon;
+            });
+
+            // Pet stats
+            let happiness = 75;
+            let hunger = 30;
+            let energy = 60;
+
+            // Update pet stats display
+            function updateStats() {
+                document.getElementById('happiness').textContent = happiness;
+                document.getElementById('hunger').textContent = hunger;
+                document.getElementById('energy').textContent = energy;
+            }
+
+            // Add log entry
+            function addLogEntry(message) {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+
+                const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                logEntry.innerHTML = `
+                    <div class="log-time">${time}</div>
+                    <div class="log-message">${message}</div>
+                `;
+
+                const actionLog = document.getElementById('actionLog');
+                actionLog.prepend(logEntry);
+
+                // Remove oldest log entry if there are more than 20
+                if (actionLog.children.length > 20) {
+                    actionLog.removeChild(actionLog.lastChild);
+                }
+            }
+
+            // Simulate pet behavior
+            function simulatePetBehavior() {
+                // Randomly change pet stats
+                happiness += Math.floor(Math.random() * 11) - 5;
+                hunger += Math.floor(Math.random() * 11) - 5;
+                energy += Math.floor(Math.random() * 11) - 5;
+
+                // Keep stats within bounds
+                happiness = Math.max(0, Math.min(100, happiness));
+                hunger = Math.max(0, Math.min(100, hunger));
+                energy = Math.max(0, Math.min(100, energy));
+
+                updateStats();
+
+                // Generate random pet behavior
+                const behaviors = [
+                    'is wagging its tail happily',
+                    'is licking its paws',
+                    'is sniffing around curiously',
+                    'is stretching and yawning',
+                    'is looking around with big eyes',
+                    'is playing with a toy',
+                    'is digging in the dirt',
+                    'is chasing its own tail',
+                    'is sleeping peacefully',
+                    'is eating a treat'
+                ];
+
+                const randomBehavior = behaviors[Math.floor(Math.random() * behaviors.length)];
+                addLogEntry(`Fluffy ${randomBehavior}.`);
+            }
+
+            // Control buttons
+            document.getElementById('feedBtn').addEventListener('click', function() {
+                hunger = Math.max(0, hunger - 20);
+                happiness = Math.min(100, happiness + 10);
+                updateStats();
+                addLogEntry('You fed Fluffy. It looks happier!');
+            });
+
+            document.getElementById('playBtn').addEventListener('click', function() {
+                energy = Math.max(0, energy - 15);
+                happiness = Math.min(100, happiness + 15);
+                updateStats();
+                addLogEntry('You played with Fluffy. It seems to be having fun!');
+            });
+
+            document.getElementById('sleepBtn').addEventListener('click', function() {
+                energy = Math.min(100, energy + 20);
+                happiness = Math.min(100, happiness + 5);
+                updateStats();
+                addLogEntry('Fluffy is taking a nap. Sweet dreams!');
+            });
+
+            document.getElementById('cleanBtn').addEventListener('click', function() {
+                happiness = Math.min(100, happiness + 5);
+                updateStats();
+                addLogEntry('You cleaned Fluffy. It looks fresh and clean!');
+            });
+
+            // Training commands
+            document.querySelectorAll('.command-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const command = this.getAttribute('data-command');
+                    const success = Math.random() > 0.3; // 70% chance of success
+
+                    if (success) {
+                        happiness = Math.min(100, happiness + 10);
+                        energy = Math.max(0, energy - 5);
+                        updateStats();
+                        addLogEntry(`Fluffy successfully performed the ${command} command!`);
+                        document.getElementById('trainingResults').innerHTML = `
+                            <p>Success! Fluffy learned to ${command}.</p>
+                            <p>Happiness increased by 10 points.</p>
+                        `;
+                    } else {
+                        happiness = Math.max(0, happiness - 5);
+                        updateStats();
+                        addLogEntry(`Fluffy tried to perform the ${command} command but failed.`);
+                        document.getElementById('trainingResults').innerHTML = `
+                            <p>Fluffy couldn't quite get the ${command} command. Try again!</p>
+                            <p>Happiness decreased by 5 points.</p>
+                        `;
+                    }
+                });
+            });
+
+            // Exploration locations
+            document.querySelectorAll('.location').forEach(location => {
+                location.addEventListener('click', function() {
+                    // Remove active class from all locations
+                    document.querySelectorAll('.location').forEach(loc => {
+                        loc.classList.remove('active');
+                    });
+
+                    // Add active class to clicked location
+                    this.classList.add('active');
+
+                    const locationName = this.getAttribute('data-location');
+                    const messages = {
+                        park: 'Fluffy is playing in the park. It seems to be having a great time!',
+                        beach: 'Fluffy is running on the beach. The waves are making it very happy!',
+                        forest: 'Fluffy is exploring the forest. The trees and leaves are fascinating!',
+                        mountain: 'Fluffy is climbing the mountain. The view is amazing!',
+                        city: 'Fluffy is walking through the city. There are so many interesting things to see!',
+                        space: 'Fluffy is floating in space. The stars are beautiful!'
+                    };
+
+                    happiness = Math.min(100, happiness + 15);
+                    energy = Math.max(0, energy - 10);
+                    updateStats();
+                    addLogEntry(messages[locationName]);
+                });
+            });
+
+            // Simulate pet behavior every 10 seconds
+            setInterval(simulatePetBehavior, 10000);
+
+            // Initial pet behavior
+            simulatePetBehavior();
+        });
+    </script>
+</body>
+</html>

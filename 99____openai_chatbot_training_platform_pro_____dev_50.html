@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Chatbot Training Platform Pro</title>
+    <meta name="description" content="Professional chatbot training and customization platform using OpenAI's chat completions API">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --dark-color: #202124;
+            --light-color: #f8f9fa;
+            --text-color: #3c4043;
+            --text-light: #80868b;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .sidebar-section ul {
+            list-style: none;
+        }
+
+        .sidebar-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-section ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .sidebar-section ul li a:hover, .sidebar-section ul li a.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .main-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background-color: #3367d6;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #2d8e46;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+        }
+
+        .btn-accent:hover {
+            background-color: #d33a2e;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .chat-container {
+            height: 60vh;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+
+        .chat-message {
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            max-width: 80%;
+        }
+
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+
+        .bot-message {
+            background-color: #f1f1f1;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+        }
+
+        .chat-input {
+            display: flex;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            margin-right: 0.5rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--dark-color);
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .close-btn:hover {
+            color: var(--accent-color);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .form-actions .btn {
+            margin-left: 0.5rem;
+        }
+
+        .loading-spinner {
+            display: none;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .mobile-menu {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: var(--dark-color);
+                z-index: 1000;
+                padding: 1rem;
+            }
+
+            .mobile-menu.active {
+                display: block;
+            }
+
+            .mobile-menu nav ul {
+                display: block;
+                margin-top: 3rem;
+            }
+
+            .mobile-menu nav ul li {
+                margin-bottom: 1rem;
+            }
+
+            .close-mobile-menu {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">Chatbot Pro</div>
+            <button class="mobile-menu-btn">☰</button>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Dashboard</a></li>
+                    <li><a href="#">Intents</a></li>
+                    <li><a href="#">Responses</a></li>
+                    <li><a href="#">Flow</a></li>
+                    <li><a href="#">Deploy</a></li>
+                    <li><a href="#">Analytics</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="mobile-menu">
+        <button class="close-mobile-menu">×</button>
+        <nav>
+            <ul>
+                <li><a href="#" class="active">Dashboard</a></li>
+                <li><a href="#">Intents</a></li>
+                <li><a href="#">Responses</a></li>
+                <li><a href="#">Flow</a></li>
+                <li><a href="#">Deploy</a></li>
+                <li><a href="#">Analytics</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <div class="dashboard">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h2>Quick Actions</h2>
+                    <ul>
+                        <li><a href="#" class="active">Dashboard</a></li>
+                        <li><a href="#">Create Intent</a></li>
+                        <li><a href="#">Add Response</a></li>
+                        <li><a href="#">Test Chatbot</a></li>
+                        <li><a href="#">Deploy</a></li>
+                    </ul>
+                </div>
+                <div class="sidebar-section">
+                    <h2>Recent Activities</h2>
+                    <ul>
+                        <li><a href="#">New intent created</a></li>
+                        <li><a href="#">Response updated</a></li>
+                        <li><a href="#">Chatbot deployed</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <div class="main-content">
+                <h1 class="section-title">Dashboard</h1>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">Intents</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">128</div>
+                        <div class="stat-label">Responses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Active Chatbots</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">1.2K</div>
+                        <div class="stat-label">Total Conversations</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Chatbot Testing</h2>
+                        <button class="btn" id="clear-chat">Clear Chat</button>
+                    </div>
+                    <div class="chat-container" id="chat-container">
+                        <div class="chat-message bot-message">
+                            <p>Hello! I'm your chatbot. How can I help you today?</p>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" class="form-control" id="user-input" placeholder="Type your message here...">
+                        <button class="btn" id="send-message">Send</button>
+                    </div>
+                    <div class="loading-spinner" id="loading-spinner"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Recent Conversations</h2>
+                        <button class="btn btn-secondary" id="view-all-conversations">View All</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Last Message</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>User123</td>
+                                    <td>How do I reset my password?</td>
+                                    <td>Resolved</td>
+                                    <td>2023-05-15</td>
+                                </tr>
+                                <tr>
+                                    <td>User456</td>
+                                    <td>What are your business hours?</td>
+                                    <td>Open</td>
+                                    <td>2023-05-16</td>
+                                </tr>
+                                <tr>
+                                    <td>User789</td>
+                                    <td>Can I get a refund?</td>
+                                    <td>Pending</td>
+                                    <td>2023-05-17</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Performance Overview</h2>
+                        <select class="form-control" style="width: auto;">
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="chart-container" id="performance-chart"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 OpenAI Chatbot Training Platform Pro. All rights reserved.</p>
+    </footer>
+
+    <div class="modal" id="conversations-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">All Conversations</h2>
+                <button class="close-btn" id="close-conversations-modal">×</button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Last Message</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>User123</td>
+                            <td>How do I reset my password?</td>
+                            <td>Resolved</td>
+                            <td>2023-05-15</td>
+                            <td>
+                                <button class="btn btn-secondary btn-sm">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>User456</td>
+                            <td>What are your business hours?</td>
+                            <td>Open</td>
+                            <td>2023-05-16</td>
+                            <td>
+                                <button class="btn btn-secondary btn-sm">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>User789</td>
+                            <td>Can I get a refund?</td>
+                            <td>Pending</td>
+                            <td>2023-05-17</td>
+                            <td>
+                                <button class="btn btn-secondary btn-sm">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>User321</td>
+                            <td>Where can I find your store locations?</td>
+                            <td>Resolved</td>
+                            <td>2023-05-18</td>
+                            <td>
+                                <button class="btn btn-secondary btn-sm">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>User654</td>
+                            <td>Do you offer international shipping?</td>
+                            <td>Open</td>
+                            <td>2023-05-19</td>
+                            <td>
+                                <button class="btn btn-secondary btn-sm">View</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const closeMobileMenu = document.querySelector('.close-mobile-menu');
+
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.add('active');
+            });
+
+            closeMobileMenu.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+            });
+
+            // Navigation active state
+            const navLinks = document.querySelectorAll('nav ul li a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+
+            // Chat functionality
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendMessageBtn = document.getElementById('send-message');
+            const clearChatBtn = document.getElementById('clear-chat');
+            const loadingSpinner = document.getElementById('loading-spinner');
+
+            function addMessage(text, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('chat-message');
+                messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+                messageDiv.innerHTML = `<p>${text}</p>`;
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            async function getBotResponse(userMessage) {
+                // Simulate API call to OpenAI's chat completions API
+                loadingSpinner.style.display = 'block';
+
+                // In a real implementation, you would use the OpenAI API here
+                // const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         'Authorization': `Bearer ${apiKey}`
+                //     },
+                //     body: JSON.stringify({
+                //         model: "gpt-3.5-turbo",
+                //         messages: [{role: "user", content: userMessage}]
+                //     })
+                // });
+
+                // const data = await response.json();
+                // const botResponse = data.choices[0].message.content;
+
+                // For demo purposes, we'll use a simple response
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                let botResponse;
+                const lowerCaseMessage = userMessage.toLowerCase();
+
+                if (lowerCaseMessage.includes('hello') || lowerCaseMessage.includes('hi')) {
+                    botResponse = "Hello! How can I assist you today?";
+                } else if (lowerCaseMessage.includes('help')) {
+                    botResponse = "I'm here to help! What do you need assistance with?";
+                } else if (lowerCaseMessage.includes('thank') || lowerCaseMessage.includes('thanks')) {
+                    botResponse = "You're welcome! Is there anything else I can help with?";
+                } else {
+                    botResponse = "I'm an AI chatbot. I can help answer questions, provide information, and assist with tasks. How can I help you today?";
+                }
+
+                loadingSpinner.style.display = 'none';
+                return botResponse;
+            }
+
+            sendMessageBtn.addEventListener('click', async function() {
+                const message = userInput.value.trim();
+                if (message) {
+                    addMessage(message, true);
+                    userInput.value = '';
+
+                    const botResponse = await getBotResponse(message);
+                    addMessage(botResponse, false);
+                }
+            });
+
+            userInput.addEventListener('keypress', async function(e) {
+                if (e.key === 'Enter') {
+                    const message = userInput.value.trim();
+                    if (message) {
+                        addMessage(message, true);
+                        userInput.value = '';
+
+                        const botResponse = await getBotResponse(message);
+                        addMessage(botResponse, false);
+                    }
+                }
+            });
+
+            clearChatBtn.addEventListener('click', function() {
+                chatContainer.innerHTML = '';
+                addMessage("Hello! I'm your chatbot. How can I help you today?", false);
+            });
+
+            // Conversations modal
+            const viewAllConversationsBtn = document.getElementById('view-all-conversations');
+            const conversationsModal = document.getElementById('conversations-modal');
+            const closeConversationsModalBtn = document.getElementById('close-conversations-modal');
+
+            viewAllConversationsBtn.addEventListener('click', function() {
+                conversationsModal.style.display = 'flex';
+            });
+
+            closeConversationsModalBtn.addEventListener('click', function() {
+                conversationsModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', function(e) {
+                if (e.target === conversationsModal) {
+                    conversationsModal.style.display = 'none';
+                }
+            });
+
+            // Simple chart simulation (in a real app, you would use a library like Chart.js)
+            const performanceChart = document.getElementById('performance-chart');
+            performanceChart.style.backgroundColor = '#f5f5f5';
+            performanceChart.style.borderRadius = 'var(--border-radius)';
+            performanceChart.style.display = 'flex';
+            performanceChart.style.alignItems = 'flex-end';
+            performanceChart.style.justifyContent = 'space-around';
+            performanceChart.style.padding = '1rem';
+
+            const bars = [
+                { value: 75, color: '#4285f4' },
+                { value: 50, color: '#34a853' },
+                { value: 80, color: '#ea4335' },
+                { value: 60, color: '#fbbc05' },
+                { value: 90, color: '#4285f4' },
+                { value: 40, color: '#34a853' },
+                { value: 70, color: '#ea4335' }
+            ];
+
+            bars.forEach(bar => {
+                const barElement = document.createElement('div');
+                barElement.style.width = '30px';
+                barElement.style.height = `${bar.value}%`;
+                barElement.style.backgroundColor = bar.color;
+                barElement.style.borderRadius = '4px 4px 0 0';
+                barElement.style.transition = 'var(--transition)';
+                performanceChart.appendChild(barElement);
+
+                barElement.addEventListener('mouseover', function() {
+                    this.style.height = `${bar.value + 5}%`;
+                    this.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+                });
+
+                barElement.addEventListener('mouseout', function() {
+                    this.style.height = `${bar.value}%`;
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

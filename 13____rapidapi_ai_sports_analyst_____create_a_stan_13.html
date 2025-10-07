@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Sports Analyst - Analyze and predict sports events with machine learning">
+    <title>AI Sports Analyst</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #2ecc71;
+            --info-color: #3498db;
+            --text-color: #333;
+            --text-light: #fff;
+            --border-radius: 4px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1rem 0;
+            box-shadow: var(--box-shadow);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        section {
+            margin-bottom: 2rem;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--text-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+        }
+
+        .visualization {
+            height: 300px;
+            margin-bottom: 1rem;
+            background: #f5f5f5;
+            border-radius: var(--border-radius);
+        }
+
+        .prediction-result {
+            background: var(--light-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+        }
+
+        footer {
+            background: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">AI Sports Analyst</div>
+                <ul class="nav-links">
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#analysis">Analysis</a></li>
+                    <li><a href="#predictions">Predictions</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="dashboard">
+            <h1>Sports Dashboard</h1>
+            <div class="dashboard">
+                <div class="card">
+                    <h3>Live Events</h3>
+                    <div class="visualization" id="live-events-map"></div>
+                    <p>View real-time sports events worldwide.</p>
+                    <button class="btn">View Details</button>
+                </div>
+                <div class="card">
+                    <h3>Player Performance</h3>
+                    <div class="visualization" id="player-performance-chart"></div>
+                    <p>Analyze top player performances across different sports.</p>
+                    <button class="btn">View Details</button>
+                </div>
+                <div class="card">
+                    <h3>Team Statistics</h3>
+                    <div class="visualization" id="team-stats-chart"></div>
+                    <p>Compare team statistics and performance metrics.</p>
+                    <button class="btn">View Details</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="analysis">
+            <h2>Sports Analysis</h2>
+            <div class="form-group">
+                <label for="sport-select">Select Sport</label>
+                <select id="sport-select">
+                    <option value="football">Football</option>
+                    <option value="basketball">Basketball</option>
+                    <option value="tennis">Tennis</option>
+                    <option value="cricket">Cricket</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="analysis-type">Analysis Type</label>
+                <select id="analysis-type">
+                    <option value="player">Player Performance</option>
+                    <option value="team">Team Statistics</option>
+                    <option value="match">Match Analysis</option>
+                </select>
+            </div>
+            <button class="btn" id="run-analysis">Run Analysis</button>
+            <div id="analysis-results" class="prediction-result"></div>
+        </section>
+
+        <section id="predictions">
+            <h2>Sports Predictions</h2>
+            <div class="form-group">
+                <label for="prediction-sport">Select Sport</label>
+                <select id="prediction-sport">
+                    <option value="football">Football</option>
+                    <option value="basketball">Basketball</option>
+                    <option value="tennis">Tennis</option>
+                    <option value="cricket">Cricket</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="prediction-type">Prediction Type</label>
+                <select id="prediction-type">
+                    <option value="outcome">Match Outcome</option>
+                    <option value="score">Final Score</option>
+                    <option value="player">Player Performance</option>
+                </select>
+            </div>
+            <button class="btn" id="generate-prediction">Generate Prediction</button>
+            <div id="prediction-results" class="prediction-result"></div>
+        </section>
+
+        <section id="about">
+            <h2>About AI Sports Analyst</h2>
+            <p>AI Sports Analyst is a powerful tool that leverages machine learning and deep learning to analyze sports data and make predictions. Our platform provides comprehensive insights into player and team performance, as well as predictions for upcoming sports events.</p>
+            <p>Using data from multiple sports APIs, we offer a complete solution for sports enthusiasts, analysts, and bettors.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 AI Sports Analyst. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialize Leaflet map for live events
+        const liveEventsMap = L.map('live-events-map').setView([51.505, -0.09], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(liveEventsMap);
+
+        // Simulate live events data
+        const liveEvents = [
+            { coordinates: [40.7128, -74.0060], sport: 'Football', event: 'New York vs Boston' },
+            { coordinates: [48.8566, 2.3522], sport: 'Basketball', event: 'Paris vs Lyon' },
+            { coordinates: [55.7558, 37.6176], sport: 'Tennis', event: 'Moscow Open' }
+        ];
+
+        liveEvents.forEach(event => {
+            L.marker(event.coordinates)
+                .addTo(liveEventsMap)
+                .bindPopup(`<b>${event.sport}</b><br>${event.event}`);
+        });
+
+        // Initialize charts
+        const playerPerformanceCtx = document.getElementById('player-performance-chart').getContext('2d');
+        const teamStatsCtx = document.getElementById('team-stats-chart').getContext('2d');
+
+        const playerPerformanceChart = new Chart(playerPerformanceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Player A', 'Player B', 'Player C', 'Player D', 'Player E'],
+                datasets: [{
+                    label: 'Performance Score',
+                    data: [85, 92, 78, 88, 90],
+                    backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const teamStatsChart = new Chart(teamStatsCtx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+                datasets: [{
+                    label: 'Team A',
+                    data: [75, 82, 88, 90, 85],
+                    borderColor: 'rgba(46, 204, 113, 1)',
+                    backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                    tension: 0.1
+                }, {
+                    label: 'Team B',
+                    data: [68, 75, 80, 85, 82],
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Analysis functionality
+        document.getElementById('run-analysis').addEventListener('click', async () => {
+            const sport = document.getElementById('sport-select').value;
+            const analysisType = document.getElementById('analysis-type').value;
+            const resultsDiv = document.getElementById('analysis-results');
+
+            resultsDiv.innerHTML = '<p>Running analysis... Please wait.</p>';
+
+            // Simulate API call with delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Generate mock analysis results
+            let analysisResults = '';
+
+            switch (analysisType) {
+                case 'player':
+                    analysisResults = `
+                        <h3>Player Performance Analysis for ${sport}</h3>
+                        <p>Top performing players based on recent matches:</p>
+                        <ul>
+                            <li>Player X - 92% performance score</li>
+                            <li>Player Y - 88% performance score</li>
+                            <li>Player Z - 85% performance score</li>
+                        </ul>
+                    `;
+                    break;
+                case 'team':
+                    analysisResults = `
+                        <h3>Team Statistics Analysis for ${sport}</h3>
+                        <p>Key statistics for top teams:</p>
+                        <table>
+                            <tr>
+                                <th>Team</th>
+                                <th>Wins</th>
+                                <th>Losses</th>
+                                <th>Win %</th>
+                            </tr>
+                            <tr>
+                                <td>Team A</td>
+                                <td>12</td>
+                                <td>2</td>
+                                <td>85.7%</td>
+                            </tr>
+                            <tr>
+                                <td>Team B</td>
+                                <td>10</td>
+                                <td>4</td>
+                                <td>71.4%</td>
+                            </tr>
+                        </table>
+                    `;
+                    break;
+                case 'match':
+                    analysisResults = `
+                        <h3>Match Analysis for ${sport}</h3>
+                        <p>Recent match analysis:</p>
+                        <p>Team A 3-1 Team B</p>
+                        <p>Key moments:</p>
+                        <ul>
+                            <li>Goal by Player X in the 15th minute</li>
+                            <li>Yellow card to Player Y in the 45th minute</li>
+                            <li>Penalty saved by Player Z in the 80th minute</li>
+                        </ul>
+                    `;
+                    break;
+            }
+
+            resultsDiv.innerHTML = analysisResults;
+        });
+
+        // Prediction functionality
+        document.getElementById('generate-prediction').addEventListener('click', async () => {
+            const sport = document.getElementById('prediction-sport').value;
+            const predictionType = document.getElementById('prediction-type').value;
+            const resultsDiv = document.getElementById('prediction-results');
+
+            resultsDiv.innerHTML = '<p>Generating prediction... Please wait.</p>';
+
+            // Simulate API call with delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Generate mock prediction results
+            let predictionResults = '';
+
+            switch (predictionType) {
+                case 'outcome':
+                    predictionResults = `
+                        <h3>Match Outcome Prediction for ${sport}</h3>
+                        <p>Predicted outcome: Team A 75% chance to win, Team B 25% chance to win</p>
+                        <p>Key factors influencing prediction:</p>
+                        <ul>
+                            <li>Team A's recent form</li>
+                            <li>Team B's injuries</li>
+                            <li>Head-to-head statistics</li>
+                        </ul>
+                    `;
+                    break;
+                case 'score':
+                    predictionResults = `
+                        <h3>Final Score Prediction for ${sport}</h3>
+                        <p>Predicted final score: Team A 3-1 Team B</p>
+                        <p>Confidence level: 82%</p>
+                        <p>Key factors influencing prediction:</p>
+                        <ul>
+                            <li>Team A's attacking efficiency</li>
+                            <li>Team B's defensive strength</li>
+                            <li>Recent match statistics</li>
+                        </ul>
+                    `;
+                    break;
+                case 'player':
+                    predictionResults = `
+                        <h3>Player Performance Prediction for ${sport}</h3>
+                        <p>Top predicted performers:</p>
+                        <ol>
+                            <li>Player X - 88% performance score</li>
+                            <li>Player Y - 85% performance score</li>
+                            <li>Player Z - 82% performance score</li>
+                        </ol>
+                        <p>Key factors influencing prediction:</p>
+                        <ul>
+                            <li>Player form</li>
+                            <li>Opponent strength</li>
+                            <li>Recent performance data</li>
+                        </ul>
+                    `;
+                    break;
+            }
+
+            resultsDiv.innerHTML = predictionResults;
+        });
+    </script>
+</body>
+</html>

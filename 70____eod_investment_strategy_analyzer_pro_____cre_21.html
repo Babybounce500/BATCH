@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EOD Investment Strategy Analyzer Pro - Advanced financial analysis tools">
+    <title>EOD Investment Strategy Analyzer Pro</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --text-color: #333;
+            --text-light: #fff;
+            --border-radius: 6px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: var(--text-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #1a252f;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e6e6e6;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--text-light);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">EOD Investment Strategy Analyzer Pro</div>
+            <nav>
+                <ul>
+                    <li><a href="#performance">Performance</a></li>
+                    <li><a href="#risk">Risk Assessment</a></li>
+                    <li><a href="#optimization">Optimization</a></li>
+                    <li><a href="#allocation">Allocation</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="performance" class="card">
+            <h2>Performance Attribution</h2>
+            <div class="form-group">
+                <label for="ticker">Ticker Symbol</label>
+                <input type="text" id="ticker" placeholder="e.g., AAPL">
+            </div>
+            <div class="form-group">
+                <label for="start-date">Start Date</label>
+                <input type="date" id="start-date">
+            </div>
+            <div class="form-group">
+                <label for="end-date">End Date</label>
+                <input type="date" id="end-date">
+            </div>
+            <button id="analyze-performance" class="btn-primary">Analyze Performance</button>
+
+            <div id="performance-results" class="chart-container"></div>
+            <div id="performance-table" class="table-container"></div>
+        </section>
+
+        <section id="risk" class="card">
+            <h2>Risk Assessment</h2>
+            <div class="form-group">
+                <label for="portfolio">Portfolio Tickers (comma separated)</label>
+                <input type="text" id="portfolio" placeholder="e.g., AAPL, MSFT, GOOGL">
+            </div>
+            <div class="form-group">
+                <label for="risk-start-date">Start Date</label>
+                <input type="date" id="risk-start-date">
+            </div>
+            <div class="form-group">
+                <label for="risk-end-date">End Date</label>
+                <input type="date" id="risk-end-date">
+            </div>
+            <button id="assess-risk" class="btn-primary">Assess Risk</button>
+
+            <div id="risk-results" class="chart-container"></div>
+            <div id="risk-metrics" class="table-container"></div>
+        </section>
+
+        <section id="optimization" class="card">
+            <h2>Portfolio Optimization</h2>
+            <div class="form-group">
+                <label for="optimization-tickers">Tickers (comma separated)</label>
+                <input type="text" id="optimization-tickers" placeholder="e.g., AAPL, MSFT, GOOGL, AMZN">
+            </div>
+            <div class="form-group">
+                <label for="optimization-start-date">Start Date</label>
+                <input type="date" id="optimization-start-date">
+            </div>
+            <div class="form-group">
+                <label for="optimization-end-date">End Date</label>
+                <input type="date" id="optimization-end-date">
+            </div>
+            <div class="form-group">
+                <label for="risk-tolerance">Risk Tolerance (0-1)</label>
+                <input type="number" id="risk-tolerance" min="0" max="1" step="0.1" value="0.5">
+            </div>
+            <button id="optimize-portfolio" class="btn-primary">Optimize Portfolio</button>
+
+            <div id="optimization-results" class="chart-container"></div>
+            <div id="optimization-table" class="table-container"></div>
+        </section>
+
+        <section id="allocation" class="card">
+            <h2>Asset Allocation</h2>
+            <div class="form-group">
+                <label for="allocation-tickers">Tickers (comma separated)</label>
+                <input type="text" id="allocation-tickers" placeholder="e.g., AAPL, MSFT, GOOGL, AMZN">
+            </div>
+            <div class="form-group">
+                <label for="allocation-start-date">Start Date</label>
+                <input type="date" id="allocation-start-date">
+            </div>
+            <div class="form-group">
+                <label for="allocation-end-date">End Date</label>
+                <input type="date" id="allocation-end-date">
+            </div>
+            <div class="form-group">
+                <label for="allocation-method">Allocation Method</label>
+                <select id="allocation-method">
+                    <option value="equal">Equal Weighting</option>
+                    <option value="market-cap">Market Cap Weighting</option>
+                    <option value="risk-parity">Risk Parity</option>
+                </select>
+            </div>
+            <button id="allocate-assets" class="btn-primary">Allocate Assets</button>
+
+            <div id="allocation-results" class="chart-container"></div>
+            <div id="allocation-table" class="table-container"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 EOD Investment Strategy Analyzer Pro. All rights reserved.</p>
+    </footer>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set default dates to last 30 days
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                if (input.id.includes('start-date')) {
+                    input.value = formatDate(thirtyDaysAgo);
+                } else if (input.id.includes('end-date')) {
+                    input.value = formatDate(today);
+                }
+            });
+
+            // Mock data for demonstration
+            const mockData = {
+                performance: {
+                    AAPL: [
+                        { date: '2023-01-01', value: 150 },
+                        { date: '2023-02-01', value: 160 },
+                        { date: '2023-03-01', value: 170 },
+                        { date: '2023-04-01', value: 180 },
+                        { date: '2023-05-01', value: 190 }
+                    ],
+                    MSFT: [
+                        { date: '2023-01-01', value: 280 },
+                        { date: '2023-02-01', value: 290 },
+                        { date: '2023-03-01', value: 300 },
+                        { date: '2023-04-01', value: 310 },
+                        { date: '2023-05-01', value: 320 }
+                    ],
+                    GOOGL: [
+                        { date: '2023-01-01', value: 2500 },
+                        { date: '2023-02-01', value: 2600 },
+                        { date: '2023-03-01', value: 2700 },
+                        { date: '2023-04-01', value: 2800 },
+                        { date: '2023-05-01', value: 2900 }
+                    ]
+                },
+                risk: {
+                    AAPL: { volatility: 0.15, sharpe: 1.2, beta: 1.1 },
+                    MSFT: { volatility: 0.12, sharpe: 1.3, beta: 1.0 },
+                    GOOGL: { volatility: 0.18, sharpe: 1.1, beta: 1.2 }
+                },
+                optimization: {
+                    weights: [0.4, 0.3, 0.2, 0.1],
+                    expectedReturn: 0.12,
+                    volatility: 0.15
+                },
+                allocation: {
+                    equal: [0.25, 0.25, 0.25, 0.25],
+                    marketCap: [0.4, 0.3, 0.2, 0.1],
+                    riskParity: [0.3, 0.2, 0.4, 0.1]
+                }
+            };
+
+            // Performance Analysis
+            document.getElementById('analyze-performance').addEventListener('click', function() {
+                const ticker = document.getElementById('ticker').value.toUpperCase();
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+
+                if (!ticker || !startDate || !endDate) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                // Show loading state
+                const resultsContainer = document.getElementById('performance-results');
+                resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call
+                setTimeout(() => {
+                    if (mockData.performance[ticker]) {
+                        // Create chart
+                        const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+                        const width = resultsContainer.clientWidth - margin.left - margin.right;
+                        const height = 300 - margin.top - margin.bottom;
+
+                        // Clear previous content
+                        resultsContainer.innerHTML = '';
+
+                        // Create SVG element
+                        const svg = d3.select('#performance-results')
+                            .append('svg')
+                            .attr('width', width + margin.left + margin.right)
+                            .attr('height', height + margin.top + margin.bottom)
+                            .append('g')
+                            .attr('transform', `translate(${margin.left},${margin.top})`);
+
+                        // Parse dates and values
+                        const data = mockData.performance[ticker].map(d => ({
+                            date: new Date(d.date),
+                            value: d.value
+                        }));
+
+                        // Set scales
+                        const x = d3.scaleTime()
+                            .domain(d3.extent(data, d => d.date))
+                            .range([0, width]);
+
+                        const y = d3.scaleLinear()
+                            .domain([0, d3.max(data, d => d.value)])
+                            .range([height, 0]);
+
+                        // Add X axis
+                        svg.append('g')
+                            .attr('transform', `translate(0,${height})`)
+                            .call(d3.axisBottom(x));
+
+                        // Add Y axis
+                        svg.append('g')
+                            .call(d3.axisLeft(y));
+
+                        // Add the line
+                        svg.append('path')
+                            .datum(data)
+                            .attr('fill', 'none')
+                            .attr('stroke', 'var(--secondary-color)')
+                            .attr('stroke-width', 2)
+                            .attr('d', d3.line()
+                                .x(d => x(d.date))
+                                .y(d => y(d.value))
+                            );
+
+                        // Add title
+                        svg.append('text')
+                            .attr('x', width / 2)
+                            .attr('y', -10)
+                            .attr('text-anchor', 'middle')
+                            .style('font-size', '16px')
+                            .style('font-weight', 'bold')
+                            .text(`${ticker} Performance from ${startDate} to ${endDate}`);
+
+                        // Create table
+                        const tableContainer = document.getElementById('performance-table');
+                        tableContainer.innerHTML = `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Value</th>
+                                        <th>Change</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.map((d, i) => `
+                                        <tr>
+                                            <td>${d.date.toISOString().split('T')[0]}</td>
+                                            <td>${d.value.toFixed(2)}</td>
+                                            <td>${i > 0 ? (d.value - data[i-1].value).toFixed(2) : 'N/A'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        resultsContainer.innerHTML = '<p>No data available for the selected ticker and date range.</p>';
+                    }
+                }, 1000);
+            });
+
+            // Risk Assessment
+            document.getElementById('assess-risk').addEventListener('click', function() {
+                const portfolio = document.getElementById('portfolio').value.toUpperCase().split(',').map(t => t.trim());
+                const startDate = document.getElementById('risk-start-date').value;
+                const endDate = document.getElementById('risk-end-date').value;
+
+                if (portfolio.length === 0 || !startDate || !endDate) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                // Show loading state
+                const resultsContainer = document.getElementById('risk-results');
+                resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call
+                setTimeout(() => {
+                    // Check if all tickers have data
+                    const hasData = portfolio.every(ticker => mockData.risk[ticker]);
+
+                    if (hasData) {
+                        // Create chart
+                        const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+                        const width = resultsContainer.clientWidth - margin.left - margin.right;
+                        const height = 300 - margin.top - margin.bottom;
+
+                        // Clear previous content
+                        resultsContainer.innerHTML = '';
+
+                        // Create SVG element
+                        const svg = d3.select('#risk-results')
+                            .append('svg')
+                            .attr('width', width + margin.left + margin.right)
+                            .attr('height', height + margin.top + margin.bottom)
+                            .append('g')
+                            .attr('transform', `translate(${margin.left},${margin.top})`);
+
+                        // Prepare data for chart
+                        const chartData = portfolio.map(ticker => ({
+                            ticker,
+                            volatility: mockData.risk[ticker].volatility
+                        }));
+
+                        // Set scales
+                        const x = d3.scaleBand()
+                            .domain(chartData.map(d => d.ticker))
+                            .range([0, width])
+                            .padding(0.2);
+
+                        const y = d3.scaleLinear()
+                            .domain([0, d3.max(chartData, d => d.volatility)])
+                            .range([height, 0]);
+
+                        // Add X axis
+                        svg.append('g')
+                            .attr('transform', `translate(0,${height})`)
+                            .call(d3.axisBottom(x));
+
+                        // Add Y axis
+                        svg.append('g')
+                            .call(d3.axisLeft(y));
+
+                        // Add bars
+                        svg.selectAll('rect')
+                            .data(chartData)
+                            .enter()
+                            .append('rect')
+                            .attr('x', d => x(d.ticker))
+                            .attr('y', d => y(d.volatility))
+                            .attr('width', x.bandwidth())
+                            .attr('height', d => height - y(d.volatility))
+                            .attr('fill', 'var(--secondary-color)');
+
+                        // Add title
+                        svg.append('text')
+                            .attr('x', width / 2)
+                            .attr('y', -10)
+                            .attr('text-anchor', 'middle')
+                            .style('font-size', '16px')
+                            .style('font-weight', 'bold')
+                            .text(`Portfolio Risk Assessment from ${startDate} to ${endDate}`);
+
+                        // Create table
+                        const tableContainer = document.getElementById('risk-metrics');
+                        tableContainer.innerHTML = `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Ticker</th>
+                                        <th>Volatility</th>
+                                        <th>Sharpe Ratio</th>
+                                        <th>Beta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${portfolio.map(ticker => `
+                                        <tr>
+                                            <td>${ticker}</td>
+                                            <td>${mockData.risk[ticker].volatility.toFixed(2)}</td>
+                                            <td>${mockData.risk[ticker].sharpe.toFixed(2)}</td>
+                                            <td>${mockData.risk[ticker].beta.toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        resultsContainer.innerHTML = '<p>No data available for one or more of the selected tickers.</p>';
+                    }
+                }, 1000);
+            });
+
+            // Portfolio Optimization
+            document.getElementById('optimize-portfolio').addEventListener('click', function() {
+                const tickers = document.getElementById('optimization-tickers').value.toUpperCase().split(',').map(t => t.trim());
+                const startDate = document.getElementById('optimization-start-date').value;
+                const endDate = document.getElementById('optimization-end-date').value;
+                const riskTolerance = parseFloat(document.getElementById('risk-tolerance').value);
+
+                if (tickers.length === 0 || !startDate || !endDate || isNaN(riskTolerance)) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                // Show loading state
+                const resultsContainer = document.getElementById('optimization-results');
+                resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call
+                setTimeout(() => {
+                    // Check if all tickers have data
+                    const hasData = tickers.every(ticker => mockData.performance[ticker]);
+
+                    if (hasData) {
+                        // Create chart
+                        const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+                        const width = resultsContainer.clientWidth - margin.left - margin.right;
+                        const height = 300 - margin.top - margin.bottom;
+
+                        // Clear previous content
+                        resultsContainer.innerHTML = '';
+
+                        // Create SVG element
+                        const svg = d3.select('#optimization-results')
+                            .append('svg')
+                            .attr('width', width + margin.left + margin.right)
+                            .attr('height', height + margin.top + margin.bottom)
+                            .append('g')
+                            .attr('transform', `translate(${margin.left},${margin.top})`);
+
+                        // Prepare data for chart
+                        const chartData = tickers.map((ticker, i) => ({
+                            ticker,
+                            weight: mockData.optimization.weights[i]
+                        }));
+
+                        // Set scales
+                        const x = d3.scaleBand()
+                            .domain(chartData.map(d => d.ticker))
+                            .range([0, width])
+                            .padding(0.2);
+
+                        const y = d3.scaleLinear()
+                            .domain([0, 1])
+                            .range([height, 0]);
+
+                        // Add X axis
+                        svg.append('g')
+                            .attr('transform', `translate(0,${height})`)
+                            .call(d3.axisBottom(x));
+
+                        // Add Y axis
+                        svg.append('g')
+                            .call(d3.axisLeft(y));
+
+                        // Add bars
+                        svg.selectAll('rect')
+                            .data(chartData)
+                            .enter()
+                            .append('rect')
+                            .attr('x', d => x(d.ticker))
+                            .attr('y', d => y(d.weight))
+                            .attr('width', x.bandwidth())
+                            .attr('height', d => height - y(d.weight))
+                            .attr('fill', 'var(--secondary-color)');
+
+                        // Add title
+                        svg.append('text')
+                            .attr('x', width / 2)
+                            .attr('y', -10)
+                            .attr('text-anchor', 'middle')
+                            .style('font-size', '16px')
+                            .style('font-weight', 'bold')
+                            .text(`Optimized Portfolio Allocation (Risk Tolerance: ${riskTolerance})`);
+
+                        // Create table
+                        const tableContainer = document.getElementById('optimization-table');
+                        tableContainer.innerHTML = `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Ticker</th>
+                                        <th>Weight</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${chartData.map(item => `
+                                        <tr>
+                                            <td>${item.ticker}</td>
+                                            <td>${(item.weight * 100).toFixed(2)}%</td>
+                                        </tr>
+                                    `).join('')}
+                                    <tr>
+                                        <td><strong>Expected Return</strong></td>
+                                        <td><strong>${(mockData.optimization.expectedReturn * 100).toFixed(2)}%</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Volatility</strong></td>
+                                        <td><strong>${(mockData.optimization.volatility * 100).toFixed(2)}%</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        resultsContainer.innerHTML = '<p>No data available for one or more of the selected tickers.</p>';
+                    }
+                }, 1000);
+            });
+
+            // Asset Allocation
+            document.getElementById('allocate-assets').addEventListener('click', function() {
+                const tickers = document.getElementById('allocation-tickers').value.toUpperCase().split(',').map(t => t.trim());
+                const startDate = document.getElementById('allocation-start-date').value;
+                const endDate = document.getElementById('allocation-end-date').value;
+                const method = document.getElementById('allocation-method').value;
+
+                if (tickers.length === 0 || !startDate || !endDate) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                // Show loading state
+                const resultsContainer = document.getElementById('allocation-results');
+                resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call
+                setTimeout(() => {
+                    // Check if all tickers have data
+                    const hasData = tickers.every(ticker => mockData.performance[ticker]);
+
+                    if (hasData) {
+                        // Create chart
+                        const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+                        const width = resultsContainer.clientWidth - margin.left - margin.right;
+                        const height = 300 - margin.top - margin.bottom;
+
+                        // Clear previous content
+                        resultsContainer.innerHTML = '';
+
+                        // Create SVG element
+                        const svg = d3.select('#allocation-results')
+                            .append('svg')
+                            .attr('width', width + margin.left + margin.right)
+                            .attr('height', height + margin.top + margin.bottom)
+                            .append('g')
+                            .attr('transform', `translate(${margin.left},${margin.top})`);
+
+                        // Prepare data for chart
+                        const weights = mockData.allocation[method];
+                        const chartData = tickers.map((ticker, i) => ({
+                            ticker,
+                            weight: weights[i]
+                        }));
+
+                        // Set scales
+                        const x = d3.scaleBand()
+                            .domain(chartData.map(d => d.ticker))
+                            .range([0, width])
+                            .padding(0.2);
+
+                        const y = d3.scaleLinear()
+                            .domain([0, 1])
+                            .range([height, 0]);
+
+                        // Add X axis
+                        svg.append('g')
+                            .attr('transform', `translate(0,${height})`)
+                            .call(d3.axisBottom(x));
+
+                        // Add Y axis
+                        svg.append('g')
+                            .call(d3.axisLeft(y));
+
+                        // Add bars
+                        svg.selectAll('rect')
+                            .data(chartData)
+                            .enter()
+                            .append('rect')
+                            .attr('x', d => x(d.ticker))
+                            .attr('y', d => y(d.weight))
+                            .attr('width', x.bandwidth())
+                            .attr('height', d => height - y(d.weight))
+                            .attr('fill', 'var(--secondary-color)');
+
+                        // Add title
+                        svg.append('text')
+                            .attr('x', width / 2)
+                            .attr('y', -10)
+                            .attr('text-anchor', 'middle')
+                            .style('font-size', '16px')
+                            .style('font-weight', 'bold')
+                            .text(`Asset Allocation (${method.charAt(0).toUpperCase() + method.slice(1)})`);
+
+                        // Create table
+                        const tableContainer = document.getElementById('allocation-table');
+                        tableContainer.innerHTML = `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Ticker</th>
+                                        <th>Weight</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${chartData.map(item => `
+                                        <tr>
+                                            <td>${item.ticker}</td>
+                                            <td>${(item.weight * 100).toFixed(2)}%</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        resultsContainer.innerHTML = '<p>No data available for one or more of the selected tickers.</p>';
+                    }
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,378 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI AI Detective Agency</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            grid-column: 1 / -1;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        aside {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .editor-container {
+            height: 500px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .clue-list {
+            list-style: none;
+        }
+
+        .clue-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .suspect-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .suspect-card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .suspect-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .suspect-info {
+            padding: 15px;
+        }
+
+        .suspect-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .suspect-details {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .ensic-container {
+            margin-top: 20px;
+        }
+
+        .forensic-img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .forensic-results {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OpenAI AI Detective Agency</h1>
+        </header>
+        <aside>
+            <h2>Mystery Scenario</h2>
+            <div class="editor-container" id="scenario-editor"></div>
+            <button class="btn" id="generate-scenario">Generate New Scenario</button>
+
+            <h2>Clues</h2>
+            <ul class="clue-list" id="clue-list"></ul>
+            <button class="btn" id="analyze-clues">Analyze Clues</button>
+
+            <h2>Forensic Analysis</h2>
+            <div class="forensic-container">
+                <input type="file" id="forensic-file" accept="image/*">
+                <button class="btn" id="analyze-image">Analyze Image</button>
+                <div id="forensic-results" class="forensic-results"></div>
+            </div>
+        </aside>
+        <main>
+            <h2>Suspects</h2>
+            <div class="suspect-list" id="suspect-list"></div>
+
+            <h2>Investigation Notes</h2>
+            <div class="editor-container" id="notes-editor"></div>
+            <button class="btn" id="save-notes">Save Notes</button>
+            <button class="btn btn-danger" id="clear-notes">Clear Notes</button>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+    <script>
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            const scenarioEditor = monaco.editor.create(document.getElementById('scenario-editor'), {
+                value: 'Your mystery scenario will appear here...',
+                language: 'markdown',
+                theme: 'vs-light',
+                automaticLayout: true
+            });
+
+            const notesEditor = monaco.editor.create(document.getElementById('notes-editor'), {
+                value: 'Write your investigation notes here...',
+                language: 'markdown',
+                theme: 'vs-light',
+                automaticLayout: true
+            });
+
+            // Mock data for demonstration
+            const mockScenario = `# The Mystery of the Vanishing Art
+
+On a quiet evening in the heart of the city, renowned artist Vincent Holloway was found dead in his studio. The police have no leads, and the case has gone cold. As a detective, you must piece together the clues to uncover the truth behind Vincent's untimely death.
+
+## Location
+Vincent Holloway's Studio
+123 Art Lane
+Metropolis
+
+## Time of Death
+Approximately 8:30 PM on the night of the 15th of October`;
+
+            const mockClues = [
+                "A single bloodstained glove found near the studio entrance",
+                "A torn piece of fabric matching Vincent's signature style",
+                "A suspicious looking individual seen near the studio around the time of death",
+                "A broken vase with Vincent's favorite painting shattered inside",
+                "A strange symbol etched into the studio's floor near the body"
+            ];
+
+            const mockSuspects = [
+                {
+                    name: "Eleanor Whitmore",
+                    image: "https://source.unsplash.com/random/200x200/?portrait,woman",
+                    details: "Vincent's ex-girlfriend who recently moved back to the city"
+                },
+                {
+                    name: "Marcus Blackwood",
+                    image: "https://source.unsplash.com/random/200x200/?portrait,man",
+                    details: "A rival artist who has been publicly criticizing Vincent's work"
+                },
+                {
+                    name: "Sophia Greenfield",
+                    image: "https://source.unsplash.com/random/200x200/?portrait,woman",
+                    details: "Vincent's loyal assistant who has been with him for years"
+                },
+                {
+                    name: "Daniel Redford",
+                    image: "https://source.unsplash.com/random/200x200/?portrait,man",
+                    details: "A wealthy art collector who recently purchased Vincent's latest piece"
+                }
+            ];
+
+            // Generate scenario
+            document.getElementById('generate-scenario').addEventListener('click', function() {
+                scenarioEditor.setValue(mockScenario);
+                displayClues(mockClues);
+                displaySuspects(mockSuspects);
+            });
+
+            // Display clues
+            function displayClues(clues) {
+                const clueList = document.getElementById('clue-list');
+                clueList.innerHTML = '';
+                clues.forEach(clue => {
+                    const li = document.createElement('li');
+                    li.className = 'clue-item';
+                    li.textContent = clue;
+                    clueList.appendChild(li);
+                });
+            }
+
+            // Display suspects
+            function displaySuspects(suspects) {
+                const suspectList = document.getElementById('suspect-list');
+                suspectList.innerHTML = '';
+                suspects.forEach(suspect => {
+                    const card = document.createElement('div');
+                    card.className = 'suspect-card';
+
+                    const img = document.createElement('img');
+                    img.className = 'suspect-img';
+                    img.src = suspect.image;
+                    img.alt = suspect.name;
+
+                    const info = document.createElement('div');
+                    info.className = 'suspect-info';
+
+                    const name = document.createElement('div');
+                    name.className = 'suspect-name';
+                    name.textContent = suspect.name;
+
+                    const details = document.createElement('div');
+                    details.className = 'suspect-details';
+                    details.textContent = suspect.details;
+
+                    info.appendChild(name);
+                    info.appendChild(details);
+
+                    card.appendChild(img);
+                    card.appendChild(info);
+
+                    suspectList.appendChild(card);
+                });
+            }
+
+            // Analyze clues
+            document.getElementById('analyze-clues').addEventListener('click', function() {
+                // In a real application, this would call the OpenAI API
+                alert('Analyzing clues... This would call the OpenAI API in a real application.');
+            });
+
+            // Analyze image
+            document.getElementById('analyze-image').addEventListener('click', function() {
+                const fileInput = document.getElementById('forensic-file');
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx.drawImage(img, 0, 0);
+
+                            // Simple image analysis (mock)
+                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const data = imageData.data;
+
+                            let redPixels = 0;
+                            for (let i = 0; i < data.length; i += 4) {
+                                if (data[i] > 200 && data[i+1] < 50 && data[i+2] < 50) {
+                                    redPixels++;
+                                }
+                            }
+
+                            const resultsDiv = document.getElementById('forensic-results');
+                            resultsDiv.innerHTML = `
+                                <h3>Forensic Analysis Results</h3>
+                                <img src="${e.target.result}" class="forensic-img" alt="Forensic Image">
+                                <p><strong>Image Dimensions:</strong> ${img.width} x ${img.height} pixels</p>
+                                <p><strong>Red Pixel Count:</strong> ${redPixels}</p>
+                                <p><strong>Analysis:</strong> The image contains ${redPixels} pixels with a high red component, which might indicate blood or a similar substance.</p>
+                            `;
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Please select an image to analyze.');
+                }
+            });
+
+            // Save notes
+            document.getElementById('save-notes').addEventListener('click', function() {
+                const notes = notesEditor.getValue();
+                localStorage.setItem('detectiveNotes', notes);
+                alert('Notes saved successfully!');
+            });
+
+            // Clear notes
+            document.getElementById('clear-notes').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear your notes?')) {
+                    notesEditor.setValue('');
+                    localStorage.removeItem('detectiveNotes');
+                }
+            });
+
+            // Load saved notes
+            const savedNotes = localStorage.getItem('detectiveNotes');
+            if (savedNotes) {
+                notesEditor.setValue(savedNotes);
+            }
+        });
+    </script>
+</body>
+</html>
+```

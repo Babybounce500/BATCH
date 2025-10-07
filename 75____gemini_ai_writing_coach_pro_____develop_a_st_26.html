@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini AI Writing Coach Pro - Professional AI-assisted writing and editing tool">
+    <title>Gemini AI Writing Coach Pro</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --light-text: #fff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            margin-right: 0.5rem;
+            font-size: 1.5em;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--light-text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            width: 100%;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .writing-tools {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tool-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .editor-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .editor-actions button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .editor-actions button:hover {
+            background-color: #3367d6;
+        }
+
+        .editor-actions button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        #editor {
+            min-height: 400px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .result-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .result-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .result-content {
+            white-space: pre-wrap;
+        }
+
+        .language-selector {
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            background-color: white;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1rem;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .modal-body {
+            margin-bottom: 1rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .modal-footer button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-footer button.primary {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+        }
+
+        .modal-footer button.primary:hover {
+            background-color: #3367d6;
+        }
+
+        .modal-footer button.secondary {
+            background-color: #f1f1f1;
+            color: var(--text-color);
+        }
+
+        .modal-footer button.secondary:hover {
+            background-color: #e1e1e1;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .editor-container {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .results-container {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">✍️</span>
+                <span>Gemini AI Writing Coach Pro</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Documents</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="app">
+        <div class="writing-tools">
+            <div class="tool-card" @click="openModal('grammar')">
+                <div class="tool-icon">📝</div>
+                <h3>Grammar Check</h3>
+                <p>Check your text for grammar and spelling errors</p>
+            </div>
+            <div class="tool-card" @click="openModal('style')">
+                <div class="tool-icon">🎨</div>
+                <h3>Style Suggestions</h3>
+                <p>Get suggestions to improve your writing style</p>
+            </div>
+            <div class="tool-card" @click="openModal('plagiarism')">
+                <div class="tool-icon">🔍</div>
+                <h3>Plagiarism Check</h3>
+                <p>Check your text for plagiarism</p>
+            </div>
+            <div class="tool-card" @click="openModal('analysis')">
+                <div class="tool-icon">📊</div>
+                <h3>Writing Analysis</h3>
+                <p>Analyze your writing style and structure</p>
+            </div>
+        </div>
+
+        <div class="editor-container">
+            <div class="editor">
+                <div class="editor-header">
+                    <h2 class="editor-title">Document Editor</h2>
+                    <div class="editor-actions">
+                        <select class="language-selector" v-model="selectedLanguage">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="it">Italian</option>
+                        </select>
+                        <button @click="generateContent" :disabled="isLoading">Generate Content</button>
+                        <button @click="saveDocument">Save Document</button>
+                    </div>
+                </div>
+                <textarea id="editor" v-model="editorContent" placeholder="Start writing your document here..."></textarea>
+            </div>
+
+            <div class="results-container">
+                <div class="result-card" v-if="grammarResults">
+                    <div class="result-header">
+                        <h3 class="result-title">Grammar Check Results</h3>
+                        <button @click="clearResults('grammar')">Clear</button>
+                    </div>
+                    <div class="result-content">
+                        {{ grammarResults }}
+                    </div>
+                </div>
+
+                <div class="result-card" v-if="styleResults">
+                    <div class="result-header">
+                        <h3 class="result-title">Style Suggestions</h3>
+                        <button @click="clearResults('style')">Clear</button>
+                    </div>
+                    <div class="result-content">
+                        {{ styleResults }}
+                    </div>
+                </div>
+
+                <div class="result-card" v-if="plagiarismResults">
+                    <div class="result-header">
+                        <h3 class="result-title">Plagiarism Check Results</h3>
+                        <button @click="clearResults('plagiarism')">Clear</button>
+                    </div>
+                    <div class="result-content">
+                        {{ plagiarismResults }}
+                    </div>
+                </div>
+
+                <div class="result-card" v-if="analysisResults">
+                    <div class="result-header">
+                        <h3 class="result-title">Writing Analysis</h3>
+                        <button @click="clearResults('analysis')">Clear</button>
+                    </div>
+                    <div class="result-content">
+                        {{ analysisResults }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" :class="{ 'active': isModalOpen }">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">{{ modalTitle }}</h2>
+                    <button class="close-modal" @click="closeModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div v-if="isLoading" class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                    <div v-else>
+                        <p>{{ modalContent }}</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="secondary" @click="closeModal">Cancel</button>
+                    <button class="primary" @click="processTool" :disabled="isLoading">Process</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Gemini AI Writing Coach Pro. All rights reserved.</p>
+    </footer>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp, ref } = Vue;
+
+        createApp({
+            setup() {
+                const editorContent = ref('');
+                const selectedLanguage = ref('en');
+                const isLoading = ref(false);
+                const isModalOpen = ref(false);
+                const modalTitle = ref('');
+                const modalContent = ref('');
+                const currentTool = ref('');
+                const grammarResults = ref('');
+                const styleResults = ref('');
+                const plagiarismResults = ref('');
+                const analysisResults = ref('');
+
+                const openModal = (tool) => {
+                    currentTool.value = tool;
+                    isModalOpen.value = true;
+
+                    switch(tool) {
+                        case 'grammar':
+                            modalTitle.value = 'Grammar Check';
+                            modalContent.value = 'This tool will analyze your text for grammar and spelling errors. Click "Process" to continue.';
+                            break;
+                        case 'style':
+                            modalTitle.value = 'Style Suggestions';
+                            modalContent.value = 'This tool will provide suggestions to improve your writing style. Click "Process" to continue.';
+                            break;
+                        case 'plagiarism':
+                            modalTitle.value = 'Plagiarism Check';
+                            modalContent.value = 'This tool will check your text for plagiarism. Click "Process" to continue.';
+                            break;
+                        case 'analysis':
+                            modalTitle.value = 'Writing Analysis';
+                            modalContent.value = 'This tool will analyze your writing style and structure. Click "Process" to continue.';
+                            break;
+                    }
+                };
+
+                const closeModal = () => {
+                    isModalOpen.value = false;
+                };
+
+                const processTool = async () => {
+                    if (!editorContent.value.trim()) {
+                        alert('Please enter some text to analyze.');
+                        return;
+                    }
+
+                    isLoading.value = true;
+
+                    try {
+                        // Simulate API call to Gemini's text generation API
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+
+                        const response = `This is a simulated response for the ${currentTool.value} tool. In a real application, this would be the actual results from Gemini's API. The text you entered in ${selectedLanguage.value} would be analyzed and the appropriate results would be displayed here.`;
+
+                        switch(currentTool.value) {
+                            case 'grammar':
+                                grammarResults.value = response;
+                                break;
+                            case 'style':
+                                styleResults.value = response;
+                                break;
+                            case 'plagiarism':
+                                plagiarismResults.value = response;
+                                break;
+                            case 'analysis':
+                                analysisResults.value = response;
+                                break;
+                        }
+
+                        closeModal();
+                    } catch (error) {
+                        console.error('Error processing tool:', error);
+                        alert('An error occurred while processing your request. Please try again.');
+                    } finally {
+                        isLoading.value = false;
+                    }
+                };
+
+                const generateContent = async () => {
+                    if (!editorContent.value.trim()) {
+                        alert('Please enter some text to generate content.');
+                        return;
+                    }
+
+                    isLoading.value = true;
+
+                    try {
+                        // Simulate API call to Gemini's text generation API
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+
+                        const generatedContent = `This is a simulated generated content based on your input in ${selectedLanguage.value}. In a real application, this would be the actual generated content from Gemini's API. The text you entered would be used as a prompt to generate more content.`;
+
+                        editorContent.value += '\n\n' + generatedContent;
+                    } catch (error) {
+                        console.error('Error generating content:', error);
+                        alert('An error occurred while generating content. Please try again.');
+                    } finally {
+                        isLoading.value = false;
+                    }
+                };
+
+                const saveDocument = () => {
+                    if (!editorContent.value.trim()) {
+                        alert('Please enter some text to save.');
+                        return;
+                    }
+
+                    alert('Document saved successfully!');
+                    // In a real application, this would save the document to a database or file system
+                };
+
+                const clearResults = (type) => {
+                    switch(type) {
+                        case 'grammar':
+                            grammarResults.value = '';
+                            break;
+                        case 'style':
+                            styleResults.value = '';
+                            break;
+                        case 'plagiarism':
+                            plagiarismResults.value = '';
+                            break;
+                        case 'analysis':
+                            analysisResults.value = '';
+                            break;
+                    }
+                };
+
+                return {
+                    editorContent,
+                    selectedLanguage,
+                    isLoading,
+                    isModalOpen,
+                    modalTitle,
+                    modalContent,
+                    currentTool,
+                    grammarResults,
+                    styleResults,
+                    plagiarismResults,
+                    analysisResults,
+                    openModal,
+                    closeModal,
+                    processTool,
+                    generateContent,
+                    saveDocument,
+                    clearResults
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

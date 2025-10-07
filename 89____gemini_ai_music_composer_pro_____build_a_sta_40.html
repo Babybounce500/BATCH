@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini AI Music Composer Pro - Professional AI-assisted music composition tool">
+    <title>Gemini AI Music Composer Pro</title>
+    <style>
+        :root {
+            --primary-color: #6e48aa;
+            --secondary-color: #9d50bb;
+            --accent-color: #f18701;
+            --text-color: #333;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .composer-container {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 2rem;
+            min-height: 70vh;
+        }
+
+        .sidebar {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .main-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d67c00;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .instrument-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .instrument-btn {
+            padding: 0.5rem;
+            text-align: center;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .instrument-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .instrument-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .piano-roll {
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            height: 300px;
+            overflow: auto;
+            margin-bottom: 1rem;
+        }
+
+        .piano-key {
+            height: 20px;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding-left: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .piano-key:hover {
+            background-color: #f0f0f0;
+        }
+
+        .piano-key.black {
+            background-color: #333;
+            color: white;
+        }
+
+        .note-cell {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .note-cell.active {
+            background-color: var(--primary-color);
+        }
+
+        .note-cell:hover {
+            background-color: #f0f0f0;
+        }
+
+        .transport-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .transport-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .play-btn {
+            background-color: var(--success-color);
+        }
+
+        .play-btn:hover {
+            background-color: #218838;
+        }
+
+        .stop-btn {
+            background-color: var(--danger-color);
+        }
+
+        .stop-btn:hover {
+            background-color: #c82333;
+        }
+
+        .bpm-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bpm-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .bpm-slider {
+            flex-grow: 1;
+        }
+
+        .chord-progression {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .chord-btn {
+            padding: 0.5rem;
+            text-align: center;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chord-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .chord-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .generated-content {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+        }
+
+        .generated-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .generated-item:last-child {
+            border-bottom: none;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .composer-container {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .mobile-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--primary-color);
+                padding: 1rem;
+                z-index: 100;
+            }
+
+            .mobile-menu.active {
+                display: block;
+            }
+
+            .mobile-menu ul {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .mobile-menu ul li {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">Gemini AI Music Composer Pro</div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Projects</a></li>
+                    <li><a href="#">Tools</a></li>
+                    <li><a href="#">Account</a></li>
+                </ul>
+            </nav>
+            <button class="mobile-menu-btn">☰</button>
+            <div class="mobile-menu">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Projects</a></li>
+                    <li><a href="#">Tools</a></li>
+                    <li><a href="#">Account</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="composer-container">
+            <aside class="sidebar">
+                <h2 class="section-title">Project Settings</h2>
+                <div class="form-group">
+                    <label for="project-name">Project Name</label>
+                    <input type="text" id="project-name" placeholder="Enter project name">
+                </div>
+                <div class="form-group">
+                    <label for="project-description">Description</label>
+                    <textarea id="project-description" rows="3" placeholder="Enter project description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="project-tempo">Tempo (BPM)</label>
+                    <input type="number" id="project-tempo" min="40" max="240" value="120">
+                </div>
+                <div class="form-group">
+                    <label for="project-key">Key Signature</label>
+                    <select id="project-key">
+                        <option value="C">C Major</option>
+                        <option value="G">G Major</option>
+                        <option value="D">D Major</option>
+                        <option value="A">A Major</option>
+                        <option value="E">E Major</option>
+                        <option value="B">B Major</option>
+                        <option value="F#">F# Major</option>
+                        <option value="C#">C# Major</option>
+                        <option value="F">F Major</option>
+                        <option value="Bb">Bb Major</option>
+                        <option value="Eb">Eb Major</option>
+                        <option value="Ab">Ab Major</option>
+                        <option value="Db">Db Major</option>
+                        <option value="Gb">Gb Major</option>
+                        <option value="Cb">Cb Major</option>
+                        <option value="Am">A Minor</option>
+                        <option value="Em">E Minor</option>
+                        <option value="Bm">B Minor</option>
+                        <option value="F#m">F# Minor</option>
+                        <option value="C#m">C# Minor</option>
+                        <option value="G#m">G# Minor</option>
+                        <option value="D#m">D# Minor</option>
+                        <option value="A#m">A# Minor</option>
+                        <option value="Fm">F Minor</option>
+                        <option value="Cm">C Minor</option>
+                        <option value="Gm">G Minor</option>
+                        <option value="Dm">D Minor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="project-time-signature">Time Signature</label>
+                    <select id="project-time-signature">
+                        <option value="4/4">4/4</option>
+                        <option value="3/4">3/4</option>
+                        <option value="2/4">2/4</option>
+                        <option value="6/8">6/8</option>
+                        <option value="12/8">12/8</option>
+                    </select>
+                </div>
+                <button class="btn-secondary">Save Project</button>
+
+                <h2 class="section-title">AI Assistance</h2>
+                <div class="form-group">
+                    <label for="ai-prompt">AI Prompt</label>
+                    <textarea id="ai-prompt" rows="3" placeholder="Describe the music you want to generate"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="ai-style">Style</label>
+                    <select id="ai-style">
+                        <option value="classical">Classical</option>
+                        <option value="jazz">Jazz</option>
+                        <option value="pop">Pop</option>
+                        <option value="rock">Rock</option>
+                        <option value="electronic">Electronic</option>
+                        <option value="hiphop">Hip-Hop</option>
+                        <option value="country">Country</option>
+                        <option value="blues">Blues</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ai-mood">Mood</label>
+                    <select id="ai-mood">
+                        <option value="happy">Happy</option>
+                        <option value="sad">Sad</option>
+                        <option value="energetic">Energetic</option>
+                        <option value="calm">Calm</option>
+                        <option value="tense">Tense</option>
+                        <option value="mysterious">Mysterious</option>
+                    </select>
+                </div>
+                <button id="generate-btn" class="btn-success">Generate Music</button>
+            </aside>
+
+            <div class="main-content">
+                <h2 class="section-title">Composer</h2>
+
+                <div class="instrument-selector">
+                    <div class="instrument-btn active" data-instrument="piano">Piano</div>
+                    <div class="instrument-btn" data-instrument="guitar">Guitar</div>
+                    <div class="instrument-btn" data-instrument="bass">Bass</div>
+                    <div class="instrument-btn" data-instrument="drums">Drums</div>
+                    <div class="instrument-btn" data-instrument="strings">Strings</div>
+                    <div class="instrument-btn" data-instrument="brass">Brass</div>
+                    <div class="instrument-btn" data-instrument="woodwinds">Woodwinds</div>
+                    <div class="instrument-btn" data-instrument="synth">Synth</div>
+                </div>
+
+                <div class="piano-roll" id="piano-roll">
+                    <!-- Piano keys will be generated by JavaScript -->
+                </div>
+
+                <div class="transport-controls">
+                    <button class="transport-btn play-btn" id="play-btn">▶</button>
+                    <button class="transport-btn stop-btn" id="stop-btn">■</button>
+                </div>
+
+                <div class="bpm-control">
+                    <span>BPM:</span>
+                    <span class="bpm-display" id="bpm-display">120</span>
+                    <input type="range" class="bpm-slider" id="bpm-slider" min="40" max="240" value="120">
+                </div>
+
+                <h3 class="section-title">Chord Progression</h3>
+                <div class="chord-progression">
+                    <div class="chord-btn active" data-chord="C">C</div>
+                    <div class="chord-btn" data-chord="Dm">Dm</div>
+                    <div class="chord-btn" data-chord="Em">Em</div>
+                    <div class="chord-btn" data-chord="F">F</div>
+                    <div class="chord-btn" data-chord="G">G</div>
+                    <div class="chord-btn" data-chord="Am">Am</div>
+                </div>
+
+                <h3 class="section-title">Generated Content</h3>
+                <div class="generated-content" id="generated-content">
+                    <!-- Generated content will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Gemini AI Music Composer Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Initialize Tone.js
+        const Tone = window.Tone;
+
+        // DOM Elements
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const instrumentBtns = document.querySelectorAll('.instrument-btn');
+        const pianoRoll = document.getElementById('piano-roll');
+        const playBtn = document.getElementById('play-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const bpmSlider = document.getElementById('bpm-slider');
+        const bpmDisplay = document.getElementById('bpm-display');
+        const chordBtns = document.querySelectorAll('.chord-btn');
+        const generateBtn = document.getElementById('generate-btn');
+        const generatedContent = document.getElementById('generated-content');
+
+        // Variables
+        let currentInstrument = 'piano';
+        let isPlaying = false;
+        let notes = [];
+        let activeNotes = new Set();
+        let synth;
+        let drumSynth;
+        let loop;
+
+        // Initialize the app
+        function init() {
+            // Set up event listeners
+            mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+            instrumentBtns.forEach(btn => btn.addEventListener('click', changeInstrument));
+            playBtn.addEventListener('click', togglePlay);
+            stopBtn.addEventListener('click', stopPlayback);
+            bpmSlider.addEventListener('input', updateBPM);
+            chordBtns.forEach(btn => btn.addEventListener('click', selectChord));
+            generateBtn.addEventListener('click', generateMusic);
+
+            // Create piano roll
+            createPianoRoll();
+
+            // Initialize synths
+            initSynths();
+
+            // Set initial BPM
+            Tone.Transport.bpm.value = 120;
+        }
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Change instrument
+        function changeInstrument(e) {
+            instrumentBtns.forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            currentInstrument = e.target.dataset.instrument;
+
+            // Update synth based on instrument
+            initSynths();
+        }
+
+        // Create piano roll
+        function createPianoRoll() {
+            const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const octaves = [4, 3, 2, 1];
+
+            pianoRoll.innerHTML = '';
+
+            octaves.forEach(octave => {
+                notes.forEach(note => {
+                    const noteElement = document.createElement('div');
+                    noteElement.className = `piano-key ${note.includes('#') ? 'black' : 'white'}`;
+                    noteElement.textContent = `${note}${octave}`;
+                    noteElement.dataset.note = `${note}${octave}`;
+                    noteElement.addEventListener('mousedown', startNote);
+                    noteElement.addEventListener('mouseup', stopNote);
+                    noteElement.addEventListener('mouseleave', stopNote);
+                    pianoRoll.appendChild(noteElement);
+                });
+            });
+        }
+
+        // Initialize synths based on current instrument
+        function initSynths() {
+            // Dispose previous synths if they exist
+            if (synth) synth.dispose();
+            if (drumSynth) drumSynth.dispose();
+
+            switch (currentInstrument) {
+                case 'piano':
+                    synth = new Tone.Sampler({
+                        urls: {
+                            A0: "A0.mp3",
+                            C1: "C1.mp3",
+                            "D#1": "Ds1.mp3",
+                            "F#1": "Fs1.mp3",
+                            A1: "A1.mp3",
+                            C2: "C2.mp3",
+                            "D#2": "Ds2.mp3",
+                            "F#2": "Fs2.mp3",
+                            A2: "A2.mp3",
+                            C3: "C3.mp3",
+                            "D#3": "Ds3.mp3",
+                            "F#3": "Fs3.mp3",
+                            A3: "A3.mp3",
+                            C4: "C4.mp3",
+                            "D#4": "Ds4.mp3",
+                            "F#4": "Fs4.mp3",
+                            A4: "A4.mp3",
+                            C5: "C5.mp3",
+                            "D#5": "Ds5.mp3",
+                            "F#5": "Fs5.mp3",
+                            A5: "A5.mp3",
+                            C6: "C6.mp3",
+                            "D#6": "Ds6.mp3",
+                            "F#6": "Fs6.mp3",
+                            A6: "A6.mp3",
+                            C7: "C7.mp3",
+                            "D#7": "Ds7.mp3",
+                            "F#7": "Fs7.mp3",
+                            A7: "A7.mp3",
+                            C8: "C8.mp3"
+                        },
+                        release: 1,
+                        baseUrl: "https://tonejs.github.io/audio/salamander/"
+                    }).toDestination();
+                    break;
+                case 'guitar':
+                    synth = new Tone.Sampler({
+                        urls: {
+                            "A#2": "As2.mp3",
+                            "A#3": "As3.mp3",
+                            "A#4": "As4.mp3",
+                            "A#5": "As5.mp3",
+                            "C#2": "Cs2.mp3",
+                            "C#3": "Cs3.mp3",
+                            "C#4": "Cs4.mp3",
+                            "C#5": "Cs5.mp3",
+                            "C#6": "Cs6.mp3",
+                            "E2": "E2.mp3",
+                            "E3": "E3.mp3",
+                            "E4": "E4.mp3",
+                            "E5": "E5.mp3",
+                            "E6": "E6.mp3",
+                            "F#2": "Fs2.mp3",
+                            "F#3": "Fs3.mp3",
+                            "F#4": "Fs4.mp3",
+                            "F#5": "Fs5.mp3",
+                            "F#6": "Fs6.mp3"
+                        },
+                        release: 1,
+                        baseUrl: "https://tonejs.github.io/audio/guitar-acoustic/"
+                    }).toDestination();
+                    break;
+                case 'bass':
+                    synth = new Tone.Sampler({
+                        urls: {
+                            "A#2": "As2.mp3",
+                            "A#3": "As3.mp3",
+                            "A#4": "As4.mp3",
+                            "A#5": "As5.mp3",
+                            "C#2": "Cs2.mp3",
+                            "C#3": "Cs3.mp3",
+                            "C#4": "Cs4.mp3",
+                            "C#5": "Cs5.mp3",
+                            "C#6": "Cs6.mp3",
+                            "E2": "E2.mp3",
+                            "E3": "E3.mp3",
+                            "E4": "E4.mp3",
+                            "E5": "E5.mp3",
+                            "E6": "E6.mp3",
+                            "F#2": "Fs2.mp3",
+                            "F#3": "Fs3.mp3",
+                            "F#4": "Fs4.mp3",
+                            "F#5": "Fs5.mp3",
+                            "F#6": "Fs6.mp3"
+                        },
+                        release: 1,
+                        baseUrl: "https://tonejs.github.io/audio/guitar-acoustic/"
+                    }).toDestination();
+                    break;
+                case 'drums':
+                    drumSynth = new Tone.MembraneSynth().toDestination();
+                    break;
+                case 'strings':
+                    synth = new Tone.Sampler({
+                        urls: {
+                            "A3": "A3.mp3",
+                            "A4": "A4.mp3",
+                            "A5": "A5.mp3",
+                            "A6": "A6.mp3",
+                            "C3": "C3.mp3",
+                            "C4": "C4.mp3",
+                            "C5": "C5.mp3",
+                            "C6": "C6.mp3",
+                            "C7": "C7.mp3",
+                            "E3": "E3.mp3",
+                            "E4": "E4.mp3",
+                            "E5": "E5.mp3",
+                            "E6": "E6.mp3",
+                            "G3": "G3.mp3",
+                            "G4": "G4.mp3",
+                            "G5": "G5.mp3",
+                            "G6": "G6.mp3"
+                        },
+                        release: 1,
+                        baseUrl: "https://tonejs.github.io/audio/casio/"
+                    }).toDestination();
+                    break;
+                case 'brass':
+                    synth = new Tone.Sampler({
+                        urls: {
+                            "A#2": "As2.mp3",
+                            "A#3": "As3.mp3",
+                            "A#4": "As4.mp3",
+                            "A#5": "As5.mp3",
+                            "C#2": "Cs2.mp3",
+                            "C#3": "Cs3.mp3",
+                            "C#4": "Cs4.mp3",
+                            "C#5": "Cs5.mp3",
+                            "C#6": "Cs6.mp3",
+                            "E2": "E2.mp3",
+                            "E3": "E3.mp3",
+                            "E4": "E4.mp3",
+                            "E5": "E5.mp3",
+                            "E6": "E6.mp3",
+                            "F#2": "Fs2.mp3",
+                            "F#3": "Fs3.mp3",
+                            "F#4": "Fs4.mp3",
+                            "F#5": "Fs5.mp3",
+                            "F#6": "Fs6.mp3"
+                        },
+                        release: 1,
+                        baseUrl: "https://tonejs.github.io/audio/flute/"
+                    }).toDestination();
+                    break;
+                case 'woodwinds':
+                    synth = new Tone.Sampler({
+                        urls: {
+                            "A#2": "As2.mp3",
+                            "A#3": "As3.mp3",
+                            "A#4": "As4.mp3",
+                            "A#5": "As5.mp3",
+                            "C#2": "Cs2.mp3",
+                            "C#3": "Cs3.mp3",
+                            "C#4": "Cs4.mp3",
+                            "C#5": "Cs5.mp3",
+                            "C#6": "Cs6.mp3",
+                            "E2": "E2.mp3",
+                            "E3": "E3.mp3",
+                            "E4": "E4.mp3",
+                            "E5": "E5.mp3",
+                            "E6": "E6.mp3",
+                            "F#2": "Fs2.mp3",
+                            "F#3": "Fs3.mp3",
+                            "F#4": "Fs4.mp3",
+                            "F#5": "Fs5.mp3",
+                            "F#6": "Fs6.mp3"
+                        },
+                        release: 1,
+                        baseUrl: "https://tonejs.github.io/audio/flute/"
+                    }).toDestination();
+                    break;
+                case 'synth':
+                    synth = new Tone.PolySynth(Tone.Synth).toDestination();
+                    break;
+            }
+        }
+
+        // Start a note
+        function startNote(e) {
+            const note = e.target.dataset.note;
+            if (currentInstrument === 'drums') {
+                drumSynth.triggerAttack(note);
+            } else {
+                synth.triggerAttack(note);
+            }
+            activeNotes.add(note);
+            e.target.classList.add('active');
+        }
+
+        // Stop a note
+        function stopNote(e) {
+            const note = e.target.dataset.note;
+            if (currentInstrument === 'drums') {
+                drumSynth.triggerRelease();
+            } else {
+                synth.triggerRelease(note);
+            }
+            activeNotes.delete(note);
+            e.target.classList.remove('active');
+        }
+
+        // Toggle play/pause
+        function togglePlay() {
+            if (isPlaying) {
+                Tone.Transport.pause();
+                playBtn.textContent = '▶';
+            } else {
+                Tone.Transport.start();
+                playBtn.textContent = '⏸';
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // Stop playback
+        function stopPlayback() {
+            Tone.Transport.stop();
+            Tone.Transport.position = 0;
+            playBtn.textContent = '▶';
+            isPlaying = false;
+        }
+
+        // Update BPM
+        function updateBPM() {
+            const bpm = bpmSlider.value;
+            Tone.Transport.bpm.value = bpm;
+            bpmDisplay.textContent = bpm;
+        }
+
+        // Select chord
+        function selectChord(e) {
+            chordBtns.forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+        }
+
+        // Generate music using AI
+        async function generateMusic() {
+            const prompt = document.getElementById('ai-prompt').value;
+            const style = document.getElementById('ai-style').value;
+            const mood = document.getElementById('ai-mood').value;
+
+            // Simulate AI generation (in a real app, this would call the Gemini API)
+            generatedContent.innerHTML = '<p>Generating music based on your prompt...</p>';
+
+            // Simulate loading time
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Generate some random music data
+            const generatedData = {
+                melody: generateRandomMelody(),
+                chords: generateRandomChords(),
+                rhythm: generateRandomRhythm()
+            };
+
+            // Display the generated content
+            displayGeneratedContent(generatedData);
+
+            // Play the generated music
+            playGeneratedMusic(generatedData);
+        }
+
+        // Generate random melody
+        function generateRandomMelody() {
+            const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+            const octaves = [3, 4, 5];
+            const melody = [];
+
+            for (let i = 0; i < 16; i++) {
+                const note = notes[Math.floor(Math.random() * notes.length)];
+                const octave = octaves[Math.floor(Math.random() * octaves.length)];
+                melody.push(`${note}${octave}`);
+            }
+
+            return melody;
+        }
+
+        // Generate random chords
+        function generateRandomChords() {
+            const chords = ['C', 'Dm', 'Em', 'F', 'G', 'Am'];
+            const progression = [];
+
+            for (let i = 0; i < 4; i++) {
+                progression.push(chords[Math.floor(Math.random() * chords.length)]);
+            }
+
+            return progression;
+        }
+
+        // Generate random rhythm
+        function generateRandomRhythm() {
+            const patterns = ['4/4', '3/4', '2/4', '6/8', '12/8'];
+            return patterns[Math.floor(Math.random() * patterns.length)];
+        }
+
+        // Display generated content
+        function displayGeneratedContent(data) {
+            generatedContent.innerHTML = `
+                <div class="generated-item">
+                    <h4>Generated Melody:</h4>
+                    <p>${data.melody.join(', ')}</p>
+                </div>
+                <div class="generated-item">
+                    <h4>Generated Chord Progression:</h4>
+                    <p>${data.chords.join(' - ')}</p>
+                </div>
+                <div class="generated-item">
+                    <h4>Generated Rhythm:</h4>
+                    <p>${data.rhythm}</p>
+                </div>
+            `;
+        }
+
+        // Play generated music
+        function playGeneratedMusic(data) {
+            // Stop any current playback
+            stopPlayback();
+
+            // Create a new loop for the generated music
+            if (loop) loop.dispose();
+
+            loop = new Tone.Loop((time) => {
+                // Play the melody
+                data.melody.forEach((note, index) => {
+                    if (currentInstrument === 'drums') {
+                        drumSynth.triggerAttackRelease(note, '8n', time + index * 0.5);
+                    } else {
+                        synth.triggerAttackRelease(note, '8n', time + index * 0.5);
+                    }
+                });
+
+                // Play the chords
+                data.chords.forEach((chord, index) => {
+                    if (currentInstrument !== 'drums') {
+                        synth.triggerAttackRelease(`${chord}2`, '1n', time + index * 2);
+                    }
+                });
+            }, '4m').start(0);
+
+            // Start playback
+            Tone.Transport.start();
+            isPlaying = true;
+            playBtn.textContent = '⏸';
+        }
+
+        // Initialize the app when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

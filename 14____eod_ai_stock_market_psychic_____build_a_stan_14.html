@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EOD AI Stock Market Psychic - Predictive analytics for stock market trends">
+    <title>EOD AI Stock Market Psychic</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc3f7;
+            --text-color: #333;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 0.5rem;
+            font-size: 1.5em;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .stock-form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, select, button {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: var(--font-main);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .prediction-results {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .prediction-title {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .prediction-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .prediction-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .prediction-label {
+            font-weight: 500;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .prediction-value {
+            font-size: 1.2rem;
+        }
+
+        .positive {
+            color: var(--success-color);
+        }
+
+        .negative {
+            color: var(--danger-color);
+        }
+
+        .neutral {
+            color: var(--warning-color);
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .logo {
+                margin-bottom: 1rem;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <span>EOD AI Stock Psychic</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#predictions">Predictions</a></li>
+                    <li><a href="#strategies">Strategies</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="dashboard" class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Market Overview</h3>
+                    <i class="fas fa-chart-bar card-icon"></i>
+                </div>
+                <div class="chart-container" id="market-overview-chart"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Top Gainers</h3>
+                    <i class="fas fa-arrow-up card-icon"></i>
+                </div>
+                <div class="chart-container" id="top-gainers-chart"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Top Losers</h3>
+                    <i class="fas fa-arrow-down card-icon"></i>
+                </div>
+                <div class="chart-container" id="top-losers-chart"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Market Sentiment</h3>
+                    <i class="fas fa-comment-dots card-icon"></i>
+                </div>
+                <div class="chart-container" id="market-sentiment-chart"></div>
+            </div>
+        </section>
+
+        <section id="predictions">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Stock Prediction</h3>
+                    <i class="fas fa-magic card-icon"></i>
+                </div>
+                <form class="stock-form" id="prediction-form">
+                    <div class="form-group">
+                        <label for="stock-symbol">Stock Symbol</label>
+                        <input type="text" id="stock-symbol" placeholder="e.g., AAPL" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prediction-period">Prediction Period</label>
+                        <select id="prediction-period">
+                            <option value="1">1 Day</option>
+                            <option value="7">1 Week</option>
+                            <option value="30">1 Month</option>
+                            <option value="90">3 Months</option>
+                            <option value="180">6 Months</option>
+                            <option value="365">1 Year</option>
+                        </select>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" id="predict-btn">Predict</button>
+                        <button type="button" id="clear-btn">Clear</button>
+                    </div>
+                </form>
+
+                <div class="prediction-results" id="prediction-results" style="display: none;">
+                    <h3 class="prediction-title">Prediction Results</h3>
+                    <div id="prediction-content"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="strategies">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Trading Strategy Backtesting</h3>
+                    <i class="fas fa-robot card-icon"></i>
+                </div>
+                <form class="stock-form" id="strategy-form">
+                    <div class="form-group">
+                        <label for="strategy-name">Strategy Name</label>
+                        <input type="text" id="strategy-name" placeholder="e.g., Moving Average Crossover" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="strategy-description">Description</label>
+                        <textarea id="strategy-description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="backtest-period">Backtest Period</label>
+                        <select id="backtest-period">
+                            <option value="30">1 Month</option>
+                            <option value="90">3 Months</option>
+                            <option value="180">6 Months</option>
+                            <option value="365">1 Year</option>
+                            <option value="730">2 Years</option>
+                            <option value="1095">3 Years</option>
+                        </select>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" id="backtest-btn">Run Backtest</button>
+                        <button type="button" id="clear-strategy-btn">Clear</button>
+                    </div>
+                </form>
+
+                <div class="prediction-results" id="strategy-results" style="display: none;">
+                    <h3 class="prediction-title">Backtest Results</h3>
+                    <div id="strategy-content"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2023 EOD AI Stock Psychic. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mock data for demonstration
+        const mockMarketData = {
+            overview: [
+                { time: '2023-01-01', value: 30000 },
+                { time: '2023-02-01', value: 32000 },
+                { time: '2023-03-01', value: 31000 },
+                { time: '2023-04-01', value: 33000 },
+                { time: '2023-05-01', value: 35000 },
+                { time: '2023-06-01', value: 34000 }
+            ],
+            gainers: [
+                { symbol: 'AAPL', change: 5.2 },
+                { symbol: 'MSFT', change: 4.8 },
+                { symbol: 'GOOGL', change: 4.5 },
+                { symbol: 'AMZN', change: 4.2 },
+                { symbol: 'TSLA', change: 6.1 }
+            ],
+            losers: [
+                { symbol: 'JPM', change: -3.7 },
+                { symbol: 'BAC', change: -3.2 },
+                { symbol: 'WFC', change: -2.9 },
+                { symbol: 'C', change: -3.5 },
+                { symbol: 'GS', change: -2.8 }
+            ],
+            sentiment: [
+                { time: '2023-01-01', value: 50 },
+                { time: '2023-02-01', value: 55 },
+                { time: '2023-03-01', value: 60 },
+                { time: '2023-04-01', value: 58 },
+                { time: '2023-05-01', value: 62 },
+                { time: '2023-06-01', value: 65 }
+            ]
+        };
+
+        // Initialize charts
+        function initCharts() {
+            // Market Overview Chart
+            const marketOverviewChart = createChart(document.getElementById('market-overview-chart'), {
+                width: document.getElementById('market-overview-chart').clientWidth,
+                height: 300,
+                layout: {
+                    backgroundColor: '#ffffff',
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: {
+                        color: '#e1e1e1',
+                    },
+                    horzLines: {
+                        color: '#e1e1e1',
+                    },
+                },
+                crosshair: {
+                    mode: LightweightCharts.CrosshairMode.Normal,
+                },
+                rightPriceScale: {
+                    borderColor: '#ccc',
+                },
+                timeScale: {
+                    borderColor: '#ccc',
+                },
+            });
+
+            const marketOverviewSeries = marketOverviewChart.addAreaSeries({
+                topColor: 'rgba(74, 111, 165, 0.56)',
+                bottomColor: 'rgba(74, 111, 165, 0.04)',
+                lineColor: 'rgba(74, 111, 165, 1)',
+                lineWidth: 2,
+            });
+
+            marketOverviewSeries.setData(mockMarketData.overview);
+
+            // Top Gainers Chart
+            const topGainersChart = createChart(document.getElementById('top-gainers-chart'), {
+                width: document.getElementById('top-gainers-chart').clientWidth,
+                height: 300,
+                layout: {
+                    backgroundColor: '#ffffff',
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: {
+                        color: '#e1e1e1',
+                    },
+                    horzLines: {
+                        color: '#e1e1e1',
+                    },
+                },
+                rightPriceScale: {
+                    borderColor: '#ccc',
+                },
+                timeScale: {
+                    borderColor: '#ccc',
+                },
+            });
+
+            const topGainersSeries = topGainersChart.addBarSeries({
+                upColor: '#26a69a',
+                downColor: '#ef5350',
+                openVisible: false,
+            });
+
+            // Mock data for top gainers (in a real app, this would come from an API)
+            const gainersData = mockMarketData.gainers.map((gainer, index) => ({
+                time: `2023-01-0${index + 1}`,
+                open: 100,
+                high: 100 + gainer.change,
+                low: 100 - gainer.change * 0.2,
+                close: 100 + gainer.change,
+            }));
+
+            topGainersSeries.setData(gainersData);
+
+            // Top Losers Chart
+            const topLosersChart = createChart(document.getElementById('top-losers-chart'), {
+                width: document.getElementById('top-losers-chart').clientWidth,
+                height: 300,
+                layout: {
+                    backgroundColor: '#ffffff',
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: {
+                        color: '#e1e1e1',
+                    },
+                    horzLines: {
+                        color: '#e1e1e1',
+                    },
+                },
+                rightPriceScale: {
+                    borderColor: '#ccc',
+                },
+                timeScale: {
+                    borderColor: '#ccc',
+                },
+            });
+
+            const topLosersSeries = topLosersChart.addBarSeries({
+                upColor: '#26a69a',
+                downColor: '#ef5350',
+                openVisible: false,
+            });
+
+            // Mock data for top losers (in a real app, this would come from an API)
+            const losersData = mockMarketData.losers.map((loser, index) => ({
+                time: `2023-01-0${index + 1}`,
+                open: 100,
+                high: 100 - loser.change,
+                low: 100 + loser.change * 0.2,
+                close: 100 - loser.change,
+            }));
+
+            topLosersSeries.setData(losersData);
+
+            // Market Sentiment Chart
+            const marketSentimentChart = createChart(document.getElementById('market-sentiment-chart'), {
+                width: document.getElementById('market-sentiment-chart').clientWidth,
+                height: 300,
+                layout: {
+                    backgroundColor: '#ffffff',
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: {
+                        color: '#e1e1e1',
+                    },
+                    horzLines: {
+                        color: '#e1e1e1',
+                    },
+                },
+                rightPriceScale: {
+                    borderColor: '#ccc',
+                },
+                timeScale: {
+                    borderColor: '#ccc',
+                },
+            });
+
+            const marketSentimentSeries = marketSentimentChart.addAreaSeries({
+                topColor: 'rgba(79, 195, 247, 0.56)',
+                bottomColor: 'rgba(79, 195, 247, 0.04)',
+                lineColor: 'rgba(79, 195, 247, 1)',
+                lineWidth: 2,
+            });
+
+            marketSentimentSeries.setData(mockMarketData.sentiment);
+        }
+
+        // Handle prediction form submission
+        document.getElementById('prediction-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const stockSymbol = document.getElementById('stock-symbol').value.toUpperCase();
+            const predictionPeriod = document.getElementById('prediction-period').value;
+
+            // Show loading state
+            const predictionContent = document.getElementById('prediction-content');
+            predictionContent.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            document.getElementById('prediction-results').style.display = 'block';
+
+            // Simulate API call with delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Generate mock prediction results
+            const prediction = generateMockPrediction(stockSymbol, predictionPeriod);
+
+            // Display results
+            predictionContent.innerHTML = `
+                <div class="prediction-item">
+                    <div class="prediction-label">Stock Symbol</div>
+                    <div class="prediction-value">${prediction.symbol}</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Current Price</div>
+                    <div class="prediction-value">$${prediction.currentPrice.toFixed(2)}</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Prediction Period</div>
+                    <div class="prediction-value">${prediction.period} days</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Predicted Price</div>
+                    <div class="prediction-value ${
+                        prediction.change > 0 ? 'positive' :
+                        prediction.change < 0 ? 'negative' : 'neutral'
+                    }">$${prediction.predictedPrice.toFixed(2)}</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Change</div>
+                    <div class="prediction-value ${
+                        prediction.change > 0 ? 'positive' :
+                        prediction.change < 0 ? 'negative' : 'neutral'
+                    }">${prediction.change > 0 ? '+' : ''}${prediction.change.toFixed(2)}% ($${Math.abs(prediction.priceChange).toFixed(2)})</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Confidence</div>
+                    <div class="prediction-value">${prediction.confidence}%</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Recommendation</div>
+                    <div class="prediction-value ${
+                        prediction.recommendation === 'Buy' ? 'positive' :
+                        prediction.recommendation === 'Sell' ? 'negative' : 'neutral'
+                    }">${prediction.recommendation}</div>
+                </div>
+            `;
+
+            // Add fade-in animation
+            predictionContent.classList.add('fade-in');
+        });
+
+        // Handle clear button
+        document.getElementById('clear-btn').addEventListener('click', function() {
+            document.getElementById('prediction-form').reset();
+            document.getElementById('prediction-results').style.display = 'none';
+        });
+
+        // Handle strategy form submission
+        document.getElementById('strategy-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const strategyName = document.getElementById('strategy-name').value;
+            const strategyDescription = document.getElementById('strategy-description').value;
+            const backtestPeriod = document.getElementById('backtest-period').value;
+
+            // Show loading state
+            const strategyContent = document.getElementById('strategy-content');
+            strategyContent.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            document.getElementById('strategy-results').style.display = 'block';
+
+            // Simulate API call with delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Generate mock backtest results
+            const backtestResults = generateMockBacktestResults(strategyName, strategyDescription, backtestPeriod);
+
+            // Display results
+            strategyContent.innerHTML = `
+                <div class="prediction-item">
+                    <div class="prediction-label">Strategy Name</div>
+                    <div class="prediction-value">${backtestResults.strategyName}</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Description</div>
+                    <div class="prediction-value">${backtestResults.description}</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Backtest Period</div>
+                    <div class="prediction-value">${backtestResults.period} days</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Total Return</div>
+                    <div class="prediction-value ${
+                        backtestResults.totalReturn > 0 ? 'positive' :
+                        backtestResults.totalReturn < 0 ? 'negative' : 'neutral'
+                    }">${backtestResults.totalReturn > 0 ? '+' : ''}${backtestResults.totalReturn.toFixed(2)}%</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Annualized Return</div>
+                    <div class="prediction-value ${
+                        backtestResults.annualizedReturn > 0 ? 'positive' :
+                        backtestResults.annualizedReturn < 0 ? 'negative' : 'neutral'
+                    }">${backtestResults.annualizedReturn > 0 ? '+' : ''}${backtestResults.annualizedReturn.toFixed(2)}%</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Sharpe Ratio</div>
+                    <div class="prediction-value">${backtestResults.sharpeRatio.toFixed(2)}</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Max Drawdown</div>
+                    <div class="prediction-value negative">${backtestResults.maxDrawdown.toFixed(2)}%</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Win Rate</div>
+                    <div class="prediction-value ${
+                        backtestResults.winRate > 50 ? 'positive' :
+                        backtestResults.winRate < 50 ? 'negative' : 'neutral'
+                    }">${backtestResults.winRate.toFixed(2)}%</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-label">Profit Factor</div>
+                    <div class="prediction-value ${
+                        backtestResults.profitFactor > 1 ? 'positive' :
+                        backtestResults.profitFactor < 1 ? 'negative' : 'neutral'
+                    }">${backtestResults.profitFactor.toFixed(2)}</div>
+                </div>
+            `;
+
+            // Add fade-in animation
+            strategyContent.classList.add('fade-in');
+        });
+
+        // Handle clear strategy button
+        document.getElementById('clear-strategy-btn').addEventListener('click', function() {
+            document.getElementById('strategy-form').reset();
+            document.getElementById('strategy-results').style.display = 'none';
+        });
+
+        // Generate mock prediction
+        function generateMockPrediction(symbol, period) {
+            // In a real app, this would be replaced with an actual API call
+            const basePrice = 100 + Math.random() * 200; // Random base price between 100 and 300
+            const change = (Math.random() * 20 - 10) * (period / 30); // Random change based on period
+            const predictedPrice = basePrice * (1 + change / 100);
+            const priceChange = predictedPrice - basePrice;
+            const confidence = Math.floor(Math.random() * 30) + 70; // Random confidence between 70% and 100%
+
+            let recommendation;
+            if (change > 5) {
+                recommendation = 'Buy';
+            } else if (change < -5) {
+                recommendation = 'Sell';
+            } else {
+                recommendation = 'Hold';
+            }
+
+            return {
+                symbol,
+                currentPrice: basePrice,
+                period: parseInt(period),
+                predictedPrice,
+                change,
+                priceChange,
+                confidence,
+                recommendation
+            };
+        }
+
+        // Generate mock backtest results
+        function generateMockBacktestResults(strategyName, description, period) {
+            // In a real app, this would be replaced with an actual API call
+            const totalReturn = (Math.random() * 50 - 10) * (period / 365); // Random return based on period
+            const annualizedReturn = totalReturn * (365 / period);
+            const sharpeRatio = Math.random() * 2 + 0.5; // Random Sharpe ratio between 0.5 and 2.5
+            const maxDrawdown = Math.random() * 20; // Random max drawdown between 0% and 20%
+            const winRate = Math.random() * 40 + 30; // Random win rate between 30% and 70%
+            const profitFactor = Math.random() * 2 + 0.5; // Random profit factor between 0.5 and 2.5
+
+            return {
+                strategyName,
+                description,
+                period: parseInt(period),
+                totalReturn,
+                annualizedReturn,
+                sharpeRatio,
+                maxDrawdown,
+                winRate,
+                profitFactor
+            };
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Initialize the page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // In a real app, you would initialize the TradingView Lightweight Charts library here
+            // For this example, we'll use a mock implementation
+            window.createChart = function(container, options) {
+                // Mock chart implementation
+                return {
+                    addAreaSeries: function() {
+                        return {
+                            setData: function() {}
+                        };
+                    },
+                    addBarSeries: function() {
+                        return {
+                            setData: function() {}
+                        };
+                    }
+                };
+            };
+
+            // Initialize charts
+            initCharts();
+
+            // Add responsive behavior for charts
+            window.addEventListener('resize', function() {
+                // In a real app, you would resize the charts here
+                // For this example, we'll just log the resize event
+                console.log('Window resized');
+            });
+        });
+    </script>
+</body>
+</html>

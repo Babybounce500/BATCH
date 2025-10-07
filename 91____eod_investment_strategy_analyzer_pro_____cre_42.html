@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EOD Investment Strategy Analyzer Pro - Advanced financial analysis tools">
+    <title>EOD Investment Strategy Analyzer Pro</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --text-color: #333;
+            --text-light: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            transition: var(--transition);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        select, input, button {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        select:focus, input:focus, button:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e6e6e6;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+        }
+
+        .dark-mode {
+            --primary-color: #34495e;
+            --secondary-color: #2980b9;
+            --accent-color: #c0392b;
+            --light-color: #1a1a1a;
+            --dark-color: #ecf0f1;
+            --text-color: #ecf0f1;
+            --text-light: #333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--secondary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">EOD Analyzer Pro</div>
+                <ul class="nav-links">
+                    <li><a href="#performance">Performance</a></li>
+                    <li><a href="#risk">Risk</a></li>
+                    <li><a href="#optimization">Optimization</a></li>
+                    <li><a href="#allocation">Allocation</a></li>
+                    <li><a href="#research">Research</a></li>
+                </ul>
+                <button class="theme-toggle" id="themeToggle">🌓</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="performance">
+            <h2>Performance Attribution</h2>
+            <div class="controls">
+                <select id="performanceSymbol">
+                    <option value="AAPL">AAPL</option>
+                    <option value="MSFT">MSFT</option>
+                    <option value="GOOGL">GOOGL</option>
+                    <option value="AMZN">AMZN</option>
+                    <option value="TSLA">TSLA</option>
+                </select>
+                <select id="performancePeriod">
+                    <option value="1M">1 Month</option>
+                    <option value="3M">3 Months</option>
+                    <option value="6M">6 Months</option>
+                    <option value="1Y">1 Year</option>
+                    <option value="5Y" selected>5 Years</option>
+                </select>
+                <button id="performanceBtn">Analyze</button>
+            </div>
+            <div class="dashboard">
+                <div class="card">
+                    <h3>Performance Chart</h3>
+                    <div class="chart-container" id="performanceChart"></div>
+                </div>
+                <div class="card">
+                    <h3>Key Metrics</h3>
+                    <div class="table-container">
+                        <table id="performanceMetrics">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total Return</td>
+                                    <td id="totalReturn">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Annualized Return</td>
+                                    <td id="annualizedReturn">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Sharpe Ratio</td>
+                                    <td id="sharpeRatio">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Max Drawdown</td>
+                                    <td id="maxDrawdown">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="risk">
+            <h2>Risk Assessment</h2>
+            <div class="controls">
+                <select id="riskSymbol">
+                    <option value="AAPL">AAPL</option>
+                    <option value="MSFT">MSFT</option>
+                    <option value="GOOGL">GOOGL</option>
+                    <option value="AMZN">AMZN</option>
+                    <option value="TSLA">TSLA</option>
+                </select>
+                <select id="riskPeriod">
+                    <option value="1M">1 Month</option>
+                    <option value="3M">3 Months</option>
+                    <option value="6M">6 Months</option>
+                    <option value="1Y">1 Year</option>
+                    <option value="5Y" selected>5 Years</option>
+                </select>
+                <button id="riskBtn">Analyze</button>
+            </div>
+            <div class="dashboard">
+                <div class="card">
+                    <h3>Volatility Chart</h3>
+                    <div class="chart-container" id="volatilityChart"></div>
+                </div>
+                <div class="card">
+                    <h3>Risk Metrics</h3>
+                    <div class="table-container">
+                        <table id="riskMetrics">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Volatility</td>
+                                    <td id="volatility">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Beta</td>
+                                    <td id="beta">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Value at Risk (95%)</td>
+                                    <td id="var">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Conditional Value at Risk (95%)</td>
+                                    <td id="cvar">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="optimization">
+            <h2>Portfolio Optimization</h2>
+            <div class="controls">
+                <select id="optimizationSymbols" multiple>
+                    <option value="AAPL">AAPL</option>
+                    <option value="MSFT">MSFT</option>
+                    <option value="GOOGL">GOOGL</option>
+                    <option value="AMZN">AMZN</option>
+                    <option value="TSLA">TSLA</option>
+                    <option value="FB">FB</option>
+                    <option value="NVDA">NVDA</option>
+                    <option value="JPM">JPM</option>
+                    <option value="V">V</option>
+                    <option value="PG">PG</option>
+                </select>
+                <select id="optimizationPeriod">
+                    <option value="1M">1 Month</option>
+                    <option value="3M">3 Months</option>
+                    <option value="6M">6 Months</option>
+                    <option value="1Y">1 Year</option>
+                    <option value="5Y" selected>5 Years</option>
+                </select>
+                <button id="optimizationBtn">Optimize</button>
+            </div>
+            <div class="dashboard">
+                <div class="card">
+                    <h3>Optimized Portfolio</h3>
+                    <div class="chart-container" id="optimizationChart"></div>
+                </div>
+                <div class="card">
+                    <h3>Allocation</h3>
+                    <div class="table-container">
+                        <table id="optimizationAllocation">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Allocation (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Allocation data will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="allocation">
+            <h2>Asset Allocation</h2>
+            <div class="controls">
+                <select id="allocationSymbols" multiple>
+                    <option value="AAPL">AAPL</option>
+                    <option value="MSFT">MSFT</option>
+                    <option value="GOOGL">GOOGL</option>
+                    <option value="AMZN">AMZN</option>
+                    <option value="TSLA">TSLA</option>
+                    <option value="FB">FB</option>
+                    <option value="NVDA">NVDA</option>
+                    <option value="JPM">JPM</option>
+                    <option value="V">V</option>
+                    <option value="PG">PG</option>
+                </select>
+                <select id="allocationPeriod">
+                    <option value="1M">1 Month</option>
+                    <option value="3M">3 Months</option>
+                    <option value="6M">6 Months</option>
+                    <option value="1Y">1 Year</option>
+                    <option value="5Y" selected>5 Years</option>
+                </select>
+                <button id="allocationBtn">Analyze</button>
+            </div>
+            <div class="dashboard">
+                <div class="card">
+                    <h3>Asset Allocation Chart</h3>
+                    <div class="chart-container" id="allocationChart"></div>
+                </div>
+                <div class="card">
+                    <h3>Performance by Asset Class</h3>
+                    <div class="table-container">
+                        <table id="allocationPerformance">
+                            <thead>
+                                <tr>
+                                    <th>Asset Class</th>
+                                    <th>Allocation (%)</th>
+                                    <th>Performance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Performance data will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="research">
+            <h2>Investment Research</h2>
+            <div class="controls">
+                <select id="researchSymbol">
+                    <option value="AAPL">AAPL</option>
+                    <option value="MSFT">MSFT</option>
+                    <option value="GOOGL">GOOGL</option>
+                    <option value="AMZN">AMZN</option>
+                    <option value="TSLA">TSLA</option>
+                </select>
+                <select id="researchPeriod">
+                    <option value="1M">1 Month</option>
+                    <option value="3M">3 Months</option>
+                    <option value="6M">6 Months</option>
+                    <option value="1Y">1 Year</option>
+                    <option value="5Y" selected>5 Years</option>
+                </select>
+                <button id="researchBtn">Research</button>
+            </div>
+            <div class="dashboard">
+                <div class="card">
+                    <h3>Fundamental Analysis</h3>
+                    <div class="table-container">
+                        <table id="fundamentalAnalysis">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Price to Earnings (P/E)</td>
+                                    <td id="peRatio">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Price to Book (P/B)</td>
+                                    <td id="pbRatio">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Debt to Equity</td>
+                                    <td id="deRatio">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Return on Equity (ROE)</td>
+                                    <td id="roe">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Earnings Per Share (EPS)</td>
+                                    <td id="eps">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Technical Analysis</h3>
+                    <div class="chart-container" id="technicalChart"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 EOD Investment Strategy Analyzer Pro. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                this.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌓';
+            });
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Performance Analysis
+            const performanceBtn = document.getElementById('performanceBtn');
+            performanceBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('performanceSymbol').value;
+                const period = document.getElementById('performancePeriod').value;
+                analyzePerformance(symbol, period);
+            });
+
+            // Risk Assessment
+            const riskBtn = document.getElementById('riskBtn');
+            riskBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('riskSymbol').value;
+                const period = document.getElementById('riskPeriod').value;
+                analyzeRisk(symbol, period);
+            });
+
+            // Portfolio Optimization
+            const optimizationBtn = document.getElementById('optimizationBtn');
+            optimizationBtn.addEventListener('click', function() {
+                const symbols = Array.from(document.getElementById('optimizationSymbols').selectedOptions).map(option => option.value);
+                const period = document.getElementById('optimizationPeriod').value;
+                optimizePortfolio(symbols, period);
+            });
+
+            // Asset Allocation
+            const allocationBtn = document.getElementById('allocationBtn');
+            allocationBtn.addEventListener('click', function() {
+                const symbols = Array.from(document.getElementById('allocationSymbols').selectedOptions).map(option => option.value);
+                const period = document.getElementById('allocationPeriod').value;
+                analyzeAllocation(symbols, period);
+            });
+
+            // Investment Research
+            const researchBtn = document.getElementById('researchBtn');
+            researchBtn.addEventListener('click', function() {
+                const symbol = document.getElementById('researchSymbol').value;
+                const period = document.getElementById('researchPeriod').value;
+                researchInvestment(symbol, period);
+            });
+
+            // Mock data generation functions
+            function generateRandomData(length, min, max) {
+                return Array.from({length}, () => Math.random() * (max - min) + min);
+            }
+
+            function generateDateRange(length) {
+                const endDate = new Date();
+                const startDate = new Date(endDate);
+                startDate.setFullYear(endDate.getFullYear() - 5);
+
+                const dates = [];
+                const interval = (endDate - startDate) / (length - 1);
+
+                for (let i = 0; i < length; i++) {
+                    const date = new Date(startDate.getTime() + i * interval);
+                    dates.push(date.toISOString().split('T')[0]);
+                }
+
+                return dates;
+            }
+
+            // Performance Analysis
+            async function analyzePerformance(symbol, period) {
+                const performanceChart = document.getElementById('performanceChart');
+                performanceChart.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Generate mock data
+                const dataLength = period === '1M' ? 30 : period === '3M' ? 90 : period === '6M' ? 180 : period === '1Y' ? 252 : 1260;
+                const dates = generateDateRange(dataLength);
+                const prices = generateRandomData(dataLength, 100, 200);
+
+                // Calculate metrics
+                const totalReturn = ((prices[prices.length - 1] - prices[0]) / prices[0] * 100).toFixed(2) + '%';
+                const annualizedReturn = (Math.pow(prices[prices.length - 1] / prices[0], 252 / dataLength) - 1).toFixed(2) + '%';
+                const sharpeRatio = (Math.random() * 2 + 0.5).toFixed(2);
+                const maxDrawdown = (Math.random() * 0.3).toFixed(2) + '%';
+
+                // Update metrics table
+                document.getElementById('totalReturn').textContent = totalReturn;
+                document.getElementById('annualizedReturn').textContent = annualizedReturn;
+                document.getElementById('sharpeRatio').textContent = sharpeRatio;
+                document.getElementById('maxDrawdown').textContent = maxDrawdown;
+
+                // Create performance chart
+                createLineChart(performanceChart, dates, prices, `${symbol} Performance`);
+            }
+
+            // Risk Assessment
+            async function analyzeRisk(symbol, period) {
+                const volatilityChart = document.getElementById('volatilityChart');
+                volatilityChart.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Generate mock data
+                const dataLength = period === '1M' ? 30 : period === '3M' ? 90 : period === '6M' ? 180 : period === '1Y' ? 252 : 1260;
+                const dates = generateDateRange(dataLength);
+                const returns = generateRandomData(dataLength, -0.05, 0.05);
+
+                // Calculate metrics
+                const volatility = (Math.sqrt(returns.reduce((sum, val) => sum + Math.pow(val, 2), 0) / returns.length) * Math.sqrt(252)).toFixed(2) + '%';
+                const beta = (Math.random() * 0.5 + 1).toFixed(2);
+                const varValue = (Math.random() * 0.05).toFixed(2) + '%';
+                const cvarValue = (Math.random() * 0.07).toFixed(2) + '%';
+
+                // Update metrics table
+                document.getElementById('volatility').textContent = volatility;
+                document.getElementById('beta').textContent = beta;
+                document.getElementById('var').textContent = varValue;
+                document.getElementById('cvar').textContent = cvarValue;
+
+                // Create volatility chart
+                createLineChart(volatilityChart, dates, returns, `${symbol} Returns`);
+            }
+
+            // Portfolio Optimization
+            async function optimizePortfolio(symbols, period) {
+                const optimizationChart = document.getElementById('optimizationChart');
+                optimizationChart.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Generate mock data
+                const dataLength = period === '1M' ? 30 : period === '3M' ? 90 : period === '6M' ? 180 : period === '1Y' ? 252 : 1260;
+                const dates = generateDateRange(dataLength);
+
+                // Generate random allocations
+                const allocations = {};
+                let remaining = 100;
+                symbols.forEach((symbol, index) => {
+                    if (index === symbols.length - 1) {
+                        allocations[symbol] = remaining;
+                    } else {
+                        const allocation = Math.floor(Math.random() * remaining);
+                        allocations[symbol] = allocation;
+                        remaining -= allocation;
+                    }
+                });
+
+                // Generate mock portfolio returns
+                const portfolioReturns = generateRandomData(dataLength, -0.05, 0.05);
+
+                // Update allocation table
+                const allocationTable = document.getElementById('optimizationAllocation').querySelector('tbody');
+                allocationTable.innerHTML = '';
+                Object.entries(allocations).forEach(([symbol, allocation]) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${symbol}</td>
+                        <td>${allocation}%</td>
+                    `;
+                    allocationTable.appendChild(row);
+                });
+
+                // Create optimization chart
+                createLineChart(optimizationChart, dates, portfolioReturns, 'Optimized Portfolio Returns');
+            }
+
+            // Asset Allocation
+            async function analyzeAllocation(symbols, period) {
+                const allocationChart = document.getElementById('allocationChart');
+                allocationChart.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Generate mock data
+                const dataLength = period === '1M' ? 30 : period === '3M' ? 90 : period === '6M' ? 180 : period === '1Y' ? 252 : 1260;
+                const dates = generateDateRange(dataLength);
+
+                // Generate random allocations
+                const allocations = {};
+                let remaining = 100;
+                symbols.forEach((symbol, index) => {
+                    if (index === symbols.length - 1) {
+                        allocations[symbol] = remaining;
+                    } else {
+                        const allocation = Math.floor(Math.random() * remaining);
+                        allocations[symbol] = allocation;
+                        remaining -= allocation;
+                    }
+                });
+
+                // Generate mock asset class performance
+                const assetClasses = ['Equities', 'Bonds', 'Commodities', 'Cash'];
+                const performanceData = assetClasses.map(assetClass => ({
+                    assetClass,
+                    allocation: Math.floor(Math.random() * 100),
+                    performance: (Math.random() * 20 - 5).toFixed(2) + '%'
+                }));
+
+                // Update performance table
+                const performanceTable = document.getElementById('allocationPerformance').querySelector('tbody');
+                performanceTable.innerHTML = '';
+                performanceData.forEach(data => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${data.assetClass}</td>
+                        <td>${data.allocation}%</td>
+                        <td>${data.performance}</td>
+                    `;
+                    performanceTable.appendChild(row);
+                });
+
+                // Create allocation chart
+                createPieChart(allocationChart, Object.entries(allocations), 'Asset Allocation');
+            }
+
+            // Investment Research
+            async function researchInvestment(symbol, period) {
+                const technicalChart = document.getElementById('technicalChart');
+                technicalChart.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Generate mock data
+                const dataLength = period === '1M' ? 30 : period === '3M' ? 90 : period === '6M' ? 180 : period === '1Y' ? 252 : 1260;
+                const dates = generateDateRange(dataLength);
+                const prices = generateRandomData(dataLength, 100, 200);
+
+                // Generate fundamental data
+                const peRatio = (Math.random() * 30 + 10).toFixed(2);
+                const pbRatio = (Math.random() * 5 + 1).toFixed(2);
+                const deRatio = (Math.random() * 2).toFixed(2);
+                const roe = (Math.random() * 0.3).toFixed(2) + '%';
+                const eps = (Math.random() * 5 + 1).toFixed(2);
+
+                // Update fundamental table
+                document.getElementById('peRatio').textContent = peRatio;
+                document.getElementById('pbRatio').textContent = pbRatio;
+                document.getElementById('deRatio').textContent = deRatio;
+                document.getElementById('roe').textContent = roe;
+                document.getElementById('eps').textContent = eps;
+
+                // Create technical chart
+                createLineChart(technicalChart, dates, prices, `${symbol} Price`);
+            }
+
+            // Chart creation functions
+            function createLineChart(container, dates, values, title) {
+                // Clear container
+                container.innerHTML = '';
+
+                // Set up dimensions
+                const margin = {top: 20, right: 30, bottom: 30, left: 40};
+                const width = container.clientWidth - margin.left - margin.right;
+                const height = container.clientHeight - margin.top - margin.bottom;
+
+                // Create SVG
+                const svg = d3.select(container)
+                    .append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append('g')
+                    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+                // Parse dates
+                const parseDate = d3.timeParse('%Y-%m-%d');
+                const data = dates.map((date, i) => ({
+                    date: parseDate(date),
+                    value: values[i]
+                }));
+
+                // Set up scales
+                const x = d3.scaleTime()
+                    .domain(d3.extent(data, d => d.date))
+                    .range([0, width]);
+
+                const y = d3.scaleLinear()
+                    .domain([d3.min(data, d => d.value) * 0.95, d3.max(data, d => d.value) * 1.05])
+                    .range([height, 0]);
+
+                // Create line
+                const line = d3.line()
+                    .x(d => x(d.date))
+                    .y(d => y(d.value));
+
+                // Add line path
+                svg.append('path')
+                    .datum(data)
+                    .attr('fill', 'none')
+                    .attr('stroke', 'var(--secondary-color)')
+                    .attr('stroke-width', 2)
+                    .attr('d', line);
+
+                // Add x-axis
+                svg.append('g')
+                    .attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x).ticks(5));
+
+                // Add y-axis
+                svg.append('g')
+                    .call(d3.axisLeft(y).ticks(5));
+
+                // Add title
+                svg.append('text')
+                    .attr('x', width / 2)
+                    .attr('y', -10)
+                    .attr('text-anchor', 'middle')
+                    .style('font-size', '14px')
+                    .style('font-weight', 'bold')
+                    .text(title);
+            }
+
+            function createPieChart(container, data, title) {
+                // Clear container
+                container.innerHTML = '';
+
+                // Set up dimensions
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                const radius = Math.min(width, height) / 2;
+
+                // Create SVG
+                const svg = d3.select(container)
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .append('g')
+                    .attr('transform', `translate(${width / 2},${height / 2})`);
+
+                // Set up color scale
+                const color = d3.scaleOrdinal()
+                    .domain(data.map(d => d[0]))
+                    .range(d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length).reverse());
+
+                // Create pie layout
+                const pie = d3.pie()
+                    .value(d => d[1])
+                    .sort(null);
+
+                // Create arc generator
+                const arc = d3.arc()
+                    .innerRadius(0)
+                    .outerRadius(Math.min(width, height) / 2 - 1);
+
+                // Create arcs
+                const arcs = svg.selectAll('arc')
+                    .data(pie(data))
+                    .enter()
+                    .append('g')
+                    .attr('class', 'arc');
+
+                // Add arcs
+                arcs.append('path')
+                    .attr('d', arc)
+                    .attr('fill', d => color(d.data[0]));
+
+                // Add labels
+                arcs.append('text')
+                    .attr('transform', d => `translate(${arc.centroid(d)})`)
+                    .attr('text-anchor', 'middle')
+                    .text(d => d.data[0]);
+
+                // Add title
+                svg.append('text')
+                    .attr('x', 0)
+                    .attr('y', -height / 2 + 20)
+                    .attr('text-anchor', 'middle')
+                    .style('font-size', '14px')
+                    .style('font-weight', 'bold')
+                    .text(title);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RapidAPI Market Trend Analyzer Pro - Advanced financial market analysis tool">
+    <title>RapidAPI Market Trend Analyzer Pro</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #2ecc71;
+            --text-color: #333;
+            --text-light: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-light);
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        nav ul li a:hover {
+            background-color: var(--primary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+
+        .btn-warning:hover {
+            background-color: #d35400;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #219653;
+        }
+
+        .risk-meter {
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .risk-level {
+            height: 100%;
+            width: 0;
+            background-color: var(--danger-color);
+            transition: var(--transition);
+        }
+
+        .risk-low {
+            background-color: var(--success-color);
+        }
+
+        .risk-medium {
+            background-color: var(--warning-color);
+        }
+
+        .risk-high {
+            background-color: var(--danger-color);
+        }
+
+        .sentiment-analysis {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .sentiment-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .sentiment-item h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .sentiment-positive {
+            color: var(--success-color);
+        }
+
+        .sentiment-neutral {
+            color: var(--warning-color);
+        }
+
+        .sentiment-negative {
+            color: var(--danger-color);
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">Market Trend Analyzer Pro</a>
+            <nav>
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Predictive Modeling</a></li>
+                    <li><a href="#">Scenario Analysis</a></li>
+                    <li><a href="#">Risk Assessment</a></li>
+                    <li><a href="#">Sentiment Analysis</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="dashboard">
+            <div class="card">
+                <h3>Market Overview</h3>
+                <div class="chart-container">
+                    <canvas id="marketOverviewChart"></canvas>
+                </div>
+                <div class="form-group">
+                    <label for="timeRange">Time Range</label>
+                    <select id="timeRange">
+                        <option value="1d">1 Day</option>
+                        <option value="1w">1 Week</option>
+                        <option value="1m">1 Month</option>
+                        <option value="3m" selected>3 Months</option>
+                        <option value="1y">1 Year</option>
+                        <option value="5y">5 Years</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Predictive Modeling</h3>
+                <div class="chart-container">
+                    <canvas id="predictiveModelChart"></canvas>
+                </div>
+                <div class="form-group">
+                    <label for="modelType">Model Type</label>
+                    <select id="modelType">
+                        <option value="linear">Linear Regression</option>
+                        <option value="arima">ARIMA</option>
+                        <option value="lstm">LSTM</option>
+                        <option value="prophet" selected>Facebook Prophet</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="forecastPeriod">Forecast Period</label>
+                    <select id="forecastPeriod">
+                        <option value="7">7 Days</option>
+                        <option value="30" selected>30 Days</option>
+                        <option value="90">90 Days</option>
+                        <option value="180">180 Days</option>
+                    </select>
+                </div>
+                <button id="runPrediction" class="btn-secondary">Run Prediction</button>
+            </div>
+
+            <div class="card">
+                <h3>Scenario Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="scenarioAnalysisChart"></canvas>
+                </div>
+                <div class="form-group">
+                    <label for="scenarioType">Scenario Type</label>
+                    <select id="scenarioType">
+                        <option value="bull">Bull Market</option>
+                        <option value="bear" selected>Bear Market</option>
+                        <option value="volatility">High Volatility</option>
+                        <option value="recession">Recession</option>
+                    </select>
+                </div>
+                <button id="analyzeScenario" class="btn-warning">Analyze Scenario</button>
+            </div>
+
+            <div class="card">
+                <h3>Risk Assessment</h3>
+                <div class="chart-container">
+                    <canvas id="riskAssessmentChart"></canvas>
+                </div>
+                <div class="risk-meter">
+                    <div class="risk-level" id="riskLevel"></div>
+                </div>
+                <div class="form-group">
+                    <label for="assetType">Asset Type</label>
+                    <select id="assetType">
+                        <option value="stocks">Stocks</option>
+                        <option value="bonds">Bonds</option>
+                        <option value="crypto" selected>Cryptocurrency</option>
+                        <option value="forex">Forex</option>
+                        <option value="commodities">Commodities</option>
+                    </select>
+                </div>
+                <button id="assessRisk" class="btn-danger">Assess Risk</button>
+            </div>
+
+            <div class="card">
+                <h3>Market Sentiment Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="sentimentAnalysisChart"></canvas>
+                </div>
+                <div class="sentiment-analysis">
+                    <div class="sentiment-item">
+                        <h4 class="sentiment-positive">Positive</h4>
+                        <p id="positiveSentiment">45%</p>
+                    </div>
+                    <div class="sentiment-item">
+                        <h4 class="sentiment-neutral">Neutral</h4>
+                        <p id="neutralSentiment">30%</p>
+                    </div>
+                    <div class="sentiment-item">
+                        <h4 class="sentiment-negative">Negative</h4>
+                        <p id="negativeSentiment">25%</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sentimentSource">Sentiment Source</label>
+                    <select id="sentimentSource">
+                        <option value="news">News Articles</option>
+                        <option value="social" selected>Social Media</option>
+                        <option value="forums">Forums</option>
+                        <option value="all">All Sources</option>
+                    </select>
+                </div>
+                <button id="analyzeSentiment" class="btn-success">Analyze Sentiment</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 RapidAPI Market Trend Analyzer Pro. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Sample data for the charts
+        const marketData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Market Price',
+                data: [300, 320, 310, 350, 340, 360],
+                borderColor: 'rgba(52, 152, 219, 1)',
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                tension: 0.1,
+                fill: true
+            }]
+        };
+
+        const predictiveData = {
+            labels: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Predicted Price',
+                data: [370, 380, 390, 400, 410, 420],
+                borderColor: 'rgba(46, 204, 113, 1)',
+                backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                tension: 0.1,
+                fill: true
+            }]
+        };
+
+        const scenarioData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Current Price',
+                data: [300, 320, 310, 350, 340, 360],
+                borderColor: 'rgba(52, 152, 219, 1)',
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                tension: 0.1,
+                fill: true
+            }, {
+                label: 'Scenario Price',
+                data: [280, 290, 300, 310, 320, 330],
+                borderColor: 'rgba(243, 156, 18, 1)',
+                backgroundColor: 'rgba(243, 156, 18, 0.2)',
+                tension: 0.1,
+                fill: true
+            }]
+        };
+
+        const riskData = {
+            labels: ['Low', 'Medium', 'High'],
+            datasets: [{
+                label: 'Risk Distribution',
+                data: [30, 50, 20],
+                backgroundColor: [
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(243, 156, 18, 0.7)',
+                    'rgba(231, 76, 60, 0.7)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const sentimentData = {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+                label: 'Sentiment Distribution',
+                data: [45, 30, 25],
+                backgroundColor: [
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(243, 156, 18, 0.7)',
+                    'rgba(231, 76, 60, 0.7)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        // Initialize charts
+        const marketOverviewChart = new Chart(
+            document.getElementById('marketOverviewChart'),
+            {
+                type: 'line',
+                data: marketData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+        const predictiveModelChart = new Chart(
+            document.getElementById('predictiveModelChart'),
+            {
+                type: 'line',
+                data: predictiveData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+        const scenarioAnalysisChart = new Chart(
+            document.getElementById('scenarioAnalysisChart'),
+            {
+                type: 'line',
+                data: scenarioData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+        const riskAssessmentChart = new Chart(
+            document.getElementById('riskAssessmentChart'),
+            {
+                type: 'pie',
+                data: riskData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+        const sentimentAnalysisChart = new Chart(
+            document.getElementById('sentimentAnalysisChart'),
+            {
+                type: 'pie',
+                data: sentimentData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+        // Update charts based on user interactions
+        document.getElementById('timeRange').addEventListener('change', function() {
+            // In a real application, this would fetch new data from the API
+            console.log('Time range changed to:', this.value);
+        });
+
+        document.getElementById('runPrediction').addEventListener('click', function() {
+            // In a real application, this would run the predictive model
+            console.log('Running prediction with model:', document.getElementById('modelType').value,
+                        'and forecast period:', document.getElementById('forecastPeriod').value);
+        });
+
+        document.getElementById('analyzeScenario').addEventListener('click', function() {
+            // In a real application, this would analyze the selected scenario
+            console.log('Analyzing scenario:', document.getElementById('scenarioType').value);
+        });
+
+        document.getElementById('assessRisk').addEventListener('click', function() {
+            // In a real application, this would assess risk for the selected asset type
+            console.log('Assessing risk for:', document.getElementById('assetType').value);
+
+            // Update risk meter (simulated)
+            const riskLevel = document.getElementById('riskLevel');
+            const assetType = document.getElementById('assetType').value;
+
+            if (assetType === 'stocks') {
+                riskLevel.style.width = '40%';
+                riskLevel.className = 'risk-level risk-medium';
+            } else if (assetType === 'bonds') {
+                riskLevel.style.width = '20%';
+                riskLevel.className = 'risk-level risk-low';
+            } else if (assetType === 'crypto') {
+                riskLevel.style.width = '80%';
+                riskLevel.className = 'risk-level risk-high';
+            } else if (assetType === 'forex') {
+                riskLevel.style.width = '60%';
+                riskLevel.className = 'risk-level risk-high';
+            } else if (assetType === 'commodities') {
+                riskLevel.style.width = '50%';
+                riskLevel.className = 'risk-level risk-medium';
+            }
+        });
+
+        document.getElementById('analyzeSentiment').addEventListener('click', function() {
+            // In a real application, this would analyze sentiment from the selected source
+            console.log('Analyzing sentiment from:', document.getElementById('sentimentSource').value);
+
+            // Update sentiment percentages (simulated)
+            const sentimentSource = document.getElementById('sentimentSource').value;
+
+            if (sentimentSource === 'news') {
+                document.getElementById('positiveSentiment').textContent = '35%';
+                document.getElementById('neutralSentiment').textContent = '40%';
+                document.getElementById('negativeSentiment').textContent = '25%';
+            } else if (sentimentSource === 'social') {
+                document.getElementById('positiveSentiment').textContent = '45%';
+                document.getElementById('neutralSentiment').textContent = '30%';
+                document.getElementById('negativeSentiment').textContent = '25%';
+            } else if (sentimentSource === 'forums') {
+                document.getElementById('positiveSentiment').textContent = '30%';
+                document.getElementById('neutralSentiment').textContent = '25%';
+                document.getElementById('negativeSentiment').textContent = '45%';
+            } else if (sentimentSource === 'all') {
+                document.getElementById('positiveSentiment').textContent = '40%';
+                document.getElementById('neutralSentiment').textContent = '35%';
+                document.getElementById('negativeSentiment').textContent = '25%';
+            }
+        });
+    </script>
+</body>
+</html>

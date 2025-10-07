@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OpenAI Text-to-Speech Studio Pro - Professional text-to-speech synthesis with voice customization and audio editing">
+    <title>OpenAI Text-to-Speech Studio Pro</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: #fff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            box-shadow: var(--box-shadow);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .studio-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .text-input {
+            grid-column: 1;
+        }
+
+        .controls {
+            grid-column: 2;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            resize: vertical;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+
+        .voice-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .control-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #3367d6;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .audio-player {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .play-btn, .stop-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 1rem;
+            background-color: var(--secondary-color);
+        }
+
+        .stop-btn {
+            background-color: var(--accent-color);
+        }
+
+        .waveform-container {
+            height: 100px;
+            background-color: #f1f1f1;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .waveform {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-bar {
+            position: absolute;
+            height: 100%;
+            background-color: rgba(66, 133, 244, 0.3);
+            width: 0;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .export-btn {
+            flex: 1;
+            background-color: var(--secondary-color);
+        }
+
+        .export-btn:hover {
+            background-color: #2d8a44;
+        }
+
+        footer {
+            background-color: var(--card-bg);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .studio-container {
+                grid-template-columns: 1fr;
+            }
+
+            .text-input, .controls {
+                grid-column: 1;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .mobile-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--card-bg);
+                padding: 1rem;
+                box-shadow: var(--box-shadow);
+            }
+
+            .mobile-menu.active {
+                display: block;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-message {
+            color: var(--accent-color);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">OpenAI TTS Studio Pro</a>
+            <button class="mobile-menu-btn">☰</button>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="mobile-menu">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="studio-container">
+            <div class="text-input">
+                <div class="card">
+                    <h2>Text Input</h2>
+                    <textarea id="text-input" placeholder="Enter text to convert to speech..."></textarea>
+                    <div id="char-count" style="text-align: right; margin-top: 0.5rem; color: #666;">0 characters</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="card">
+                    <h2>Voice Controls</h2>
+                    <div class="voice-controls">
+                        <div class="control-group">
+                            <label for="voice-select">Voice</label>
+                            <select id="voice-select">
+                                <option value="alloy">Alloy</option>
+                                <option value="echo">Echo</option>
+                                <option value="fable">Fable</option>
+                                <option value="onyx">Onyx</option>
+                                <option value="nova">Nova</option>
+                                <option value="shimmer">Shimmer</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="speed-control">Speed</label>
+                            <input type="range" id="speed-control" min="0.5" max="2" step="0.1" value="1">
+                            <div class="range-value">1.0x</div>
+                        </div>
+                        <div class="control-group">
+                            <label for="pitch-control">Pitch</label>
+                            <input type="range" id="pitch-control" min="0.5" max="2" step="0.1" value="1">
+                            <div class="range-value">1.0x</div>
+                        </div>
+                        <div class="control-group">
+                            <label for="volume-control">Volume</label>
+                            <input type="range" id="volume-control" min="0" max="1" step="0.1" value="0.8">
+                            <div class="range-value">80%</div>
+                        </div>
+                        <div class="control-group">
+                            <button id="generate-btn">Generate Speech</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Audio Player</h2>
+                    <div class="audio-player">
+                        <button class="play-btn" id="play-btn">▶</button>
+                        <button class="stop-btn" id="stop-btn">■</button>
+                        <div class="waveform-container">
+                            <div class="waveform" id="waveform"></div>
+                            <div class="progress-bar" id="progress-bar"></div>
+                        </div>
+                    </div>
+                    <div class="export-options">
+                        <button class="export-btn" id="download-btn">Download</button>
+                        <button class="export-btn" id="share-btn">Share</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 OpenAI Text-to-Speech Studio Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mobileMenu = document.querySelector('.mobile-menu');
+
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+            });
+
+            // Character counter
+            const textInput = document.getElementById('text-input');
+            const charCount = document.getElementById('char-count');
+
+            textInput.addEventListener('input', function() {
+                charCount.textContent = `${this.value.length} characters`;
+            });
+
+            // Range input value display
+            const rangeInputs = document.querySelectorAll('input[type="range"]');
+
+            rangeInputs.forEach(input => {
+                const valueDisplay = input.nextElementSibling;
+                input.addEventListener('input', function() {
+                    if (input.id === 'volume-control') {
+                        valueDisplay.textContent = `${Math.round(this.value * 100)}%`;
+                    } else {
+                        valueDisplay.textContent = `${this.value}x`;
+                    }
+                });
+            });
+
+            // Howler.js setup
+            let sound = null;
+            const waveform = document.getElementById('waveform');
+            const progressBar = document.getElementById('progress-bar');
+            const playBtn = document.getElementById('play-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const generateBtn = document.getElementById('generate-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const shareBtn = document.getElementById('share-btn');
+
+            // Simulate generating speech from OpenAI API
+            generateBtn.addEventListener('click', async function() {
+                const text = textInput.value.trim();
+                if (!text) {
+                    alert('Please enter some text to convert to speech.');
+                    return;
+                }
+
+                // Disable button and show loading state
+                generateBtn.disabled = true;
+                generateBtn.innerHTML = 'Generating <span class="loading"></span>';
+
+                try {
+                    // Simulate API call with a delay
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // In a real implementation, you would call the OpenAI TTS API here
+                    // and get the audio data in response
+
+                    // For demonstration, we'll use a sample audio file
+                    const sampleAudioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+
+                    // Create a new Howl instance
+                    sound = new Howl({
+                        src: [sampleAudioUrl],
+                        html5: true,
+                        onload: function() {
+                            // Enable buttons
+                            generateBtn.disabled = false;
+                            generateBtn.textContent = 'Generate Speech';
+                            playBtn.disabled = false;
+                            stopBtn.disabled = false;
+                            downloadBtn.disabled = false;
+                            shareBtn.disabled = false;
+
+                            // Create waveform visualization
+                            createWaveformVisualization();
+                        },
+                        onend: function() {
+                            playBtn.textContent = '▶';
+                            progressBar.style.width = '0%';
+                        },
+                        onplay: function() {
+                            playBtn.textContent = '❚❚';
+                        },
+                        onpause: function() {
+                            playBtn.textContent = '▶';
+                        }
+                    });
+
+                    // Load the audio
+                    sound.load();
+                } catch (error) {
+                    console.error('Error generating speech:', error);
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = 'Generate Speech';
+                    alert('Error generating speech. Please try again.');
+                }
+            });
+
+            // Play/pause button
+            playBtn.addEventListener('click', function() {
+                if (!sound) return;
+
+                if (sound.playing()) {
+                    sound.pause();
+                } else {
+                    sound.play();
+                    updateProgressBar();
+                }
+            });
+
+            // Stop button
+            stopBtn.addEventListener('click', function() {
+                if (!sound) return;
+
+                sound.stop();
+                playBtn.textContent = '▶';
+                progressBar.style.width = '0%';
+            });
+
+            // Download button
+            downloadBtn.addEventListener('click', function() {
+                if (!sound) {
+                    alert('Please generate speech first.');
+                    return;
+                }
+
+                // In a real implementation, you would download the actual audio file
+                alert('Download functionality would be implemented here.');
+            });
+
+            // Share button
+            shareBtn.addEventListener('click', function() {
+                if (!sound) {
+                    alert('Please generate speech first.');
+                    return;
+                }
+
+                // In a real implementation, you would share the audio file
+                alert('Share functionality would be implemented here.');
+            });
+
+            // Update progress bar
+            function updateProgressBar() {
+                if (!sound) return;
+
+                const interval = setInterval(() => {
+                    if (!sound.playing()) {
+                        clearInterval(interval);
+                        return;
+                    }
+
+                    const progress = (sound.seek() / sound.duration()) * 100;
+                    progressBar.style.width = `${progress}%`;
+                }, 100);
+            }
+
+            // Create waveform visualization
+            function createWaveformVisualization() {
+                if (!sound) return;
+
+                // In a real implementation, you would analyze the audio data
+                // and create a proper waveform visualization
+
+                // For demonstration, we'll create a simple visualization
+                waveform.innerHTML = '';
+                const duration = sound.duration();
+                const segments = 50;
+                const segmentWidth = 100 / segments;
+
+                for (let i = 0; i < segments; i++) {
+                    const segment = document.createElement('div');
+                    segment.style.position = 'absolute';
+                    segment.style.left = `${i * segmentWidth}%`;
+                    segment.style.width = `${segmentWidth}%`;
+                    segment.style.bottom = '50%';
+                    segment.style.height = `${Math.random() * 100}%`;
+                    segment.style.backgroundColor = `rgba(66, 133, 244, ${Math.random() * 0.5 + 0.3})`;
+                    waveform.appendChild(segment);
+                }
+            }
+
+            // Initialize Howler.js
+            const Howler = {
+                ctx: new (window.AudioContext || window.webkitAudioContext)(),
+                autoSuspend: false,
+                noAudio: false
+            };
+
+            // Howler.js core
+            class Howl {
+                constructor(options) {
+                    this._src = options.src || '';
+                    this._html5 = options.html5 || false;
+                    this._onload = options.onload || function() {};
+                    this._onend = options.onend || function() {};
+                    this._onplay = options.onplay || function() {};
+                    this._onpause = options.onpause || function() {};
+                    this._volume = options.volume || 1;
+                    this._playing = false;
+                    this._duration = 0;
+                    this._seek = 0;
+                    this._audio = null;
+                    this._buffer = null;
+                    this._source = null;
+                    this._startTime = 0;
+                    this._pauseTime = 0;
+                }
+
+                load() {
+                    if (this._html5) {
+                        this._audio = new Audio();
+                        this._audio.src = this._src;
+                        this._audio.preload = 'auto';
+                        this._audio.volume = this._volume;
+
+                        this._audio.addEventListener('canplaythrough', () => {
+                            this._duration = this._audio.duration;
+                            this._onload();
+                        });
+
+                        this._audio.addEventListener('ended', () => {
+                            this._playing = false;
+                            this._onend();
+                        });
+
+                        this._audio.addEventListener('play', () => {
+                            this._playing = true;
+                            this._onplay();
+                        });
+
+                        this._audio.addEventListener('pause', () => {
+                            this._playing = false;
+                            this._onpause();
+                        });
+                    } else {
+                        const request = new XMLHttpRequest();
+                        request.open('GET', this._src, true);
+                        request.responseType = 'arraybuffer';
+
+                        request.onload = () => {
+                            Howler.ctx.decodeAudioData(request.response, (buffer) => {
+                                this._buffer = buffer;
+                                this._duration = buffer.duration;
+                                this._onload();
+                            });
+                        };
+
+                        request.send();
+                    }
+                }
+
+                play() {
+                    if (this._html5) {
+                        if (this._audio) {
+                            this._audio.currentTime = this._seek;
+                            this._audio.play();
+                        }
+                    } else {
+                        if (this._buffer) {
+                            this._source = Howler.ctx.createBufferSource();
+                            this._source.buffer = this._buffer;
+                            this._source.connect(Howler.ctx.destination);
+                            this._source.start(0, this._seek);
+                            this._startTime = Howler.ctx.currentTime - this._seek;
+                            this._playing = true;
+                            this._onplay();
+
+                            this._source.onended = () => {
+                                this._playing = false;
+                                this._onend();
+                            };
+                        }
+                    }
+                }
+
+                pause() {
+                    if (this._html5) {
+                        if (this._audio) {
+                            this._audio.pause();
+                            this._seek = this._audio.currentTime;
+                        }
+                    } else {
+                        if (this._source) {
+                            this._source.stop();
+                            this._seek = Howler.ctx.currentTime - this._startTime;
+                            this._playing = false;
+                            this._onpause();
+                        }
+                    }
+                }
+
+                stop() {
+                    if (this._html5) {
+                        if (this._audio) {
+                            this._audio.pause();
+                            this._audio.currentTime = 0;
+                            this._seek = 0;
+                        }
+                    } else {
+                        if (this._source) {
+                            this._source.stop();
+                            this._seek = 0;
+                            this._playing = false;
+                            this._onend();
+                        }
+                    }
+                }
+
+                playing() {
+                    return this._playing;
+                }
+
+                duration() {
+                    return this._duration;
+                }
+
+                seek() {
+                    if (this._html5) {
+                        if (this._audio) {
+                            return this._audio.currentTime;
+                        }
+                    } else {
+                        if (this._playing) {
+                            return Howler.ctx.currentTime - this._startTime;
+                        } else {
+                            return this._seek;
+                        }
+                    }
+                    return 0;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

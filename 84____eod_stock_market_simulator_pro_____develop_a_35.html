@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EOD Stock Market Simulator Pro - Advanced stock market simulation with virtual portfolio management">
+    <title>EOD Stock Market Simulator Pro</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #27ae60;
+            --text-color: #333;
+            --text-light: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .portfolio-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .summary-item {
+            padding: 1rem;
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        .market-data {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .market-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .market-table th, .market-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .market-table th {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+        }
+
+        .market-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .market-table tr:hover {
+            background-color: #e9e9e9;
+        }
+
+        .trade-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: var(--text-light);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .chart-container {
+            height: 400px;
+            width: 100%;
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1rem;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard {
+                grid-template-columns: 2fr 1fr;
+            }
+
+            .market-data {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        .dark-mode {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #1a1a1a;
+            --light-color: #333;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #27ae60;
+            --text-color: #f0f0f0;
+            --text-light: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">EOD Stock Market Simulator Pro</h1>
+                <nav>
+                    <ul>
+                        <li><a href="#dashboard">Dashboard</a></li>
+                        <li><a href="#portfolio">Portfolio</a></li>
+                        <li><a href="#market">Market</a></li>
+                        <li><a href="#analysis">Analysis</a></li>
+                        <li><button class="theme-toggle" id="themeToggle">🌓</button></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="dashboard" class="dashboard">
+            <div class="card">
+                <h2 class="card-title">Portfolio Summary</h2>
+                <div class="portfolio-summary" id="portfolioSummary">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Market Overview</h2>
+                <div class="market-data" id="marketOverview">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="card">
+            <h2 class="card-title">Your Portfolio</h2>
+            <div class="portfolio-table" id="portfolioTable">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="market" class="card">
+            <h2 class="card-title">Market Data</h2>
+            <div class="market-table-container">
+                <table class="market-table" id="marketTable">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Company</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>% Change</th>
+                            <th>Volume</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" class="loading">
+                                <div class="spinner"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="analysis" class="card">
+            <h2 class="card-title">Market Analysis</h2>
+            <div class="chart-container" id="marketChart">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="trade" class="card">
+            <h2 class="card-title">Trade Stocks</h2>
+            <form class="trade-form" id="tradeForm">
+                <div class="form-group">
+                    <label for="stockSymbol">Stock Symbol</label>
+                    <input type="text" id="stockSymbol" required>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="orderType">Order Type</label>
+                    <select id="orderType" required>
+                        <option value="buy">Buy</option>
+                        <option value="sell">Sell</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Execute Trade</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 EOD Stock Market Simulator Pro. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+            });
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Simulate loading data
+            setTimeout(() => {
+                loadPortfolioSummary();
+                loadMarketOverview();
+                loadPortfolioTable();
+                loadMarketTable();
+                loadMarketChart();
+            }, 1000);
+
+            // Form submission
+            const tradeForm = document.getElementById('tradeForm');
+            tradeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                executeTrade();
+            });
+
+            // Simulated data functions
+            function loadPortfolioSummary() {
+                const portfolioSummary = document.getElementById('portfolioSummary');
+                portfolioSummary.innerHTML = `
+                    <div class="summary-item">
+                        <h3>Total Value</h3>
+                        <p class="summary-value">$125,432.78</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Daily Change</h3>
+                        <p class="summary-value" style="color: var(--success-color);">+$1,234.56</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Total Shares</h3>
+                        <p class="summary-value">452</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Cash Balance</h3>
+                        <p class="summary-value">$5,678.90</p>
+                    </div>
+                `;
+            }
+
+            function loadMarketOverview() {
+                const marketOverview = document.getElementById('marketOverview');
+                marketOverview.innerHTML = `
+                    <div class="summary-item">
+                        <h3>Market Index</h3>
+                        <p class="summary-value">32,456.78</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Daily Change</h3>
+                        <p class="summary-value" style="color: var(--danger-color);">-123.45</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>% Change</h3>
+                        <p class="summary-value" style="color: var(--danger-color);">-0.38%</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Volume</h3>
+                        <p class="summary-value">1.2B</p>
+                    </div>
+                `;
+            }
+
+            function loadPortfolioTable() {
+                const portfolioTable = document.getElementById('portfolioTable');
+                portfolioTable.innerHTML = `
+                    <table class="market-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Company</th>
+                                <th>Shares</th>
+                                <th>Avg Cost</th>
+                                <th>Current Price</th>
+                                <th>Value</th>
+                                <th>Change</th>
+                                <th>% Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>AAPL</td>
+                                <td>Apple Inc.</td>
+                                <td>15</td>
+                                <td>$150.25</td>
+                                <td>$175.45</td>
+                                <td>$2,631.75</td>
+                                <td style="color: var(--success-color);">+$25.20</td>
+                                <td style="color: var(--success-color);">+17.43%</td>
+                            </tr>
+                            <tr>
+                                <td>MSFT</td>
+                                <td>Microsoft Corporation</td>
+                                <td>8</td>
+                                <td>$250.50</td>
+                                <td>$275.75</td>
+                                <td>$2,206.00</td>
+                                <td style="color: var(--success-color);">+$25.25</td>
+                                <td style="color: var(--success-color);">+10.10%</td>
+                            </tr>
+                            <tr>
+                                <td>GOOGL</td>
+                                <td>Alphabet Inc.</td>
+                                <td>5</td>
+                                <td>$2,800.00</td>
+                                <td>$2,650.50</td>
+                                <td>$13,252.50</td>
+                                <td style="color: var(--danger-color);">-$149.50</td>
+                                <td style="color: var(--danger-color);">-5.34%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            function loadMarketTable() {
+                const marketTable = document.getElementById('marketTable');
+                marketTable.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Company</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>% Change</th>
+                            <th>Volume</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>AAPL</td>
+                            <td>Apple Inc.</td>
+                            <td>$175.45</td>
+                            <td style="color: var(--success-color);">+25.20</td>
+                            <td style="color: var(--success-color);">+17.43%</td>
+                            <td>78,456,234</td>
+                        </tr>
+                        <tr>
+                            <td>MSFT</td>
+                            <td>Microsoft Corporation</td>
+                            <td>$275.75</td>
+                            <td style="color: var(--success-color);">+25.25</td>
+                            <td style="color: var(--success-color);">+10.10%</td>
+                            <td>54,231,876</td>
+                        </tr>
+                        <tr>
+                            <td>GOOGL</td>
+                            <td>Alphabet Inc.</td>
+                            <td>$2,650.50</td>
+                            <td style="color: var(--danger-color);">-$149.50</td>
+                            <td style="color: var(--danger-color);">-5.34%</td>
+                            <td>12,345,678</td>
+                        </tr>
+                        <tr>
+                            <td>AMZN</td>
+                            <td>Amazon.com Inc.</td>
+                            <td>$3,200.75</td>
+                            <td style="color: var(--success-color);">+50.25</td>
+                            <td style="color: var(--success-color);">+1.60%</td>
+                            <td>8,765,432</td>
+                        </tr>
+                        <tr>
+                            <td>TSLA</td>
+                            <td>Tesla Inc.</td>
+                            <td>$750.25</td>
+                            <td style="color: var(--danger-color);">-$24.75</td>
+                            <td style="color: var(--danger-color);">-3.15%</td>
+                            <td>15,234,567</td>
+                        </tr>
+                    </tbody>
+                `;
+            }
+
+            function loadMarketChart() {
+                const marketChart = document.getElementById('marketChart');
+                marketChart.innerHTML = `
+                    <div style="height: 100%; width: 100%; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: var(--border-radius); display: flex; justify-content: center; align-items: center;">
+                        <p style="font-size: 1.2rem; color: var(--text-color);">Market Chart Visualization</p>
+                    </div>
+                `;
+            }
+
+            function executeTrade() {
+                const stockSymbol = document.getElementById('stockSymbol').value;
+                const quantity = document.getElementById('quantity').value;
+                const orderType = document.getElementById('orderType').value;
+
+                // Simulate trade execution
+                setTimeout(() => {
+                    alert(`Trade executed: ${orderType.toUpperCase()} ${quantity} shares of ${stockSymbol}`);
+                    tradeForm.reset();
+                    // Refresh portfolio data
+                    loadPortfolioSummary();
+                    loadPortfolioTable();
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

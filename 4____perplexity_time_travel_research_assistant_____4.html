@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Perplexity Time Travel Research Assistant">
+    <title>Perplexity Time Travel Research Assistant</title>
+    <style>
+        :root {
+            --primary: #3273dc;
+            --primary-invert: #f5f5f5;
+            --danger: #f14668;
+            --light: #f5f5f5;
+            --dark: #363636;
+            --radius: 4px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            padding: 0;
+            margin: 0;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: var(--primary-invert);
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .columns {
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: -0.75rem;
+            margin-right: -0.75rem;
+            margin-top: -1.5rem;
+        }
+
+        .column {
+            flex: none;
+            padding: 0.75rem;
+        }
+
+        .is-full {
+            flex: none;
+            width: 100%;
+        }
+
+        .is-half {
+            flex: none;
+            width: 50%;
+        }
+
+        .box {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
+            color: #4a4a4a;
+            display: block;
+            padding: 1.25rem;
+        }
+
+        .field {
+            margin-bottom: 1rem;
+        }
+
+        .control {
+            position: relative;
+            text-align: left;
+        }
+
+        .label {
+            color: var(--dark);
+            display: block;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .input, .textarea {
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            border-radius: var(--radius);
+            color: var(--dark);
+            display: block;
+            font-size: 1rem;
+            height: 2.5em;
+            line-height: 1.5;
+            padding: calc(0.5em - 1px);
+            width: 100%;
+        }
+
+        .textarea {
+            height: auto;
+            min-height: 120px;
+            padding: calc(0.75em - 1px);
+        }
+
+        .select {
+            display: inline-flex;
+            position: relative;
+            vertical-align: top;
+            width: 100%;
+        }
+
+        .select select {
+            display: inline-flex;
+            padding-left: 1.5em;
+            padding-right: 1.5em;
+            width: 100%;
+        }
+
+        .button {
+            background-color: var(--primary);
+            border: 1px solid transparent;
+            border-radius: var(--radius);
+            color: var(--primary-invert);
+            cursor: pointer;
+            display: inline-block;
+            font-size: 1rem;
+            height: 2.5em;
+            line-height: 1.5;
+            padding-bottom: calc(0.5em - 1px);
+            padding-left: 1em;
+            padding-right: 1em;
+            padding-top: calc(0.5em - 1px);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .button.is-danger {
+            background-color: var(--danger);
+        }
+
+        .button.is-loading::after {
+            animation: spinAround 0.5s infinite linear;
+            border: 2px solid var(--primary-invert);
+            border-radius: 290486px;
+            border-right-color: transparent;
+            border-top-color: transparent;
+            content: "";
+            display: block;
+            height: 1em;
+            position: relative;
+            width: 1em;
+        }
+
+        .timeline-container {
+            height: 500px;
+            margin-top: 2rem;
+            position: relative;
+        }
+
+        .timeline {
+            height: 100%;
+            width: 100%;
+        }
+
+        .event-marker {
+            fill: var(--primary);
+            stroke: white;
+            stroke-width: 2px;
+        }
+
+        .event-marker:hover {
+            fill: var(--danger);
+            cursor: pointer;
+        }
+
+        .event-tooltip {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
+            padding: 0.75rem;
+            position: absolute;
+            z-index: 10;
+        }
+
+        .event-tooltip h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-tooltip p {
+            margin-bottom: 0.5rem;
+        }
+
+        .cluster-container {
+            height: 500px;
+            margin-top: 2rem;
+        }
+
+        .cluster {
+            height: 100%;
+            width: 100%;
+        }
+
+        .cluster-node {
+            fill: var(--primary);
+            stroke: white;
+            stroke-width: 2px;
+        }
+
+        .cluster-node:hover {
+            fill: var(--danger);
+            cursor: pointer;
+        }
+
+        .cluster-tooltip {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
+            padding: 0.75rem;
+            position: absolute;
+            z-index: 10;
+        }
+
+        .cluster-tooltip h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cluster-tooltip p {
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes spinAround {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(359deg);
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .columns {
+                flex-direction: column;
+            }
+
+            .is-half {
+                flex: none;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Perplexity Time Travel Research Assistant</h1>
+            <p class="subtitle">Explore historical events and patterns</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="section">
+                <div class="box">
+                    <h2 class="title">Research Parameters</h2>
+                    <div class="columns">
+                        <div class="column is-half">
+                            <div class="field">
+                                <label class="label">Time Period</label>
+                                <div class="control">
+                                    <div class="select">
+                                        <select id="time-period">
+                                            <option value="ancient">Ancient (5000 BCE - 500 CE)</option>
+                                            <option value="medieval">Medieval (500 - 1500)</option>
+                                            <option value="early-modern">Early Modern (1500 - 1800)</option>
+                                            <option value="modern">Modern (1800 - Present)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-half">
+                            <div class="field">
+                                <label class="label">Region</label>
+                                <div class="control">
+                                    <div class="select">
+                                        <select id="region">
+                                            <option value="global">Global</option>
+                                            <option value="africa">Africa</option>
+                                            <option value="asia">Asia</option>
+                                            <option value="europe">Europe</option>
+                                            <option value="north-america">North America</option>
+                                            <option value="south-america">South America</option>
+                                            <option value="oceania">Oceania</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="column is-half">
+                            <div class="field">
+                                <label class="label">Event Type</label>
+                                <div class="control">
+                                    <div class="select">
+                                        <select id="event-type">
+                                            <option value="all">All Events</option>
+                                            <option value="war">Wars and Conflicts</option>
+                                            <option value="discovery">Scientific Discoveries</option>
+                                            <option value="political">Political Events</option>
+                                            <option value="cultural">Cultural Events</option>
+                                            <option value="technological">Technological Advances</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-half">
+                            <div class="field">
+                                <label class="label">Search Query</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="search-query" placeholder="Enter search terms">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="column is-full">
+                            <div class="field">
+                                <div class="control">
+                                    <button class="button" id="search-button">Search</button>
+                                    <button class="button is-danger" id="clear-button">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="box">
+                    <h2 class="title">Timeline Visualization</h2>
+                    <div class="timeline-container">
+                        <svg class="timeline"></svg>
+                        <div class="event-tooltip" id="event-tooltip"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="box">
+                    <h2 class="title">Event Clusters</h2>
+                    <div class="cluster-container">
+                        <svg class="cluster"></svg>
+                        <div class="cluster-tooltip" id="cluster-tooltip"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="box">
+                    <h2 class="title">Research Results</h2>
+                    <div class="content" id="research-results">
+                        <p>Your research results will appear here after performing a search.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const searchButton = document.getElementById('search-button');
+            const clearButton = document.getElementById('clear-button');
+            const timePeriodSelect = document.getElementById('time-period');
+            const regionSelect = document.getElementById('region');
+            const eventTypeSelect = document.getElementById('event-type');
+            const searchQueryInput = document.getElementById('search-query');
+            const researchResults = document.getElementById('research-results');
+            const timelineContainer = document.querySelector('.timeline-container');
+            const timeline = document.querySelector('.timeline');
+            const eventTooltip = document.getElementById('event-tooltip');
+            const clusterContainer = document.querySelector('.cluster-container');
+            const cluster = document.querySelector('.cluster');
+            const clusterTooltip = document.getElementById('cluster-tooltip');
+
+            // Sample historical data
+            const historicalData = {
+                ancient: [
+                    { id: 1, year: -3000, event: "Construction of the Great Pyramid of Giza begins", type: "cultural" },
+                    { id: 2, year: -2500, event: "Rise of the Akkadian Empire", type: "political" },
+                    { id: 3, year: -1200, event: "Bronze Age Collapse", type: "political" },
+                    { id: 4, year: -500, event: "Birth of Alexander the Great", type: "political" },
+                    { id: 5, year: -400, event: "Birth of Socrates", type: "cultural" },
+                    { id: 6, year: -336, event: "Alexander the Great conquers Persia", type: "war" },
+                    { id: 7, year: -210, event: "Death of Alexander the Great", type: "political" },
+                    { id: 8, year: -100, event: "Birth of Julius Caesar", type: "political" },
+                    { id: 9, year: -44, event: "Julius Caesar crosses the Rubicon", type: "political" },
+                    { id: 10, year: 44, event: "Death of Julius Caesar", type: "political" }
+                ],
+                medieval: [
+                    { id: 11, year: 476, event: "Fall of the Western Roman Empire", type: "political" },
+                    { id: 12, year: 568, event: "Birth of Muhammad", type: "religious" },
+                    { id: 13, year: 622, event: "Hijra (emigration of Muhammad)", type: "religious" },
+                    { id: 14, year: 800, event: "Coronation of Charlemagne as Holy Roman Emperor", type: "political" },
+                    { id: 15, year: 1066, event: "Norman conquest of England", type: "war" },
+                    { id: 16, year: 1095, event: "First Crusade begins", type: "war" },
+                    { id: 17, year: 1215, event: "Magna Carta signed", type: "political" },
+                    { id: 18, year: 1347, event: "Black Death begins in Europe", type: "historical" },
+                    { id: 19, year: 1453, event: "Fall of Constantinople to the Ottomans", type: "war" },
+                    { id: 20, year: 1492, event: "Expulsion of Jews from Spain", type: "historical" }
+                ],
+                'early-modern': [
+                    { id: 21, year: 1517, event: "Martin Luther posts his 95 Theses", type: "religious" },
+                    { id: 22, year: 1588, event: "Defeat of the Spanish Armada", type: "war" },
+                    { id: 23, year: 1607, event: "First successful blood transfusion", type: "medical" },
+                    { id: 24, year: 1620, event: "Mayflower arrives in America", type: "historical" },
+                    { id: 25, year: 1649, event: "English Civil War ends with the execution of Charles I", type: "political" },
+                    { id: 26, year: 1776, event: "Declaration of Independence signed", type: "political" },
+                    { id: 27, year: 1789, event: "Storming of the Bastille", type: "political" },
+                    { id: 28, year: 1804, event: "Haitian Revolution begins", type: "war" },
+                    { id: 29, year: 1815, event: "Napoleon Bonaparte abdicates", type: "political" },
+                    { id: 30, year: 1861, event: "American Civil War begins", type: "war" }
+                ],
+                modern: [
+                    { id: 31, year: 1876, event: "Alexander Graham Bell patents the telephone", type: "technological" },
+                    { id: 32, year: 1903, event: "Wright brothers make first powered flight", type: "technological" },
+                    { id: 33, year: 1914, event: "World War I begins", type: "war" },
+                    { id: 34, year: 1917, event: "Russian Revolution", type: "political" },
+                    { id: 35, year: 1918, event: "World War I ends", type: "war" },
+                    { id: 36, year: 1929, event: "Stock market crash leads to the Great Depression", type: "economical" },
+                    { id: 37, year: 1939, event: "World War II begins", type: "war" },
+                    { id: 38, year: 1945, event: "World War II ends", type: "war" },
+                    { id: 39, year: 1957, event: "Sputnik launched, beginning the Space Age", type: "technological" },
+                    { id: 40, year: 1969, event: "Apollo 11 moon landing", type: "technological" },
+                    { id: 41, year: 1989, event: "Fall of the Berlin Wall", type: "political" },
+                    { id: 42, year: 1991, event: "Dissolution of the Soviet Union", type: "political" },
+                    { id: 43, year: 2001, event: "September 11 attacks", type: "historical" },
+                    { id: 44, year: 2008, event: "Global financial crisis begins", type: "economical" },
+                    { id: 45, year: 2020, event: "COVID-19 pandemic begins", type: "historical" }
+                ]
+            };
+
+            // Sample cluster data
+            const clusterData = {
+                ancient: {
+                    nodes: [
+                        { id: 1, name: "Ancient Egypt", group: 1 },
+                        { id: 2, name: "Mesopotamia", group: 1 },
+                        { id: 3, name: "Ancient Greece", group: 2 },
+                        { id: 4, name: "Ancient Rome", group: 2 },
+                        { id: 5, name: "Indus Valley", group: 3 },
+                        { id: 6, name: "China", group: 3 }
+                    ],
+                    links: [
+                        { source: 1, target: 2 },
+                        { source: 3, target: 4 },
+                        { source: 5, target: 6 }
+                    ]
+                },
+                medieval: {
+                    nodes: [
+                        { id: 1, name: "Viking Age", group: 1 },
+                        { id: 2, name: "Crusades", group: 1 },
+                        { id: 3, name: "Feudalism", group: 2 },
+                        { id: 4, name: "Black Death", group: 2 },
+                        { id: 5, name: "Mongol Empire", group: 3 },
+                        { id: 6, name: "Ottoman Empire", group: 3 }
+                    ],
+                    links: [
+                        { source: 1, target: 2 },
+                        { source: 3, target: 4 },
+                        { source: 5, target: 6 }
+                    ]
+                },
+                'early-modern': {
+                    nodes: [
+                        { id: 1, name: "Renaissance", group: 1 },
+                        { id: 2, name: "Reformation", group: 1 },
+                        { id: 3, name: "Colonialism", group: 2 },
+                        { id: 4, name: "Scientific Revolution", group: 2 },
+                        { id: 5, name: "Enlightenment", group: 3 },
+                        { id: 6, name: "Industrial Revolution", group: 3 }
+                    ],
+                    links: [
+                        { source: 1, target: 2 },
+                        { source: 3, target: 4 },
+                        { source: 5, target: 6 }
+                    ]
+                },
+                modern: {
+                    nodes: [
+                        { id: 1, name: "World War I", group: 1 },
+                        { id: 2, name: "Russian Revolution", group: 1 },
+                        { id: 3, name: "Great Depression", group: 2 },
+                        { id: 4, name: "World War II", group: 2 },
+                        { id: 5, name: "Cold War", group: 3 },
+                        { id: 6, name: "Digital Revolution", group: 3 }
+                    ],
+                    links: [
+                        { source: 1, target: 2 },
+                        { source: 3, target: 4 },
+                        { source: 5, target: 6 }
+                    ]
+                }
+            };
+
+            // Initialize visualization
+            let currentData = historicalData.ancient;
+            let currentClusterData = clusterData.ancient;
+            renderTimeline(currentData);
+            renderCluster(currentClusterData);
+
+            // Event listeners
+            searchButton.addEventListener('click', handleSearch);
+            clearButton.addEventListener('click', handleClear);
+            timePeriodSelect.addEventListener('change', updateVisualizations);
+            regionSelect.addEventListener('change', updateVisualizations);
+            eventTypeSelect.addEventListener('change', updateVisualizations);
+
+            // Functions
+            function handleSearch() {
+                const timePeriod = timePeriodSelect.value;
+                const region = regionSelect.value;
+                const eventType = eventTypeSelect.value;
+                const query = searchQueryInput.value.trim();
+
+                // Simulate API call with loading state
+                searchButton.classList.add('is-loading');
+                researchResults.innerHTML = '<p>Searching for historical information...</p>';
+
+                // Simulate API response delay
+                setTimeout(() => {
+                    // In a real application, you would call the Perplexity search API here
+                    // For this example, we'll use the sample data and filter it based on the search parameters
+
+                    // Filter the data based on the search parameters
+                    let filteredData = historicalData[timePeriod];
+
+                    if (region !== 'global') {
+                        filteredData = filteredData.filter(event => {
+                            // In a real application, you would check the event's region
+                            // For this example, we'll just return all events
+                            return true;
+                        });
+                    }
+
+                    if (eventType !== 'all') {
+                        filteredData = filteredData.filter(event => event.type === eventType);
+                    }
+
+                    if (query) {
+                        filteredData = filteredData.filter(event =>
+                            event.event.toLowerCase().includes(query.toLowerCase())
+                        );
+                    }
+
+                    // Update the timeline with the filtered data
+                    currentData = filteredData;
+                    renderTimeline(currentData);
+
+                    // Display research results
+                    if (filteredData.length > 0) {
+                        let resultsHTML = '<ul>';
+                        filteredData.forEach(event => {
+                            resultsHTML += `<li><strong>${event.year}:</strong> ${event.event}</li>`;
+                        });
+                        resultsHTML += '</ul>';
+                        researchResults.innerHTML = resultsHTML;
+                    } else {
+                        researchResults.innerHTML = '<p>No historical events found matching your criteria.</p>';
+                    }
+
+                    searchButton.classList.remove('is-loading');
+                }, 1500);
+            }
+
+            function handleClear() {
+                searchQueryInput.value = '';
+                eventTypeSelect.value = 'all';
+                regionSelect.value = 'global';
+                timePeriodSelect.value = 'ancient';
+
+                // Reset to default data
+                currentData = historicalData.ancient;
+                currentClusterData = clusterData.ancient;
+                renderTimeline(currentData);
+                renderCluster(currentClusterData);
+
+                researchResults.innerHTML = '<p>Your research results will appear here after performing a search.</p>';
+            }
+
+            function updateVisualizations() {
+                const timePeriod = timePeriodSelect.value;
+
+                // Update timeline and cluster visualizations
+                currentData = historicalData[timePeriod];
+                currentClusterData = clusterData[timePeriod];
+                renderTimeline(currentData);
+                renderCluster(currentClusterData);
+            }
+
+            function renderTimeline(data) {
+                // Clear previous timeline
+                timeline.innerHTML = '';
+
+                // Set up dimensions
+                const width = timelineContainer.clientWidth;
+                const height = timelineContainer.clientHeight;
+                const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+
+                // Create scales
+                const xScale = d3.scaleLinear()
+                    .domain(d3.extent(data, d => d.year))
+                    .range([margin.left, width - margin.right]);
+
+                const yScale = d3.scaleLinear()
+                    .domain([0, data.length])
+                    .range([height - margin.bottom, margin.top]);
+
+                // Create axes
+                const xAxis = d3.axisBottom(xScale)
+                    .tickFormat(d3.format("d"));
+
+                const yAxis = d3.axisLeft(yScale)
+                    .ticks(data.length);
+
+                // Create SVG group for the timeline
+                const g = d3.select(timeline)
+                    .attr("width", width)
+                    .attr("height", height)
+                    .append("g");
+
+                // Add axes
+                g.append("g")
+                    .attr("transform", `translate(0,${height - margin.bottom})`)
+                    .call(xAxis);
+
+                g.append("g")
+                    .attr("transform", `translate(${margin.left},0)`)
+                    .call(yAxis);
+
+                // Add event markers
+                g.selectAll(".event-marker")
+                    .data(data)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "event-marker")
+                    .attr("cx", d => xScale(d.year))
+                    .attr("cy", (d, i) => yScale(i))
+                    .attr("r", 6)
+                    .on("mouseover", showEventTooltip)
+                    .on("mouseout", hideEventTooltip);
+            }
+
+            function showEventTooltip(event, d) {
+                eventTooltip.innerHTML = `
+                    <h3>${d.year}</h3>
+                    <p>${d.event}</p>
+                    <p><strong>Type:</strong> ${d.type}</p>
+                `;
+
+                const x = event.clientX;
+                const y = event.clientY;
+
+                eventTooltip.style.display = 'block';
+                eventTooltip.style.left = `${x + 10}px`;
+                eventTooltip.style.top = `${y + 10}px`;
+            }
+
+            function hideEventTooltip() {
+                eventTooltip.style.display = 'none';
+            }
+
+            function renderCluster(data) {
+                // Clear previous cluster
+                cluster.innerHTML = '';
+
+                // Set up dimensions
+                const width = clusterContainer.clientWidth;
+                const height = clusterContainer.clientHeight;
+                const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+
+                // Create SVG group for the cluster
+                const g = d3.select(cluster)
+                    .attr("width", width)
+                    .attr("height", height)
+                    .append("g");
+
+                // Create force simulation
+                const simulation = d3.forceSimulation(data.nodes)
+                    .force("link", d3.forceLink(data.links).id(d => d.id).distance(100))
+                    .force("charge", d3.forceManyBody().strength(-300))
+                    .force("center", d3.forceCenter(width / 2, height / 2));
+
+                // Add links
+                const link = g.append("g")
+                    .selectAll("line")
+                    .data(data.links)
+                    .enter()
+                    .append("line")
+                    .attr("stroke", "#999")
+                    .attr("stroke-opacity", 0.6)
+                    .attr("stroke-width", d => Math.sqrt(d.value));
+
+                // Add nodes
+                const node = g.append("g")
+                    .selectAll("circle")
+                    .data(data.nodes)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "cluster-node")
+                    .attr("r", 10)
+                    .on("mouseover", showClusterTooltip)
+                    .on("mouseout", hideClusterTooltip)
+                    .call(drag(simulation));
+
+                // Add labels
+                const label = g.append("g")
+                    .selectAll("text")
+                    .data(data.nodes)
+                    .enter()
+                    .append("text")
+                    .text(d => d.name)
+                    .attr("text-anchor", "middle")
+                    .attr("dy", -15)
+                    .style("font-size", "12px");
+
+                // Update positions on each tick
+                simulation.on("tick", () => {
+                    link
+                        .attr("x1", d => d.source.x)
+                        .attr("y1", d => d.source.y)
+                        .attr("x2", d => d.target.x)
+                        .attr("y2", d => d.target.y);
+
+                    node
+                        .attr("cx", d => d.x)
+                        .attr("cy", d => d.y);
+
+                    label
+                        .attr("x", d => d.x)
+                        .attr("y", d => d.y);
+                });
+            }
+
+            function showClusterTooltip(event, d) {
+                clusterTooltip.innerHTML = `
+                    <h3>${d.name}</h3>
+                    <p><strong>Group:</strong> ${d.group}</p>
+                `;
+
+                const x = event.clientX;
+                const y = event.clientY;
+
+                clusterTooltip.style.display = 'block';
+                clusterTooltip.style.left = `${x + 10}px`;
+                clusterTooltip.style.top = `${y + 10}px`;
+            }
+
+            function hideClusterTooltip() {
+                clusterTooltip.style.display = 'none';
+            }
+
+            function drag(simulation) {
+                function dragstarted(event, d) {
+                    if (!event.active) simulation.alphaTarget(0.3).restart();
+                    d.fx = d.x;
+                    d.fy = d.y;
+                }
+
+                function dragged(event, d) {
+                    d.fx = event.x;
+                    d.fy = event.y;
+                }
+
+                function dragended(event, d) {
+                    if (!event.active) simulation.alphaTarget(0);
+                    d.fx = null;
+                    d.fy = null;
+                }
+
+                return d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended);
+            }
+        });
+    </script>
+</body>
+</html>

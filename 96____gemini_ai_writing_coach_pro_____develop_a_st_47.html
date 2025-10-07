@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini AI Writing Coach Pro - Professional AI-assisted writing and editing tool">
+    <title>Gemini AI Writing Coach Pro</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --background-color: #f8f9fa;
+            --text-color: #202124;
+            --light-text: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1rem 0;
+            box-shadow: var(--box-shadow);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--light-text);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .editor {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1rem;
+            height: 60vh;
+            overflow-y: auto;
+        }
+
+        .editor textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: inherit;
+        }
+
+        .sidebar {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .tool-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-section h4 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .tool-options {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tool-option {
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-option label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .tool-option input {
+            margin-right: 0.5rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: #3367d6;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #2d9248;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+        }
+
+        .btn-accent:hover {
+            background-color: #d33a2f;
+        }
+
+        .results {
+            margin-top: 2rem;
+        }
+
+        .results h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .result-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-item h4 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+                cursor: pointer;
+            }
+
+            .mobile-menu.active .bar1 {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+
+            .mobile-menu.active .bar2 {
+                opacity: 0;
+            }
+
+            .mobile-menu.active .bar3 {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
+
+            .mobile-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary-color);
+                padding: 1rem;
+                z-index: 100;
+            }
+
+            .mobile-nav.active {
+                display: block;
+            }
+
+            .mobile-nav-links {
+                list-style: none;
+            }
+
+            .mobile-nav-links li {
+                margin-bottom: 1rem;
+            }
+
+            .mobile-nav-links a {
+                color: var(--light-text);
+                text-decoration: none;
+                transition: var(--transition);
+            }
+
+            .mobile-nav-links a:hover {
+                text-decoration: underline;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="container">
+                <nav>
+                    <div class="logo">Gemini AI Writing Coach Pro</div>
+                    <div class="mobile-menu" @click="toggleMobileMenu">
+                        <div class="bar1"></div>
+                        <div class="bar2"></div>
+                        <div class="bar3"></div>
+                    </div>
+                    <ul class="nav-links">
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Writing Tools</a></li>
+                        <li><a href="#">Account</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-nav" :class="{ active: isMobileMenuOpen }">
+                    <ul class="mobile-nav-links">
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Writing Tools</a></li>
+                        <li><a href="#">Account</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="container">
+                <div class="dashboard" v-if="currentView === 'dashboard'">
+                    <div class="card">
+                        <h3>Quick Start</h3>
+                        <p>Start a new document or continue working on an existing one.</p>
+                        <button @click="startNewDocument">New Document</button>
+                        <button class="btn-secondary" @click="continueDocument">Continue</button>
+                    </div>
+                    <div class="card">
+                        <h3>Recent Documents</h3>
+                        <ul>
+                            <li v-for="doc in recentDocuments" :key="doc.id">
+                                <a href="#" @click.prevent="openDocument(doc.id)">{{ doc.title }}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Writing Tips</h3>
+                        <p>Get tips and suggestions for improving your writing skills.</p>
+                        <button @click="showWritingTips">View Tips</button>
+                    </div>
+                </div>
+
+                <div class="editor-container" v-if="currentView === 'editor'">
+                    <div class="editor">
+                        <textarea v-model="documentContent" placeholder="Start writing here..."></textarea>
+                    </div>
+                    <div class="sidebar">
+                        <h3>Writing Tools</h3>
+
+                        <div class="tool-section">
+                            <h4>Grammar Check</h4>
+                            <div class="tool-options">
+                                <div class="tool-option">
+                                    <label>
+                                        <input type="checkbox" v-model="grammarCheckEnabled">
+                                        Enable Grammar Check
+                                    </label>
+                                </div>
+                            </div>
+                            <button @click="checkGrammar">Check Grammar</button>
+                        </div>
+
+                        <div class="tool-section">
+                            <h4>Style Suggestions</h4>
+                            <div class="tool-options">
+                                <div class="tool-option">
+                                    <label>
+                                        <input type="checkbox" v-model="styleSuggestionsEnabled">
+                                        Enable Style Suggestions
+                                    </label>
+                                </div>
+                            </div>
+                            <button @click="getStyleSuggestions">Get Suggestions</button>
+                        </div>
+
+                        <div class="tool-section">
+                            <h4>Plagiarism Detection</h4>
+                            <div class="tool-options">
+                                <div class="tool-option">
+                                    <label>
+                                        <input type="checkbox" v-model="plagiarismCheckEnabled">
+                                        Enable Plagiarism Check
+                                    </label>
+                                </div>
+                            </div>
+                            <button @click="checkPlagiarism">Check Plagiarism</button>
+                        </div>
+
+                        <div class="tool-section">
+                            <h4>Language Support</h4>
+                            <div class="tool-options">
+                                <div class="tool-option">
+                                    <label>
+                                        <select v-model="selectedLanguage">
+                                            <option value="en">English</option>
+                                            <option value="es">Spanish</option>
+                                            <option value="fr">French</option>
+                                            <option value="de">German</option>
+                                            <option value="it">Italian</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+                            <button @click="translateDocument">Translate</button>
+                        </div>
+
+                        <div class="tool-section">
+                            <h4>Writing Style Analysis</h4>
+                            <button @click="analyzeWritingStyle">Analyze Style</button>
+                        </div>
+
+                        <div class="tool-section">
+                            <h4>Writing Improvement</h4>
+                            <button @click="improveWriting">Improve Writing</button>
+                        </div>
+
+                        <div class="tool-section">
+                            <button class="btn-accent" @click="saveDocument">Save Document</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results" v-if="results.length > 0">
+                    <h3>Results</h3>
+                    <div class="result-item" v-for="(result, index) in results" :key="index">
+                        <h4>{{ result.title }}</h4>
+                        <p>{{ result.content }}</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="container">
+                <p>&copy; 2023 Gemini AI Writing Coach Pro. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                currentView: 'dashboard',
+                isMobileMenuOpen: false,
+                documentContent: '',
+                grammarCheckEnabled: true,
+                styleSuggestionsEnabled: true,
+                plagiarismCheckEnabled: true,
+                selectedLanguage: 'en',
+                recentDocuments: [
+                    { id: 1, title: 'Research Paper' },
+                    { id: 2, title: 'Business Proposal' },
+                    { id: 3, title: 'Creative Writing' }
+                ],
+                results: []
+            },
+            methods: {
+                toggleMobileMenu() {
+                    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+                },
+                startNewDocument() {
+                    this.currentView = 'editor';
+                    this.documentContent = '';
+                    this.results = [];
+                },
+                continueDocument() {
+                    this.currentView = 'editor';
+                    // In a real app, this would load the last edited document
+                    this.documentContent = 'This is a sample document content.';
+                    this.results = [];
+                },
+                openDocument(id) {
+                    this.currentView = 'editor';
+                    // In a real app, this would load the specific document
+                    this.documentContent = `Content of document ${id}`;
+                    this.results = [];
+                },
+                showWritingTips() {
+                    this.results = [
+                        {
+                            title: 'Writing Tip 1',
+                            content: 'Tip 1: Start with a strong opening sentence that grabs the reader\'s attention.'
+                        },
+                        {
+                            title: 'Writing Tip 2',
+                            content: 'Tip 2: Use varied sentence structures to make your writing more engaging.'
+                        },
+                        {
+                            title: 'Writing Tip 3',
+                            content: 'Tip 3: Proofread your work to catch and correct any errors.'
+                        }
+                    ];
+                },
+                checkGrammar() {
+                    if (this.grammarCheckEnabled) {
+                        // Simulate grammar check API call
+                        this.results.push({
+                            title: 'Grammar Check Results',
+                            content: 'No grammar errors found. Well done!'
+                        });
+                    } else {
+                        this.results.push({
+                            title: 'Grammar Check',
+                            content: 'Grammar check is disabled.'
+                        });
+                    }
+                },
+                getStyleSuggestions() {
+                    if (this.styleSuggestionsEnabled) {
+                        // Simulate style suggestions API call
+                        this.results.push({
+                            title: 'Style Suggestions',
+                            content: 'Consider using more descriptive language to enhance your writing.'
+                        });
+                    } else {
+                        this.results.push({
+                            title: 'Style Suggestions',
+                            content: 'Style suggestions are disabled.'
+                        });
+                    }
+                },
+                checkPlagiarism() {
+                    if (this.plagiarismCheckEnabled) {
+                        // Simulate plagiarism check API call
+                        this.results.push({
+                            title: 'Plagiarism Check Results',
+                            content: 'No plagiarism detected. Your content is original.'
+                        });
+                    } else {
+                        this.results.push({
+                            title: 'Plagiarism Check',
+                            content: 'Plagiarism check is disabled.'
+                        });
+                    }
+                },
+                translateDocument() {
+                    // Simulate translation API call
+                    this.results.push({
+                        title: 'Translation Results',
+                        content: `Document translated to ${this.selectedLanguage}.`
+                    });
+                },
+                analyzeWritingStyle() {
+                    // Simulate writing style analysis API call
+                    this.results.push({
+                        title: 'Writing Style Analysis',
+                        content: 'Your writing style is formal and professional.'
+                    });
+                },
+                improveWriting() {
+                    // Simulate writing improvement API call
+                    this.results.push({
+                        title: 'Writing Improvement Suggestions',
+                        content: 'Consider adding more examples to support your points.'
+                    });
+                },
+                saveDocument() {
+                    // Simulate document saving
+                    this.results.push({
+                        title: 'Document Saved',
+                        content: 'Your document has been saved successfully.'
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

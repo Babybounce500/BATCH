@@ -1,0 +1,115 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mistral AI Chef's Kitchen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.css">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .recipe-card {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .wavesurfer-container {
+            margin: 20px 0;
+        }
+        .button-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mistral AI Chef's Kitchen</h1>
+
+        <div class="button-group">
+            <button id="generate-recipe" class="button">Generate Recipe</button>
+            <button id="generate-instructions" class="button">Generate Instructions</button>
+            <button id="substitute-ingredients" class="button">Substitute Ingredients</button>
+            <button id="plan-meal" class="button">Plan Meal</button>
+            <button id="recommend-recipes" class="button">Recommend Recipes</button>
+        </div>
+
+        <div id="recipe-container" class="recipe-card">
+            <h2 id="recipe-title">Recipe Title</h2>
+            <p id="recipe-description">Recipe description will appear here.</p>
+            <div id="wavesurfer-container" class="wavesurfer-container"></div>
+            <div id="recipe-instructions">
+                <h3>Instructions</h3>
+                <p>Instructions will appear here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wavesurfer = WaveSurfer.create({
+                container: '#wavesurfer-container',
+                waveColor: 'violet',
+                progressColor: 'purple',
+                cursorColor: 'navy',
+                barWidth: 3,
+                barRadius: 3,
+                cursorWidth: 1,
+                height: 100,
+                barGap: 3
+            });
+
+            // Mock data for demonstration
+            const mockRecipes = [
+                {
+                    title: 'Spaghetti Carbonara',
+                    description: 'A classic Italian pasta dish made with eggs, hard cheese, pancetta, and pepper.',
+                    instructions: '1. Cook the pasta. 2. Fry the pancetta. 3. Mix eggs and cheese. 4. Combine everything.',
+                    audioUrl: 'https://example.com/audio/spaghetti-carbonara.mp3'
+                },
+                {
+                    title: 'Chicken Stir Fry',
+                    description: 'A quick and easy stir fry with chicken and vegetables.',
+                    instructions: '1. Cook the chicken. 2. Prepare the vegetables.  everything together.',
+                    audioUrl: 'https://example.com/audio/chicken-stir-fry.mp3'
+                }
+            ];
+
+            document.getElementById('generate-recipe').addEventListener('click', function() {
+                const randomRecipe = mockRecipes[Math.floor(Math.random() * mockRecipes.length)];
+                document.getElementById('recipe-title').textContent = randomRecipe.title;
+                document.getElementById('recipe-description').textContent = randomRecipe.description;
+                document.querySelector('#recipe-instructions p').textContent = randomRecipe.instructions;
+                wavesurfer.load(randomRecipe.audioUrl);
+            });
+
+            document.getElementById('generate-instructions').addEventListener('click', function() {
+                alert('Generating cooking instructions...');
+                // In a real app, this would call the Mistral API
+            });
+
+            document.getElementById('substitute-ingredients').addEventListener('click', function() {
+                alert('Substituting ingredients...');
+                // In a real app, this would use machine learning
+            });
+
+            document.getElementById('plan-meal').addEventListener('click', function() {
+                alert('Planning meal...');
+                // In a real app, this would use optimization algorithms
+            });
+
+            document.getElementById('recommend-recipes').addEventListener('click', function() {
+                alert('Recommending recipes...');
+                // In a real app, this would use collaborative filtering
+            });
+        });
+    </script>
+</body>
+</html>
+```

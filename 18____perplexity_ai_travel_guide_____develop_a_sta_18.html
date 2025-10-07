@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perplexity AI Travel Guide</title>
+    <meta name="description" content="AI-powered travel planning and recommendations">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-color: #f3f4f6;
+            --text-color: #374151;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .hero {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .search-form {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 0.25rem;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .search-button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.25rem;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-button:hover {
+            background-color: #0d9488;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--dark-color);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .recommendation-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .recommendation-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .recommendation-content {
+            padding: 1.5rem;
+        }
+
+        .recommendation-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .recommendation-description {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            border: none;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .recommendation-button:hover {
+            background-color: #2563eb;
+        }
+
+        .itinerary {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        .itinerary-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+        }
+
+        .itinerary-item {
+            display: flex;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .itinerary-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .itinerary-time {
+            width: 100px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .itinerary-details {
+            flex: 1;
+        }
+
+        .itinerary-location {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .itinerary-description {
+            color: var(--text-color);
+        }
+
+        .map-container {
+            height: 400px;
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+
+        .copyright {
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+
+            .hero p {
+                font-size: 1.125rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-button {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Perplexity AI Travel</div>
+                <div class="nav-links">
+                    <a href="#" class="nav-link">Home</a>
+                    <a href="#" class="nav-link">Destinations</a>
+                    <a href="#" class="nav-link">Itineraries</a>
+                    <a href="#" class="nav-link">About</a>
+                    <a href="#" class="nav-link">Contact</a>
+                </div>
+                <button class="mobile-menu-button hidden bg-gray-800 text-white p-2 rounded">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Discover Your Next Adventure</h1>
+                <p>Let our AI-powered travel assistant plan your perfect trip with personalized recommendations and optimized itineraries.</p>
+                <form class="search-form">
+                    <input type="text" class="search-input" placeholder="Where to?">
+                    <button type="submit" class="search-button">Search</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="py-12">
+            <div class="container">
+                <h2 class="section-title">Why Choose Perplexity AI Travel?</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3 class="feature-title">AI-Powered Recommendations</h3>
+                        <p>Our advanced AI algorithms analyze your preferences and travel history to provide personalized recommendations.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🗺️</div>
+                        <h3 class="feature-title">Smart Itinerary Planning</h3>
+                        <p>Create optimized itineraries with our machine learning-powered route optimization and scheduling algorithms.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Data-Driven Insights</h3>
+                        <p>Get valuable travel insights with our interactive charts and visualizations powered by Chart.js.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-12 bg-gray-100">
+            <div class="container">
+                <h2 class="section-title">Popular Destinations</h2>
+                <div class="recommendations">
+                    <div class="recommendation-card">
+                        <img src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Paris" class="recommendation-image">
+                        <div class="recommendation-content">
+                            <h3 class="recommendation-title">Paris, France</h3>
+                            <p class="recommendation-description">Explore the romantic city of lights with our curated itinerary featuring iconic landmarks, world-class cuisine, and hidden gems.</p>
+                            <button class="recommendation-button">View Itinerary</button>
+                        </div>
+                    </div>
+                    <div class="recommendation-card">
+                        <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Kyoto" class="recommendation-image">
+                        <div class="recommendation-content">
+                            <h3 class="recommendation-title">Kyoto, Japan</h3>
+                            <p class="recommendation-description">Discover the cultural heart of Japan with our expertly crafted itinerary featuring traditional temples, stunning gardens, and authentic dining experiences.</p>
+                            <button class="recommendation-button">View Itinerary</button>
+                        </div>
+                    </div>
+                    <div class="recommendation-card">
+                        <img src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Santorini" class="recommendation-image">
+                        <div class="recommendation-content">
+                            <h3 class="recommendation-title">Santorini, Greece</h3>
+                            <p class="recommendation-description">Experience the breathtaking beauty of Santorini with our romantic itinerary featuring white-washed buildings, crystal-clear waters, and stunning sunsets.</p>
+                            <button class="recommendation-button">View Itinerary</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-12">
+            <div class="container">
+                <h2 class="section-title">Your Personalized Itinerary</h2>
+                <div class="itinerary">
+                    <h3 class="itinerary-title">Paris, France - 5 Days</h3>
+                    <div class="itinerary-item">
+                        <div class="itinerary-time">Day 1</div>
+                        <div class="itinerary-details">
+                            <h4 class="itinerary-location">Eiffel Tower</h4>
+                            <p class="itinerary-description">Start your journey with a visit to the iconic Eiffel Tower. Enjoy panoramic views of Paris from the summit and explore the exhibits in the museum.</p>
+                        </div>
+                    </div>
+                    <div class="itinerary-item">
+                        <div class="itinerary-time">Day 2</div>
+                        <div class="itinerary-details">
+                            <h4 class="itinerary-location">Louvre Museum</h4>
+                            <p class="itinerary-description">Delve into the rich history of art and culture at the Louvre Museum. See masterpieces like the Mona Lisa and the Venus de Milo.</p>
+                        </div>
+                    </div>
+                    <div class="itinerary-item">
+                        <div class="itinerary-time">Day 3</div>
+                        <div class="itinerary-details">
+                            <h4 class="itinerary-location">Seine River Cruise</h4>
+                            <p class="itinerary-description">Take a leisurely cruise along the Seine River and enjoy the beautiful architecture and landmarks of Paris from the water.</p>
+                        </div>
+                    </div>
+                    <div class="itinerary-item">
+                        <div class="itinerary-time">Day 4</div>
+                        <div class="itinerary-details">
+                            <h4 class="itinerary-location">Montmartre</h4>
+                            <p class="itinerary-description">Explore the charming neighborhood of Montmartre, known for its artistic heritage, charming streets, and the famous Sacré-Cœur Basilica.</p>
+                        </div>
+                    </div>
+                    <div class="itinerary-item">
+                        <div class="itinerary-time">Day 5</div>
+                        <div class="itinerary-details">
+                            <h4 class="itinerary-location">Champs-Élysées</h4>
+                            <p class="itinerary-description">End your trip with a stroll along the famous Champs-Élysées, one of the most prestigious avenues in the world, and enjoy shopping and dining in the area.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-12 bg-gray-100">
+            <div class="container">
+                <h2 class="section-title">Travel Insights</h2>
+                <div class="map-container">
+                    <canvas id="travelChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">FAQ</a>
+                <a href="#" class="footer-link">Contact Us</a>
+            </div>
+            <p class="copyright">&copy; 2023 Perplexity AI Travel. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileMenuButton.addEventListener('click', () => {
+            navLinks.classList.toggle('hidden');
+        });
+
+        // Initialize Chart.js
+        const ctx = document.getElementById('travelChart').getContext('2d');
+        const travelChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+                datasets: [{
+                    label: 'Number of Travelers',
+                    data: [1200, 1900, 3000, 5000, 2000, 3000],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(59, 130, 246, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(59, 130, 246, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Form submission
+        const searchForm = document.querySelector('.search-form');
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const searchInput = document.querySelector('.search-input');
+            const searchTerm = searchInput.value.trim();
+
+            if (searchTerm) {
+                // Simulate API call to Perplexity search
+                simulatePerplexitySearch(searchTerm)
+                    .then(results => {
+                        console.log('Search results:', results);
+                        // Process and display results
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        });
+
+        // Simulate Perplexity search API call
+        async function simulatePerplexitySearch(query) {
+            // In a real implementation, this would be an actual API call to Perplexity
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const mockResults = [
+                        { title: `Travel guide to ${query}`, snippet: `Comprehensive travel guide for ${query}...` },
+                        { title: `Best hotels in ${query}`, snippet: `Top-rated hotels and accommodations in ${query}...` },
+                        { title: `Things to do in ${query}`, snippet: `List of popular attractions and activities in ${query}...` }
+                    ];
+                    resolve(mockResults);
+                }, 1000);
+            });
+        }
+
+        // Recommendation button click
+        document.querySelectorAll('.recommendation-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const recommendationCard = button.closest('.recommendation-card');
+                const destination = recommendationCard.querySelector('.recommendation-title').textContent;
+
+                // Simulate generating a personalized itinerary
+                simulateGenerateItinerary(destination)
+                    .then(itinerary => {
+                        console.log('Generated itinerary:', itinerary);
+                        // Display the itinerary in the itinerary section
+                        displayItinerary(itinerary);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+        });
+
+        // Simulate generating a personalized itinerary
+        async function simulateGenerateItinerary(destination) {
+            // In a real implementation, this would use the Perplexity API and machine learning algorithms
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const mockItinerary = {
+                        destination: destination,
+                        days: 5,
+                        activities: [
+                            { day: 1, location: 'Iconic Landmark', description: `Visit the famous landmark in ${destination}...` },
+                            { day: 2, location: 'Museum', description: `Explore the cultural exhibits at the museum in ${destination}...` },
+                            { day: 3, location: 'Scenic Spot', description: `Enjoy the beautiful views at the scenic spot in ${destination}...` },
+                            { day: 4, location: 'Local Market', description: `Experience the vibrant atmosphere of the local market in ${destination}...` },
+                            { day: 5, location: 'Final Attraction', description: `End your trip with a visit to the final attraction in ${destination}...` }
+                        ]
+                    };
+                    resolve(mockItinerary);
+                }, 1500);
+            });
+        }
+
+        // Display the itinerary in the itinerary section
+        function displayItinerary(itinerary) {
+            const itinerarySection = document.querySelector('.itinerary');
+            const itineraryTitle = itinerarySection.querySelector('.itinerary-title');
+            const itineraryItemsContainer = itinerarySection.querySelector('.itinerary');
+
+            // Update the title
+            itineraryTitle.textContent = `${itinerary.destination} - ${itinerary.days} Days`;
+
+            // Clear existing itinerary items
+            const existingItems = itineraryItemsContainer.querySelectorAll('.itinerary-item:not(:first-child)');
+            existingItems.forEach(item => item.remove());
+
+            // Add new itinerary items
+            itinerary.activities.forEach(activity => {
+                const itineraryItem = document.createElement('div');
+                itineraryItem.className = 'itinerary-item';
+
+                itineraryItem.innerHTML = `
+                    <div class="itinerary-time">Day ${activity.day}</div>
+                    <div class="itinerary-details">
+                        <h4 class="itinerary-location">${activity.location}</h4>
+                        <p class="itinerary-description">${activity.description}</p>
+                    </div>
+                `;
+
+                itineraryItemsContainer.appendChild(itineraryItem);
+            });
+
+            // Scroll to the itinerary section
+            itinerarySection.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

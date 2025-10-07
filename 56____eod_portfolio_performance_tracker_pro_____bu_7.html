@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EOD Portfolio Performance Tracker Pro - Comprehensive portfolio tracking with TradingView integration">
+    <title>EOD Portfolio Performance Tracker Pro</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --text-color: #333;
+            --text-light: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f5f7fa;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+        }
+
+        nav ul li a:hover {
+            color: var(--secondary-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            color: var(--secondary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: var(--text-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .portfolio-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-item {
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .summary-item h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+        }
+
+        .summary-item p {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .positive {
+            color: #27ae60 !important;
+        }
+
+        .negative {
+            color: #e74c3c !important;
+        }
+
+        .transactions {
+            margin-top: 2rem;
+        }
+
+        .transactions h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+        }
+
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .transaction-table th, .transaction-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .transaction-table th {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .transaction-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .add-transaction {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            align-self: flex-end;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .dark-mode {
+            --primary-color: #34495e;
+            --secondary-color: #2980b9;
+            --accent-color: #c0392b;
+            --light-color: #7f8c8d;
+            --dark-color: #ecf0f1;
+            --text-color: #ecf0f1;
+            --text-light: #2c3e50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+            }
+
+            nav ul li {
+                margin-left: 0;
+                margin-right: 1rem;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .portfolio-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .add-transaction {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">EOD Portfolio Tracker</div>
+            <nav>
+                <ul>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#portfolio">Portfolio</a></li>
+                    <li><a href="#benchmarks">Benchmarks</a></li>
+                    <li><a href="#risk">Risk Assessment</a></li>
+                    <li><a href="#attribution">Performance Attribution</a></li>
+                </ul>
+            </nav>
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="dashboard">
+            <h2>Portfolio Dashboard</h2>
+            <div class="portfolio-summary">
+                <div class="summary-item">
+                    <h4>Total Value</h4>
+                    <p id="totalValue">$0.00</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Daily Change</h4>
+                    <p id="dailyChange">$0.00</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Monthly Change</h4>
+                    <p id="monthlyChange">$0.00</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Annual Change</h4>
+                    <p id="annualChange">$0.00</p>
+                </div>
+            </div>
+
+            <div class="dashboard">
+                <div class="card">
+                    <h3>Portfolio Performance</h3>
+                    <div class="chart-container" id="performanceChart"></div>
+                </div>
+                <div class="card">
+                    <h3>Asset Allocation</h3>
+                    <div class="chart-container" id="allocationChart"></div>
+                </div>
+                <div class="card">
+                    <h3>Benchmark Comparison</h3>
+                    <div class="chart-container" id="benchmarkChart"></div>
+                </div>
+                <div class="card">
+                    <h3>Risk Metrics</h3>
+                    <div class="chart-container" id="riskChart"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="transactions">
+            <h3>Portfolio Transactions</h3>
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Symbol</th>
+                        <th>Type</th>
+                        <th>Shares</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="transactionTableBody">
+                    <!-- Transactions will be added here dynamically -->
+                </tbody>
+            </table>
+
+            <div class="add-transaction">
+                <div class="form-group">
+                    <label for="transactionDate">Date</label>
+                    <input type="date" id="transactionDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="symbol">Symbol</label>
+                    <input type="text" id="symbol" required>
+                </div>
+                <div class="form-group">
+                    <label for="transactionType">Type</label>
+                    <select id="transactionType" required>
+                        <option value="buy">Buy</option>
+                        <option value="sell">Sell</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="shares">Shares</label>
+                    <input type="number" id="shares" min="0.01" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="number" id="price" min="0.01" step="0.01" required>
+                </div>
+                <button class="btn" id="addTransactionBtn">Add Transaction</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 EOD Portfolio Performance Tracker Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Sample data for demonstration
+        const sampleData = {
+            portfolio: {
+                totalValue: 125000.50,
+                dailyChange: 350.25,
+                monthlyChange: 1200.75,
+                annualChange: 15000.00
+            },
+            transactions: [
+                { date: '2023-01-15', symbol: 'AAPL', type: 'buy', shares: 10, price: 150.25, total: 1502.50 },
+                { date: '2023-01-20', symbol: 'MSFT', type: 'buy', shares: 8, price: 250.50, total: 2004.00 },
+                { date: '2023-01-25', symbol: 'GOOGL', type: 'buy', shares: 5, price: 2800.00, total: 14000.00 },
+                { date: '2023-02-05', symbol: 'AAPL', type: 'sell', shares: 2, price: 155.75, total: 311.50 },
+                { date: '2023-02-10', symbol: 'AMZN', type: 'buy', shares: 3, price: 3200.00, total: 9600.00 }
+            ],
+            performance: [
+                { time: '2023-01-01', value: 100000.00 },
+                { time: '2023-01-08', value: 102000.00 },
+                { time: '2023-01-15', value: 105000.00 },
+                { time: '2023-01-22', value: 110000.00 },
+                { time: '2023-01-29', value: 115000.00 },
+                { time: '2023-02-05', value: 120000.00 },
+                { time: '2023-02-12', value: 125000.00 }
+            ],
+            allocation: [
+                { name: 'AAPL', value: 30 },
+                { name: 'MSFT', value: 25 },
+                { name: 'GOOGL', value: 20 },
+                { name: 'AMZN', value: 15 },
+                { name: 'Other', value: 10 }
+            ],
+            benchmarks: [
+                { time: '2023-01-01', portfolio: 100000.00, benchmark: 98000.00 },
+                { time: '2023-01-08', portfolio: 102000.00, benchmark: 100000.00 },
+                { time: '2023-01-15', portfolio: 105000.00, benchmark: 102000.00 },
+                { time: '2023-01-22', portfolio: 110000.00, benchmark: 105000.00 },
+                { time: '2023-01-29', portfolio: 115000.00, benchmark: 108000.00 },
+                { time: '2023-02-05', portfolio: 120000.00, benchmark: 110000.00 },
+                { time: '2023-02-12', portfolio: 125000.00, benchmark: 115000.00 }
+            ],
+            risk: [
+                { time: '2023-01-01', volatility: 5.2, beta: 1.1 },
+                { time: '2023-01-08', volatility: 5.5, beta: 1.2 },
+                { time: '2023-01-15', volatility: 5.3, beta: 1.1 },
+                { time: '2023-01-22', volatility: 5.7, beta: 1.3 },
+                { time: '2023-01-29', volatility: 5.4, beta: 1.2 },
+                { time: '2023-02-05', volatility: 5.6, beta: 1.2 },
+                { time: '2023-02-12', volatility: 5.8, beta: 1.4 }
+            ]
+        };
+
+        // DOM elements
+        const themeToggle = document.getElementById('themeToggle');
+        const totalValue = document.getElementById('totalValue');
+        const dailyChange = document.getElementById('dailyChange');
+        const monthlyChange = document.getElementById('monthlyChange');
+        const annualChange = document.getElementById('annualChange');
+        const transactionTableBody = document.getElementById('transactionTableBody');
+        const addTransactionBtn = document.getElementById('addTransactionBtn');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load sample data
+            loadSampleData();
+
+            // Set up event listeners
+            themeToggle.addEventListener('click', toggleTheme);
+            addTransactionBtn.addEventListener('click', addTransaction);
+
+            // Initialize charts
+            initCharts();
+        });
+
+        // Load sample data
+        function loadSampleData() {
+            // Update portfolio summary
+            totalValue.textContent = `$${sampleData.portfolio.totalValue.toFixed(2)}`;
+            dailyChange.textContent = `$${sampleData.portfolio.dailyChange.toFixed(2)}`;
+            dailyChange.classList.add(sampleData.portfolio.dailyChange >= 0 ? 'positive' : 'negative');
+            monthlyChange.textContent = `$${sampleData.portfolio.monthlyChange.toFixed(2)}`;
+            monthlyChange.classList.add(sampleData.portfolio.monthlyChange >= 0 ? 'positive' : 'negative');
+            annualChange.textContent = `$${sampleData.portfolio.annualChange.toFixed(2)}`;
+            annualChange.classList.add(sampleData.portfolio.annualChange >= 0 ? 'positive' : 'negative');
+
+            // Update transaction table
+            updateTransactionTable();
+
+            // Render charts with sample data
+            renderPerformanceChart();
+            renderAllocationChart();
+            renderBenchmarkChart();
+            renderRiskChart();
+        }
+
+        // Toggle dark/light theme
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+
+        // Add new transaction
+        function addTransaction() {
+            const date = document.getElementById('transactionDate').value;
+            const symbol = document.getElementById('symbol').value.toUpperCase();
+            const type = document.getElementById('transactionType').value;
+            const shares = parseFloat(document.getElementById('shares').value);
+            const price = parseFloat(document.getElementById('price').value);
+            const total = shares * price;
+
+            if (date && symbol && !isNaN(shares) && !isNaN(price)) {
+                const newTransaction = { date, symbol, type, shares, price, total };
+                sampleData.transactions.push(newTransaction);
+                updateTransactionTable();
+
+                // Clear form
+                document.getElementById('transactionDate').value = '';
+                document.getElementById('symbol').value = '';
+                document.getElementById('shares').value = '';
+                document.getElementById('price').value = '';
+
+                // Update charts (in a real app, you would fetch new data)
+                updateCharts();
+            } else {
+                alert('Please fill in all fields with valid values.');
+            }
+        }
+
+        // Update transaction table
+        function updateTransactionTable() {
+            transactionTableBody.innerHTML = '';
+            sampleData.transactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${transaction.date}</td>
+                    <td>${transaction.symbol}</td>
+                    <td>${transaction.type}</td>
+                    <td>${transaction.shares.toFixed(2)}</td>
+                    <td>$${transaction.price.toFixed(2)}</td>
+                    <td>$${transaction.total.toFixed(2)}</td>
+                `;
+                transactionTableBody.appendChild(row);
+            });
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // In a real application, you would use TradingView Lightweight Charts library
+            // For this demo, we'll simulate chart rendering
+            console.log('Initializing charts...');
+        }
+
+        // Render performance chart
+        function renderPerformanceChart() {
+            // In a real application, you would use TradingView Lightweight Charts library
+            // For this demo, we'll simulate chart rendering
+            console.log('Rendering performance chart with data:', sampleData.performance);
+        }
+
+        // Render allocation chart
+        function renderAllocationChart() {
+            // In a real application, you would use TradingView Lightweight Charts library
+            // For this demo, we'll simulate chart rendering
+            console.log('Rendering allocation chart with data:', sampleData.allocation);
+        }
+
+        // Render benchmark chart
+        function renderBenchmarkChart() {
+            // In a real application, you would use TradingView Lightweight Charts library
+            // For this demo, we'll simulate chart rendering
+            console.log('Rendering benchmark chart with data:', sampleData.benchmarks);
+        }
+
+        // Render risk chart
+        function renderRiskChart() {
+            // In a real application, you would use TradingView Lightweight Charts library
+            // For this demo, we'll simulate chart rendering
+            console.log('Rendering risk chart with data:', sampleData.risk);
+        }
+
+        // Update charts (simulated)
+        function updateCharts() {
+            // In a real application, you would fetch new data and update the charts
+            console.log('Updating charts with new data...');
+            renderPerformanceChart();
+            renderAllocationChart();
+            renderBenchmarkChart();
+            renderRiskChart();
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

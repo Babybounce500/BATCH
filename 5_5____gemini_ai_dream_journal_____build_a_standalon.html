@@ -1,0 +1,195 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Dream Journal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.5/dist/css/foundation.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+        }
+        .dream-journal {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .dream-entry {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .dream-visualization {
+            height: 400px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .interpretation {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .btn-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dream-journal">
+        <h1 class="text-center">Gemini AI Dream Journal</h1>
+
+        <div class="btn-group text-center">
+            <button id="newDreamBtn" class="button">New Dream Entry</button>
+            <button id="analyzeDreamsBtn" class="button">Analyze Dreams</button>
+        </div>
+
+        <div id="dreamEntries"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.5/dist/js/foundation.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dreamEntriesContainer = document.getElementById('dreamEntries');
+            const newDreamBtn = document.getElementById('newDreamBtn');
+            const analyzeDreamsBtn = document.getElementById('analyzeDreamsBtn');
+
+            let dreams = JSON.parse(localStorage.getItem('dreams')) || [];
+
+            function saveDreams() {
+                localStorage.setItem('dreams', JSON.stringify(dreams));
+            }
+
+            function renderDreamEntries() {
+                dreamEntriesContainer.innerHTML = '';
+                dreams.forEach((dream, index) => {
+                    const dreamEntry = document.createElement('div');
+                    dreamEntry.className = 'dream-entry';
+                    dreamEntry.innerHTML = `
+                        <h3>${dream.title}</h3>
+                        <p><strong>Date:</strong> ${new Date(dream.date).toLocaleDateString()}</p>
+                        <div class="dream-visualization" id="visualization-${index}"></div>
+                        <p>${dream.description}</p>
+                        <div class="interpretation">
+                            <h4>Interpretation</h4>
+                            <p>${dream.interpretation || 'No interpretation available yet.'}</p>
+                            <button class="button generate-interpretation" data-index="${index}">Generate Interpretation</button>
+                        </div>
+                    `;
+                    dreamEntriesContainer.appendChild(dreamEntry);
+
+                    // Initialize 3D visualization
+                    initVisualization(`visualization-${index}`, dream);
+                });
+
+                // Add event listeners to generate interpretation buttons
+                document.querySelectorAll('.generate-interpretation').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        generateInterpretation(index);
+                    });
+                });
+            }
+
+            function initVisualization(containerId, dream) {
+                const container = document.getElementById(containerId);
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                container.appendChild(renderer.domElement);
+
+                // Create a simple 3D representation of the dream
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+
+                camera.position.z = 3;
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+                    renderer.render(scene, camera);
+                }
+
+                animate();
+
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                });
+            }
+
+            function generateInterpretation(index) {
+                // In a real application, this would call the Gemini API
+                // For demonstration, we'll use a simple mock function
+                const dream = dreams[index];
+                dream.interpretation = `This dream about ${dream.description} might symbolize ${getRandomSymbol()}.`;
+                dreams[index] = dream;
+                saveDreams();
+                renderDreamEntries();
+            }
+
+            function getRandomSymbol() {
+                const symbols = [
+                    'personal growth and self-discovery',
+                    'communication and relationships',
+                    'emotional well-being',
+                    'creativity and imagination',
+                    'facing challenges and overcoming obstacles',
+                    'spiritual or philosophical insights',
+                    'unconscious desires or fears',
+                    'past experiences or memories',
+                    'future possibilities or goals'
+                ];
+                return symbols[Math.floor(Math.random() * symbols.length)];
+            }
+
+            newDreamBtn.addEventListener('click', function() {
+                const title = prompt('Enter dream title:');
+                if (!title) return;
+
+                const description = prompt('Describe your dream:');
+                if (!description) return;
+
+                const dream = {
+                    title,
+                    description,
+                    date: new Date().toISOString(),
+                    interpretation: null
+                };
+
+                dreams.unshift(dream);
+                saveDreams();
+                renderDreamEntries();
+            });
+
+            analyzeDreamsBtn.addEventListener('click', function() {
+                if (dreams.length < 3) {
+                    alert('You need at least 3 dream entries to analyze.');
+                    return;
+                }
+
+                // In a real application, this would perform actual dream analysis
+                // For demonstration, we'll show a simple message
+                alert('Dream analysis would show patterns and themes in your dreams.');
+            });
+
+            // Initial render
+            renderDreamEntries();
+        });
+    </script>
+</body>
+</html>
+```

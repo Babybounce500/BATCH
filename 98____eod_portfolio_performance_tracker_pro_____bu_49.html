@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EOD Portfolio Performance Tracker Pro - Comprehensive portfolio tracking with TradingView charts">
+    <title>EOD Portfolio Performance Tracker Pro</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --text-color: #333;
+            --text-light: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color);
+            color: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background-color: #c0392b;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .portfolio-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 0.5rem;
+        }
+
+        .summary-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .positive {
+            color: var(--success-color);
+        }
+
+        .negative {
+            color: var(--accent-color);
+        }
+
+        .risk-matrix {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .risk-cell {
+            aspect-ratio: 1;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .risk-cell:hover {
+            transform: scale(1.05);
+        }
+
+        .risk-low {
+            background-color: var(--success-color);
+        }
+
+        .risk-medium {
+            background-color: var(--warning-color);
+        }
+
+        .risk-high {
+            background-color: var(--accent-color);
+        }
+
+        .risk-very-high {
+            background-color: #c0392b;
+        }
+
+        .risk-extreme {
+            background-color: #7f8c8d;
+        }
+
+        .benchmark-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .benchmark-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1rem;
+        }
+
+        .benchmark-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .benchmark-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .benchmark-performance {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .performance-indicator {
+            display: flex;
+            align-items: center;
+        }
+
+        .performance-icon {
+            margin-right: 0.5rem;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--secondary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-light);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            nav ul li {
+                margin-left: 0;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .portfolio-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .benchmark-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .risk-matrix {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .risk-matrix {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">EOD Portfolio Tracker</div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="nav-link" data-target="dashboard">Dashboard</a></li>
+                    <li><a href="#" class="nav-link" data-target="portfolio">Portfolio</a></li>
+                    <li><a href="#" class="nav-link" data-target="benchmarks">Benchmarks</a></li>
+                    <li><a href="#" class="nav-link" data-target="research">Research</a></li>
+                    <li><a href="#" class="nav-link" data-target="settings">Settings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="dashboard" class="active">
+            <div class="portfolio-summary">
+                <div class="summary-item">
+                    <div class="summary-label">Total Value</div>
+                    <div class="summary-value" id="total-value">$0.00</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Daily Change</div>
+                    <div class="summary-value" id="daily-change">$0.00</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Monthly Return</div>
+                    <div class="summary-value" id="monthly-return">0.00%</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Annualized Return</div>
+                    <div class="summary-value" id="annualized-return">0.00%</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Sharpe Ratio</div>
+                    <div class="summary-value" id="sharpe-ratio">0.00</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Risk Level</div>
+                    <div class="summary-value" id="risk-level">Low</div>
+                </div>
+            </div>
+
+            <div class="dashboard">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Portfolio Performance</h3>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" id="add-asset-btn">Add Asset</button>
+                            <button class="btn btn-secondary" id="refresh-btn">Refresh</button>
+                        </div>
+                    </div>
+                    <div class="chart-container" id="performance-chart"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Asset Allocation</h3>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" id="rebalance-btn">Rebalance</button>
+                        </div>
+                    </div>
+                    <div class="chart-container" id="allocation-chart"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Risk Assessment</h3>
+                    </div>
+                    <div class="risk-matrix">
+                        <div class="risk-cell risk-low" data-risk="Low">L</div>
+                        <div class="risk-cell risk-medium" data-risk="Medium">M</div>
+                        <div class="risk-cell risk-high" data-risk="High">H</div>
+                        <div class="risk-cell risk-very-high" data-risk="Very High">VH</div>
+                        <div class="risk-cell risk-extreme" data-risk="Extreme">E</div>
+                    </div>
+                    <div class="chart-container" id="risk-chart"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Benchmark Comparison</h3>
+                    </div>
+                    <div class="benchmark-comparison">
+                        <div class="benchmark-item">
+                            <div class="benchmark-title">S&P 500</div>
+                            <div class="benchmark-value" id="sp500-value">$0.00</div>
+                            <div class="benchmark-performance">
+                                <div class="performance-indicator">
+                                    <span class="performance-icon">↑</span>
+                                    <span id="sp500-daily">0.00%</span>
+                                </div>
+                                <div class="performance-indicator">
+                                    <span class="performance-icon">↑</span>
+                                    <span id="sp500-monthly">0.00%</span>
+                                </div>
+                                <div class="performance-indicator">
+                                    <span class="performance-icon">↑</span>
+                                    <span id="sp500-annual">0.00%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="benchmark-item">
+                            <div class="benchmark-title">NASDAQ</div>
+                            <div class="benchmark-value" id="nasdaq-value">$0.00</div>
+                            <div class="benchmark-performance">
+                                <div class="performance-indicator">
+                                    <span class="performance-icon">↑</span>
+                                    <span id="nasdaq-daily">0.00%</span>
+                                </div>
+                                <div class="performance-indicator">
+                                    <span class="performance-icon">↑</span>
+                                    <span id="nasdaq-monthly">0.00%</span>
+                                </div>
+                                <div class="performance-indicator">
+                                    <span class="performance-icon">↑</span>
+                                    <span id="nasdaq-annual">0.00%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Performance Attribution</h3>
+                    </div>
+                    <div class="chart-container" id="attribution-chart"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Diversification Analysis</h3>
+                    </div>
+                    <div class="chart-container" id="diversification-chart"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Portfolio Holdings</h3>
+                    <div class="card-actions">
+                        <button class="btn btn-primary" id="add-holding-btn">Add Holding</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="holdings-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Name</th>
+                                <th>Shares</th>
+                                <th>Purchase Price</th>
+                                <th>Current Price</th>
+                                <th>Value</th>
+                                <th>Change</th>
+                                <th>Allocation</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="holdings-body">
+                            <!-- Holdings will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="benchmarks">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Benchmark Comparison</h3>
+                </div>
+                <div class="benchmark-comparison">
+                    <div class="benchmark-item">
+                        <div class="benchmark-title">S&P 500</div>
+                        <div class="benchmark-value" id="sp500-value-benchmarks">$0.00</div>
+                        <div class="benchmark-performance">
+                            <div class="performance-indicator">
+                                <span class="performance-icon">↑</span>
+                                <span id="sp500-daily-benchmarks">0.00%</span>
+                            </div>
+                            <div class="performance-indicator">
+                                <span class="performance-icon">↑</span>
+                                <span id="sp500-monthly-benchmarks">0.00%</span>
+                            </div>
+                            <div class="performance-indicator">
+                                <span class="performance-icon">↑</span>
+                                <span id="sp500-annual-benchmarks">0.00%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="benchmark-item">
+                        <div class="benchmark-title">NASDAQ</div>
+                        <div class="benchmark-value" id="nasdaq-value-benchmarks">$0.00</div>
+                        <div class="benchmark-performance">
+                            <div class="performance-indicator">
+                                <span class="performance-icon">↑</span>
+                                <span id="nasdaq-daily-benchmarks">0.00%</span>
+                            </div>
+                            <div class="performance-indicator">
+                                <span class="performance-icon">↑</span>
+                                <span id="nasdaq-monthly-benchmarks">0.00%</span>
+                            </div>
+                            <div class="performance-indicator">
+                                <span class="performance-icon">↑</span>
+                                <span id="nasdaq-annual-benchmarks">0.00%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container" id="benchmark-chart"></div>
+            </div>
+        </section>
+
+        <section id="research">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Investment Research</h3>
+                </div>
+                <div class="form-group">
+                    <label for="search-term">Search for stocks, ETFs, or mutual funds</label>
+                    <input type="text" id="search-term" placeholder="Enter symbol or name">
+                </div>
+                <div class="table-container">
+                    <table id="research-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Change</th>
+                                <th>Volume</th>
+                                <th>Market Cap</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="research-body">
+                            <!-- Research results will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="settings">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Account Settings</h3>
+                </div>
+                <form id="settings-form">
+                    <div class="form-group">
+                        <label for="currency">Default Currency</label>
+                        <select id="currency">
+                            <option value="USD">USD - US Dollar</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="GBP">GBP - British Pound</option>
+                            <option value="JPY">JPY - Japanese Yen</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="timezone">Time Zone</label>
+                        <select id="timezone">
+                            <option value="America/New_York">New York</option>
+                            <option value="America/Chicago">Chicago</option>
+                            <option value="America/Denver">Denver</option>
+                            <option value="America/Los_Angeles">Los Angeles</option>
+                            <option value="Europe/London">London</option>
+                            <option value="Europe/Paris">Paris</option>
+                            <option value="Asia/Tokyo">Tokyo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="notifications">Notification Preferences</label>
+                        <select id="notifications">
+                            <option value="all">All Notifications</option>
+                            <option value="important">Important Only</option>
+                            <option value="none">No Notifications</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal" id="add-asset-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Asset</h3>
+                <button class="close-btn" id="close-asset-modal">&times;</button>
+            </div>
+            <form id="add-asset-form">
+                <div class="form-group">
+                    <label for="asset-symbol">Symbol</label>
+                    <input type="text" id="asset-symbol" required>
+                </div>
+                <div class="form-group">
+                    <label for="asset-name">Name</label>
+                    <input type="text" id="asset-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="asset-type">Type</label>
+                    <select id="asset-type" required>
+                        <option value="stock">Stock</option>
+                        <option value="etf">ETF</option>
+                        <option value="mutual-fund">Mutual Fund</option>
+                        <option value="bond">Bond</option>
+                        <option value="crypto">Cryptocurrency</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="asset-description">Description</label>
+                    <textarea id="asset-description"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-asset-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="add-holding-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Holding</h3>
+                <button class="close-btn" id="close-holding-modal">&times;</button>
+            </div>
+            <form id="add-holding-form">
+                <div class="form-group">
+                    <label for="holding-asset">Asset</label>
+                    <select id="holding-asset" required>
+                        <!-- Assets will be added here dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="holding-shares">Shares</label>
+                    <input type="number" id="holding-shares" step="0.0001" required>
+                </div>
+                <div class="form-group">
+                    <label for="holding-purchase-price">Purchase Price</label>
+                    <input type="number" id="holding-purchase-price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="holding-purchase-date">Purchase Date</label>
+                    <input type="date" id="holding-purchase-date" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-holding-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Holding</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="edit-holding-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Holding</h3>
+                <button class="close-btn" id="close-edit-holding-modal">&times;</button>
+            </div>
+            <form id="edit-holding-form">
+                <input type="hidden" id="edit-holding-id">
+                <div class="form-group">
+                    <label for="edit-holding-asset">Asset</label>
+                    <select id="edit-holding-asset" required>
+                        <!-- Assets will be added here dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-holding-shares">Shares</label>
+                    <input type="number" id="edit-holding-shares" step="0.0001" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-holding-purchase-price">Purchase Price</label>
+                    <input type="number" id="edit-holding-purchase-price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-holding-purchase-date">Purchase Date</label>
+                    <input type="date" id="edit-holding-purchase-date" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-edit-holding-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="loading-modal">
+        <div class="modal-content">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading data, please wait...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="copyright">&copy; 2023 EOD Portfolio Performance Tracker Pro. All rights reserved.</div>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mock data for demonstration
+        const mockAssets = [
+            { id: 1, symbol: 'AAPL', name: 'Apple Inc.', type: 'stock', description: 'Technology company' },
+            { id: 2, symbol: 'MSFT', name: 'Microsoft Corporation', type: 'stock', description: 'Technology company' },
+            { id: 3, symbol: 'AMZN', name: 'Amazon.com Inc.', type: 'stock', description: 'E-commerce and cloud computing' },
+            { id: 4, symbol: 'GOOGL', name: 'Alphabet Inc.', type: 'stock', description: 'Parent company of Google' },
+            { id: 5, symbol: 'SPY', name: 'SPDR S&P 500 ETF Trust', type: 'etf', description: 'Tracks the S&P 500 index' },
+            { id: 6, symbol: 'QQQ', name: 'Invesco QQQ Trust', type: 'etf', description: 'Tracks the NASDAQ-100 index' },
+            { id: 7, symbol: 'BTC', name: 'Bitcoin', type: 'crypto', description: 'Decentralized digital currency' },
+            { id: 8, symbol: 'ETH', name: 'Ethereum', type: 'crypto', description: 'Blockchain platform' }
+        ];
+
+        const mockHoldings = [
+            { id: 1, assetId: 1, shares: 10, purchasePrice: 150.25, purchaseDate: '2023-01-15' },
+            { id: 2, assetId: 2, shares: 5, purchasePrice: 250.75, purchaseDate: '2023-02-20' },
+            { id: 3, assetId: 3, shares: 2, purchasePrice: 3200.50, purchaseDate: '2023-03-10' },
+            { id: 4, assetId: 4, shares: 3, purchasePrice: 2800.75, purchaseDate: '2023-04-05' },
+            { id: 5, assetId: 5, shares: 100, purchasePrice: 400.25, purchaseDate: '2023-05-12' },
+            { id: 6, assetId: 6, shares: 50, purchasePrice: 300.50, purchaseDate: '2023-06-18' },
+            { id: 7, assetId: 7, shares: 0.5, purchasePrice: 40000.00, purchaseDate: '2023-07-22' },
+            { id: 8, assetId: 8, shares: 2, purchasePrice: 3000.00, purchaseDate: '2023-08-30' }
+        ];
+
+        // Mock price data for demonstration
+        const mockPrices = {
+            'AAPL': { price: 175.50, change: 25.25, changePercent: 17.48, volume: 75000000, marketCap: 2500000000000 },
+            'MSFT': { price: 275.80, change: 25.05, changePercent: 9.74, volume: 50000000, marketCap: 2200000000000 },
+            'AMZN': { price: 3500.75, change: 300.25, changePercent: 9.37, volume: 2500000, marketCap: 1500000000000 },
+            'GOOGL': { price: 3000.90, change: 200.15, changePercent: 7.14, volume: 1500000, marketCap: 1800000000000 },
+            'SPY': { price: 425.30, change: 25.05, changePercent: 6.28, volume: 100000000, marketCap: 400000000000 },
+            'QQQ': { price: 325.60, change: 20.10, changePercent: 6.53, volume: 80000000, marketCap: 300000000000 },
+            'BTC': { price: 45000.00, change: 3000.00, changePercent: 7.00, volume: 50000000000, marketCap: 850000000000 },
+            'ETH': { price: 3200.00, change: 200.00, changePercent: 6.52, volume: 30000000000, marketCap: 380000000000 }
+        };
+
+        // Mock benchmark data for demonstration
+        const mockBenchmarks = {
+            'SP500': {
+                value: 4500.50,
+                daily: { change: 25.30, changePercent: 0.56 },
+                monthly: { change: 125.50, changePercent: 2.83 },
+                annual: { change: 1500.25, changePercent: 35.56 }
+            },
+            'NASDAQ': {
+                value: 15000.75,
+                daily: { change: 80.50, changePercent: 0.54 },
+                monthly: { change: 400.25, changePercent: 2.74 },
+                annual: { change: 4500.50, changePercent: 33.33 }
+            }
+        };
+
+        // Mock performance data for demonstration
+        const mockPerformanceData = [
+            { time: '2023-01-01', value: 100000 },
+            { time: '2023-02-01', value: 105000 },
+            { time: '2023-03-01', value: 110000 },
+            { time: '2023-04-01', value: 115000 },
+            { time: '2023-05-01', value: 120000 },
+            { time: '2023-06-01', value: 125000 },
+            { time: '2023-07-01', value: 130000 },
+            { time: '2023-08-01', value: 135000 }
+        ];
+
+        // Mock allocation data for demonstration
+        const mockAllocationData = [
+            { name: 'Technology', value: 60 },
+            { name: 'Financials', value: 20 },
+            { name: 'Healthcare', value: 10 },
+            { name: 'Consumer Discretionary', value: 5 },
+            { name: 'Industrials', value: 5 }
+        ];
+
+        // Mock risk data for demonstration
+        const mockRiskData = [
+            { time: '2023-01-01', value: 10 },
+            { time: '2023-02-01', value: 12 },
+            { time: '2023-03-01', value: 15 },
+            { time: '2023-04-01', value: 18 },
+            { time: '2023-05-01', value: 20 },
+            { time: '2023-06-01', value: 22 },
+            { time: '2023-07-01', value: 25 },
+            { time: '2023-08-01', value: 28 }
+        ];
+
+        // Mock attribution data for demonstration
+        const mockAttributionData = [
+            { name: 'Stocks', value: 70 },
+            { name: 'Bonds', value: 20 },
+            { name: 'Cash', value: 10 }
+        ];
+
+        // Mock diversification data for demonstration
+        const mockDiversificationData = [
+            { name: 'Technology', value: 40 },
+            { name: 'Financials', value: 30 },
+            { name: 'Healthcare', value: 20 },
+            { name: 'Consumer Discretionary', value: 7 },
+            { name: 'Industrials', value: 3 }
+        ];
+
+        // DOM elements
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('main section');
+        const addAssetBtn = document.getElementById('add-asset-btn');
+        const addAssetModal = document.getElementById('add-asset-modal');
+        const closeAssetModal = document.getElementById('close-asset-modal');
+        const cancelAssetBtn = document.getElementById('cancel-asset-btn');
+        const addAssetForm = document.getElementById('add-asset-form');
+        const addHoldingBtn = document.getElementById('add-holding-btn');
+        const addHoldingModal = document.getElementById('add-holding-modal');
+        const closeHoldingModal = document.getElementById('close-holding-modal');
+        const cancelHoldingBtn = document.getElementById('cancel-holding-btn');
+        const addHoldingForm = document.getElementById('add-holding-form');
+        const editHoldingModal = document.getElementById('edit-holding-modal');
+        const closeEditHoldingModal = document.getElementById('close-edit-holding-modal');
+        const cancelEditHoldingBtn = document.getElementById('cancel-edit-holding-btn');
+        const editHoldingForm = document.getElementById('edit-holding-form');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const rebalanceBtn = document.getElementById('rebalance-btn');
+        const riskCells = document.querySelectorAll('.risk-cell');
+        const loadingModal = document.getElementById('loading-modal');
+        const settingsForm = document.getElementById('settings-form');
+        const searchTerm = document.getElementById('search-term');
+        const researchBody = document.getElementById('research-body');
+
+        // Chart variables
+        let performanceChart;
+        let allocationChart;
+        let riskChart;
+        let attributionChart;
+        let diversificationChart;
+        let benchmarkChart;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize charts
+            initCharts();
+
+            // Load initial data
+            loadData();
+
+            // Set up event listeners
+            setupEventListeners();
+        });
+
+        // Initialize charts
+        function initCharts() {
+            // Performance chart
+            performanceChart = createChart('performance-chart', 'Portfolio Performance');
+
+            // Allocation chart
+            allocationChart = createChart('allocation-chart', 'Asset Allocation');
+
+            // Risk chart
+            riskChart = createChart('risk-chart', 'Risk Assessment');
+
+            // Attribution chart
+            attributionChart = createChart('attribution-chart', 'Performance Attribution');
+
+            // Diversification chart
+            diversificationChart = createChart('diversification-chart', 'Diversification Analysis');
+
+            // Benchmark chart
+            benchmarkChart = createChart('benchmark-chart', 'Benchmark Comparison');
+        }
+
+        // Create a new chart
+        function createChart(containerId, title) {
+            const container = document.getElementById(containerId);
+
+            // In a real application, you would use TradingView Lightweight Charts here
+            // This is a simplified placeholder
+            const chart = document.createElement('div');
+            chart.className = 'chart-placeholder';
+            chart.textContent = title;
+            container.appendChild(chart);
+
+            return chart;
+        }
+
+        // Load initial data
+        async function loadData() {
+            showLoading();
+
+            try {
+                // Simulate API calls with mock data
+                await simulateApiCall(1000);
+
+                // Update dashboard with mock data
+                updateDashboard();
+
+                // Update holdings table
+                updateHoldingsTable();
+
+                // Update benchmark comparison
+                updateBenchmarkComparison();
+
+                // Update research table
+                updateResearchTable();
+
+                // Update charts with mock data
+                updateCharts();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showNotification('Error loading data. Please try again.', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Simulate an API call
+        function simulateApiCall(delay) {
+            return new Promise(resolve => {
+                setTimeout(resolve, delay);
+            });
+        }
+
+        // Update dashboard with data
+        function updateDashboard() {
+            // Calculate total portfolio value
+            const totalValue = calculateTotalValue();
+            document.getElementById('total-value').textContent = formatCurrency(totalValue);
+
+            // Calculate daily change
+            const dailyChange = calculateDailyChange();
+            document.getElementById('daily-change').textContent = formatCurrency(dailyChange);
+            document.getElementById('daily-change').className = dailyChange >= 0 ? 'summary-value positive' : 'summary-value negative';
+
+            // Calculate monthly return
+            const monthlyReturn = calculateMonthlyReturn();
+            document.getElementById('monthly-return').textContent = formatPercentage(monthlyReturn);
+            document.getElementById('monthly-return').className = monthlyReturn >= 0 ? 'summary-value positive' : 'summary-value negative';
+
+            // Calculate annualized return
+            const annualizedReturn = calculateAnnualizedReturn();
+            document.getElementById('annualized-return').textContent = formatPercentage(annualizedReturn);
+            document.getElementById('annualized-return').className = annualizedReturn >= 0 ? 'summary-value positive' : 'summary-value negative';
+
+            // Calculate Sharpe ratio
+            const sharpeRatio = calculateSharpeRatio();
+            document.getElementById('sharpe-ratio').textContent = formatNumber(sharpeRatio);
+            document.getElementById('sharpe-ratio').className = sharpeRatio >= 1 ? 'summary-value positive' : 'summary-value negative';
+
+            // Determine risk level
+            const riskLevel = determineRiskLevel();
+            document.getElementById('risk-level').textContent = riskLevel;
+            document.getElementById('risk-level').className = `summary-value ${getRiskClass(riskLevel)}`;
+        }
+
+        // Calculate total portfolio value
+        function calculateTotalValue() {
+            let total = 0;
+
+            mockHoldings.forEach(holding => {
+                const asset = mockAssets.find(a => a.id === holding.assetId);
+                if (asset && mockPrices[asset.symbol]) {
+                    total += holding.shares * mockPrices[asset.symbol].price;
+                }
+            });
+
+            return total;
+        }
+
+        // Calculate daily change
+        function calculateDailyChange() {
+            let change = 0;
+
+            mockHoldings.forEach(holding => {
+                const asset = mockAssets.find(a => a.id === holding.assetId);
+                if (asset && mockPrices[asset.symbol]) {
+                    const currentValue = holding.shares * mockPrices[asset.symbol].price;
+                    const purchaseValue = holding.shares * holding.purchasePrice;
+                    change += currentValue - purchaseValue;
+                }
+            });
+
+            return change;
+        }
+
+        // Calculate monthly return
+        function calculateMonthlyReturn() {
+            const totalValue = calculateTotalValue();
+            const initialValue = 90000; // Mock initial value
+            return ((totalValue - initialValue) / initialValue) * 100;
+        }
+
+        // Calculate annualized return
+        function calculateAnnualizedReturn() {
+            const monthlyReturn = calculateMonthlyReturn();
+            return ((1 + monthlyReturn / 100) ** 12 - 1) * 100;
+        }
+
+        // Calculate Sharpe ratio
+        function calculateSharpeRatio() {
+            // Simplified calculation for demonstration
+            const annualizedReturn = calculateAnnualizedReturn();
+            const riskFreeRate = 2.0; // Mock risk-free rate
+            const annualizedVolatility = 15.0; // Mock annualized volatility
+
+            return (annualizedReturn - riskFreeRate) / annualizedVolatility;
+        }
+
+        // Determine risk level
+        function determineRiskLevel() {
+            const sharpeRatio = calculateSharpeRatio();
+
+            if (sharpeRatio >= 1.5) return 'Low';
+            if (sharpeRatio >= 1.0) return 'Medium';
+            if (sharpeRatio >= 0.5) return 'High';
+            if (sharpeRatio >= 0.0) return 'Very High';
+            return 'Extreme';
+        }
+
+        // Get risk class for styling
+        function getRiskClass(riskLevel) {
+            switch (riskLevel.toLowerCase()) {
+                case 'low': return 'positive';
+                case 'medium': return '';
+                case 'high': return 'negative';
+                case 'very high': return 'negative';
+                case 'extreme': return 'negative';
+                default: return '';
+            }
+        }
+
+        // Update holdings table
+        function updateHoldingsTable() {
+            const holdingsBody = document.getElementById('holdings-body');
+            holdingsBody.innerHTML = '';
+
+            mockHoldings.forEach(holding => {
+                const asset = mockAssets.find(a => a.id === holding.assetId);
+                if (asset && mockPrices[asset.symbol]) {
+                    const currentPrice = mockPrices[asset.symbol].price;
+                    const value = holding.shares * currentPrice;
+                    const change = (currentPrice - holding.purchasePrice) * holding.shares;
+                    const changePercent = ((currentPrice - holding.purchasePrice) / holding.purchasePrice) * 100;
+                    const totalValue = calculateTotalValue();
+                    const allocation = (value / totalValue) * 100;
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${asset.symbol}</td>
+                        <td>${asset.name}</td>
+                        <td>${formatNumber(holding.shares)}</td>
+                        <td>${formatCurrency(holding.purchasePrice)}</td>
+                        <td>${formatCurrency(currentPrice)}</td>
+                        <td>${formatCurrency(value)}</td>
+                        <td class="${change >= 0 ? 'positive' : 'negative'}">${formatCurrency(change)} (${formatPercentage(changePercent)})</td>
+                        <td>${formatPercentage(allocation)}</td>
+                        <td>
+                            <button class="btn btn-primary edit-holding-btn" data-id="${holding.id}">Edit</button>
+                            <button class="btn btn-secondary delete-holding-btn" data-id="${holding.id}">Delete</button>
+                        </td>
+                    `;
+
+                    holdingsBody.appendChild(row);
+                }
+            });
+
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-holding-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const holdingId = parseInt(e.target.getAttribute('data-id'));
+                    openEditHoldingModal(holdingId);
+                });
+            });
+
+            document.querySelectorAll('.delete-holding-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const holdingId = parseInt(e.target.getAttribute('data-id'));
+                    deleteHolding(holdingId);
+                });
+            });
+        }
+
+        // Update benchmark comparison
+        function updateBenchmarkComparison() {
+            // Update S&P 500 benchmark
+            document.getElementById('sp500-value').textContent = formatCurrency(mockBenchmarks.SP500.value);
+            document.getElementById('sp500-daily').textContent = formatPercentage(mockBenchmarks.SP500.daily.changePercent);
+            document.getElementById('sp500-monthly').textContent = formatPercentage(mockBenchmarks.SP500.monthly.changePercent);
+            document.getElementById('sp500-annual').textContent = formatPercentage(mockBenchmarks.SP500.annual.changePercent);
+
+            // Update NASDAQ benchmark
+            document.getElementById('nasdaq-value').textContent = formatCurrency(mockBenchmarks.NASDAQ.value);
+            document.getElementById('nasdaq-daily').textContent = formatPercentage(mockBenchmarks.NASDAQ.daily.changePercent);
+            document.getElementById('nasdaq-monthly').textContent = formatPercentage(mockBenchmarks.NASDAQ.monthly.changePercent);
+            document.getElementById('nasdaq-annual').textContent = formatPercentage(mockBenchmarks.NASDAQ.annual.changePercent);
+
+            // Update benchmark chart in benchmarks section
+            document.getElementById('sp500-value-benchmarks').textContent = formatCurrency(mockBenchmarks.SP500.value);
+            document.getElementById('sp500-daily-benchmarks').textContent = formatPercentage(mockBenchmarks.SP500.daily.changePercent);
+            document.getElementById('sp500-monthly-benchmarks').textContent = formatPercentage(mockBenchmarks.SP500.monthly.changePercent);
+            document.getElementById('sp500-annual-benchmarks').textContent = formatPercentage(mockBenchmarks.SP500.annual.changePercent);
+
+            document.getElementById('nasdaq-value-benchmarks').textContent = formatCurrency(mockBenchmarks.NASDAQ.value);
+            document.getElementById('nasdaq-daily-benchmarks').textContent = formatPercentage(mockBenchmarks.NASDAQ.daily.changePercent);
+            document.getElementById('nasdaq-monthly-benchmarks').textContent = formatPercentage(mockBenchmarks.NASDAQ.monthly.changePercent);
+            document.getElementById('nasdaq-annual-benchmarks').textContent = formatPercentage(mockBenchmarks.NASDAQ.annual.changePercent);
+        }
+
+        // Update research table
+        function updateResearchTable() {
+            researchBody.innerHTML = '';
+
+            // Display all assets in the research table
+            mockAssets.forEach(asset => {
+                if (mockPrices[asset.symbol]) {
+                    const priceData = mockPrices[asset.symbol];
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${asset.symbol}</td>
+                        <td>${asset.name}</td>
+                        <td>${formatCurrency(priceData.price)}</td>
+                        <td class="${priceData.change >= 0 ? 'positive' : 'negative'}">${formatCurrency(priceData.change)} (${formatPercentage(priceData.changePercent)})</td>
+                        <td>${formatNumber(priceData.volume)}</td>
+                        <td>${formatCurrency(priceData.marketCap)}</td>
+                        <td>
+                            <button class="btn btn-primary add-to-portfolio-btn" data-symbol="${asset.symbol}">Add to Portfolio</button>
+                        </td>
+                    `;
+
+                    researchBody.appendChild(row);
+                }
+            });
+
+            // Add event listeners to "Add to Portfolio" buttons
+            document.querySelectorAll('.add-to-portfolio-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const symbol = e.target.getAttribute('data-symbol');
+                    addToPortfolio(symbol);
+                });
+            });
+        }
+
+        // Add asset to portfolio
+        function addToPortfolio(symbol) {
+            const asset = mockAssets.find(a => a.symbol === symbol);
+            if (asset) {
+                // In a real application, you would open a modal to enter holding details
+                // For this demo, we'll just add a holding with default values
+                const newHolding = {
+                    id: mockHoldings.length + 1,
+                    assetId: asset.id,
+                    shares: 1,
+                    purchasePrice: mockPrices[symbol].price,
+                    purchaseDate: new Date().toISOString().split('T')[0]
+                };
+
+                mockHoldings.push(newHolding);
+                updateHoldingsTable();
+                updateDashboard();
+                updateCharts();
+
+                showNotification(`Added ${asset.symbol} to your portfolio.`, 'success');
+            }
+        }
+
+        // Update charts with data
+        function updateCharts() {
+            // In a real application, you would update the TradingView Lightweight Charts here
+            // This is a simplified placeholder
+
+            // Performance chart
+            updateChart(performanceChart, mockPerformanceData);
+
+            // Allocation chart
+            updateChart(allocationChart, mockAllocationData);
+
+            // Risk chart
+            updateChart(riskChart, mockRiskData);
+
+            // Attribution chart
+            updateChart(attributionChart, mockAttributionData);
+
+            // Diversification chart
+            updateChart(diversificationChart, mockDiversificationData);
+
+            // Benchmark chart
+            updateBenchmarkChart();
+        }
+
+        // Update a chart with data
+        function updateChart(chart, data) {
+            // In a real application, you would update the TradingView Lightweight Charts here
+            // This is a simplified placeholder
+            console.log(`Updating chart with data:`, data);
+        }
+
+        // Update benchmark chart
+        function updateBenchmarkChart() {
+            // In a real application, you would update the TradingView Lightweight Charts here
+            // This is a simplified placeholder
+            console.log('Updating benchmark chart');
+        }
+
+        // Open add asset modal
+        function openAddAssetModal() {
+            addAssetModal.classList.add('active');
+        }
+
+        // Close add asset modal
+        function closeAddAssetModal() {
+            addAssetModal.classList.remove('active');
+            addAssetForm.reset();
+        }
+
+        // Open add holding modal
+        function openAddHoldingModal() {
+            // Populate asset dropdown
+            const assetDropdown = document.getElementById('holding-asset');
+            assetDropdown.innerHTML = '<option value="">Select an asset</option>';
+
+            mockAssets.forEach(asset => {
+                const option = document.createElement('option');
+                option.value = asset.id;
+                option.textContent = `${asset.symbol} - ${asset.name}`;
+                assetDropdown.appendChild(option);
+            });
+
+            addHoldingModal.classList.add('active');
+        }
+
+        // Close add holding modal
+        function closeAddHoldingModal() {
+            addHoldingModal.classList.remove('active');
+            addHoldingForm.reset();
+        }
+
+        // Open edit holding modal
+        function openEditHoldingModal(holdingId) {
+            const holding = mockHoldings.find(h => h.id === holdingId);
+            if (holding) {
+                // Populate asset dropdown
+                const assetDropdown = document.getElementById('edit-holding-asset');
+                assetDropdown.innerHTML = '<option value="">Select an asset</option>';
+
+                mockAssets.forEach(asset => {
+                    const option = document.createElement('option');
+                    option.value = asset.id;
+                    option.textContent = `${asset.symbol} - ${asset.name}`;
+                    if (asset.id === holding.assetId) {
+                        option.selected = true;
+                    }
+                    assetDropdown.appendChild(option);
+                });
+
+                // Populate form fields
+                document.getElementById('edit-holding-id').value = holding.id;
+                document.getElementById('edit-holding-shares').value = holding.shares;
+                document.getElementById('edit-holding-purchase-price').value = holding.purchasePrice;
+                document.getElementById('edit-holding-purchase-date').value = holding.purchaseDate;
+
+                editHoldingModal.classList.add('active');
+            }
+        }
+
+        // Close edit holding modal
+        function closeEditHoldingModal() {
+            editHoldingModal.classList.remove('active');
+            editHoldingForm.reset();
+        }
+
+        // Delete holding
+        function deleteHolding(holdingId) {
+            if (confirm('Are you sure you want to delete this holding?')) {
+                const index = mockHoldings.findIndex(h => h.id === holdingId);
+                if (index !== -1) {
+                    mockHoldings.splice(index, 1);
+                    updateHoldingsTable();
+                    updateDashboard();
+                    updateCharts();
+                    showNotification('Holding deleted successfully.', 'success');
+                }
+            }
+        }
+
+        // Show loading modal
+        function showLoading() {
+            loadingModal.classList.add('active');
+        }
+
+        // Hide loading modal
+        function hideLoading() {
+            loadingModal.classList.remove('active');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+
+            // Add to document
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Format currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(value);
+        }
+
+        // Format percentage
+        function formatPercentage(value) {
+            return `${value.toFixed(2)}%`;
+        }
+
+        // Format number
+        function formatNumber(value) {
+            return new Intl.NumberFormat('en-US').format(value);
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Navigation links
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = e.target.getAttribute('data-target');
+
+                    // Hide all sections
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+
+                    // Show target section
+                    document.getElementById(target).classList.add('active');
+
+                    // Update active nav link
+                    navLinks.forEach(navLink => {
+                        navLink.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+                });
+            });
+
+            // Add asset button
+            addAssetBtn.addEventListener('click', openAddAssetModal);
+
+            // Close add asset modal
+            closeAssetModal.addEventListener('click', closeAddAssetModal);
+            cancelAssetBtn.addEventListener('click', closeAddAssetModal);
+
+            // Add asset form submission
+            addAssetForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Get form values
+                const symbol = document.getElementById('asset-symbol').value;
+                const name = document.getElementById('asset-name').value;
+                const type = document.getElementById('asset-type').value;
+                const description = document.getElementById('asset-description').value;
+
+                // Create new asset
+                const newAsset = {
+                    id: mockAssets.length + 1,
+                    symbol,
+                    name,
+                    type,
+                    description
+                };
+
+                // Add to mock data
+                mockAssets.push(newAsset);
+
+                // Close modal and show success
+                closeAddAssetModal();
+                showNotification('Asset added successfully.', 'success');
+
+                // Update research table
+                updateResearchTable();
+            });
+
+            // Add holding button
+            addHoldingBtn.addEventListener('click', openAddHoldingModal);
+
+            // Close add holding modal
+            closeHoldingModal.addEventListener('click', closeAddHoldingModal);
+            cancelHoldingBtn.addEventListener('click', closeAddHoldingModal);
+
+            // Add holding form submission
+            addHoldingForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Get form values
+                const assetId = parseInt(document.getElementById('holding-asset').value);
+                const shares = parseFloat(document.getElementById('holding-shares').value);
+                const purchasePrice = parseFloat(document.getElementById('holding-purchase-price').value);
+                const purchaseDate = document.getElementById('holding-purchase-date').value;
+
+                // Create new holding
+                const newHolding = {
+                    id: mockHoldings.length + 1,
+                    assetId,
+                    shares,
+                    purchasePrice,
+                    purchaseDate
+                };
+
+                // Add to mock data
+                mockHoldings.push(newHolding);
+
+                // Close modal and show success
+                closeAddHoldingModal();
+                showNotification('Holding added successfully.', 'success');
+
+                // Update holdings table and dashboard
+                updateHoldingsTable();
+                updateDashboard();
+                updateCharts();
+            });
+
+            // Close edit holding modal
+            closeEditHoldingModal.addEventListener('click', closeEditHoldingModal);
+            cancelEditHoldingBtn.addEventListener('click', closeEditHoldingModal);
+
+            // Edit holding form submission
+            editHoldingForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Get form values
+                const holdingId = parseInt(document.getElementById('edit-holding-id').value);
+                const assetId = parseInt(document.getElementById('edit-holding-asset').value);
+                const shares = parseFloat(document.getElementById('edit-holding-shares').value);
+                const purchasePrice = parseFloat(document.getElementById('edit-holding-purchase-price').value);
+                const purchaseDate = document.getElementById('edit-holding-purchase-date').value;
+
+                // Find and update holding
+                const holdingIndex = mockHoldings.findIndex(h => h.id === holdingId);
+                if (holdingIndex !== -1) {
+                    mockHoldings[holdingIndex] = {
+                        id: holdingId,
+                        assetId,
+                        shares,
+                        purchasePrice,
+                        purchaseDate
+                    };
+
+                    // Close modal and show success
+                    closeEditHoldingModal();
+                    showNotification('Holding updated successfully.', 'success');
+
+                    // Update holdings table and dashboard
+                    updateHoldingsTable();
+                    updateDashboard();
+                    updateCharts();
+                }
+            });
+
+            // Refresh button
+            refreshBtn.addEventListener('click', loadData);
+
+            // Rebalance button
+            rebalanceBtn.addEventListener('click', () => {
+                showNotification('Portfolio rebalanced successfully.', 'success');
+                // In a real application, you would implement the rebalancing logic here
+            });
+
+            // Risk cells
+            riskCells.forEach(cell => {
+                cell.addEventListener('click', () => {
+                    const riskLevel = cell.getAttribute('data-risk');
+                    showNotification(`Selected risk level: ${riskLevel}`, 'info');
+                    // In a real application, you would update the portfolio risk level here
+                });
+            });
+
+            // Settings form submission
+            settingsForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Get form values
+                const currency = document.getElementById('currency').value;
+                const timezone = document.getElementById('timezone').value;
+                const notifications = document.getElementById('notifications').value;
+
+                // In a real application, you would save these settings
+                showNotification('Settings saved successfully.', 'success');
+            });
+
+            // Search term input
+            searchTerm.addEventListener('input', (e) => {
+                const searchValue = e.target.value.toLowerCase();
+
+                // Filter research table based on search term
+                const rows = researchBody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const symbol = row.querySelector('td:first-child').textContent.toLowerCase();
+                    const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+                    if (symbol.includes(searchValue) || name.includes(searchValue)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
